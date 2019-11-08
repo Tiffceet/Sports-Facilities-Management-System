@@ -2,6 +2,7 @@
 	This header file contains:
 		- all includes on standard C Library
 		- Environment variables
+		- global utilities functions
 */
 #ifndef STDCXX_H
 #define STDCXX_H
@@ -14,6 +15,10 @@
 #pragma warning(disable: 4996)
 
 // Env variables declarations
-const char *APPDATA_PATH;
-const char CURRENT_SYS_DATE[50];
+char *APPDATA_PATH;
+char CURRENT_SYS_DATE[50];
+
+// function declarations
+void init();
+int getUserMenuChoice(char buffer[], int size);
 #endif

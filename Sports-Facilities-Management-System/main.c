@@ -6,7 +6,6 @@ int main(void)
 {
 	// initalise env variables
 	init();
-	printf("%s\n%s\n", APPDATA_PATH, CURRENT_SYS_DATE);
 	while (mainMenu()) // if user input is invalid, menu() returns 0
 	{
 		system("cls"); // clear current console screen
@@ -14,19 +13,6 @@ int main(void)
 	}
 	system("pause");
 	return 0;
-}
-
-// Function to define all env variables
-void init()
-{
-	APPDATA_PATH = getenv("APPDATA");
-	if (!APPDATA_PATH) // If appdata is somehow gone, uses relative folder path "data"
-	{
-		APPDATA_PATH = "data";
-	}
-	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);
-	sprintf(CURRENT_SYS_DATE, "%d-%d-%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 }
 
 int mainMenu()
@@ -45,12 +31,10 @@ int mainMenu()
 
 	// prevents user from spamming keys on menu
 	char choice[100];
-	fgets(choice, 99, stdin);
-	if (strlen(choice) != 2) // 2 because fgets() also capture the \n
+	if (getUserMenuChoice(choice, 99)) 
 	{
 		return 1;
 	}
-	rewind(stdin);
 
 	// menu selection
 	switch (choice[0])
