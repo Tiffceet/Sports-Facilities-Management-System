@@ -1,15 +1,12 @@
-#ifndef STDCXX_H
 #include "stdcxx.h"
-#endif
-
-#include "_booking.h"
-
+#include "booking.h"
+void init();
 int mainMenu();
 int main(void)
 {
 	// initalise env variables
 	init();
-	
+	printf("%s\n%s\n", APPDATA_PATH, CURRENT_SYS_DATE);
 	while (mainMenu()) // if user input is invalid, menu() returns 0
 	{
 		system("cls"); // clear current console screen
@@ -17,6 +14,19 @@ int main(void)
 	}
 	system("pause");
 	return 0;
+}
+
+// Function to define all env variables
+void init()
+{
+	APPDATA_PATH = getenv("APPDATA");
+	if (!APPDATA_PATH) // If appdata is somehow gone, uses relative folder path "data"
+	{
+		APPDATA_PATH = "data";
+	}
+	time_t t = time(NULL);
+	struct tm tm = *localtime(&t);
+	sprintf(CURRENT_SYS_DATE, "%d-%d-%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 }
 
 int mainMenu()
