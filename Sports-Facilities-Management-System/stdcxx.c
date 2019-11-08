@@ -7,6 +7,11 @@ void init()
 	{
 		APPDATA_PATH = "data";
 	}
+	else
+	{
+		system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS"); // make sure SFMS folder exists
+		sprintf(APPDATA_PATH, "%s\\SFMS", APPDATA_PATH); // append SFMS to appdata path
+	}
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
 	sprintf(CURRENT_SYS_DATE, "%d-%d-%d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
