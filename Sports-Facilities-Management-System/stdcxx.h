@@ -16,9 +16,20 @@
 
 // Env variables declarations
 char *APPDATA_PATH;
-char CURRENT_SYS_DATE[50];
+typedef struct
+{
+	int y, m, d;
+} Date;
+
+typedef struct
+{
+	int h, m, s;
+} Time;
 
 // function declarations
 void init();
 int getUserMenuChoice(char buffer[], int size);
+void getSystemDate(char dateVar[]);
+void getSystemTime(char timeVar[]);
+int chkFileExist(char* dir);
 #endif
