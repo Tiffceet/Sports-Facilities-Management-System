@@ -1,6 +1,5 @@
 #include "stdcxx.h"
 #include "booking.h"
-void init();
 int mainMenu();
 int main(void)
 {
@@ -57,5 +56,5 @@ int mainMenu()
 		// printf("%52sInvalid Choice.\n", "");
 		return 1;
 	}
-	return 0;
+	return 1;
 }

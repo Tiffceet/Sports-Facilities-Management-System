@@ -1,6 +1,14 @@
 #include "booking.h"
 #include "stdcxx.h"
-
+typedef struct
+{
+	char bookingID[10];
+	Date currentDate;
+	Date bookingDate;
+	Time bookingTime;
+	char usrID[20];
+	char facilityID[20];
+} BookingData;
 void bookingSeachRecords()
 {
 
@@ -18,15 +26,11 @@ void bookingModifyRecords()
 
 void bookingDisplayAll()
 {
-	FILE *f;
-	f = fopen(bookingFilePath, 'r');
-	if (!f)
+	if (!chkFileExist(bookingFilePath))
 	{
 		printf("Missing booking.txt.\nIts all developers' fault. Contact the developers.\n");
-		fclose(f);
 		return;
 	}
-	fclose(f);
 }
 
 int bookingMenu()
@@ -43,7 +47,7 @@ int bookingMenu()
 	char choice[10];
 	if (getUserMenuChoice(choice, 9))
 	{
-		return 1;
+		return 1; // stop menu processing if input is invalid (not one character long)
 	}
 	switch (choice[0])
 	{
@@ -66,10 +70,9 @@ int bookingMenu()
 
 void bookingMakeSureFileExist()
 {
-	FILE *f = fopen(bookingFilePath, "r");
-	if (!f)
+	FILE *f;
+	if (!chkFileExist(bookingFilePath))
 	{
-		fclose(f);
 		f = fopen(bookingFilePath, "w");
 		fclose(f);
 	}

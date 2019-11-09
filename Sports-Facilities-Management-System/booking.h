@@ -7,5 +7,4 @@ void bookingSeachRecords();
 void bookingBook();
 void bookingModifyRecords();
 char bookingFilePath[1024];
-
 #endif
