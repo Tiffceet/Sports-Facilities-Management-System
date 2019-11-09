@@ -15,7 +15,7 @@
 #pragma warning(disable: 4996)
 
 // Env variables declarations
-char *APPDATA_PATH;
+char APPDATA_PATH[1024];
 typedef struct
 {
 	int y, m, d;
@@ -32,4 +32,5 @@ int getUserMenuChoice(char buffer[], int size);
 void getSystemDate(char dateVar[]);
 void getSystemTime(char timeVar[]);
 int chkFileExist(char* dir);
+char *trimwhitespace(char *str);
 #endif

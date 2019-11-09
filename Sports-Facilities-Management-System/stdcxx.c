@@ -2,15 +2,15 @@
 // function to define all env variables
 void init()
 {
-	APPDATA_PATH = getenv("APPDATA");
-	if (!APPDATA_PATH) // If appdata is somehow gone, uses relative folder path "data"
+	char *temp = getenv("APPDATA");
+	if (!temp) // If appdata is somehow gone, uses relative folder path "data"
 	{
-		APPDATA_PATH = "data";
+		strcpy(APPDATA_PATH, "data");
 	}
 	else
 	{
 		system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS"); // make sure SFMS folder exists
-		sprintf(APPDATA_PATH, "%s\\SFMS", APPDATA_PATH); // append SFMS to appdata path
+		sprintf(APPDATA_PATH, "%s\\SFMS", temp); // append SFMS to appdata path
 	}
 }
 
@@ -21,11 +21,15 @@ int getUserMenuChoice(char buffer[], int size)
 {
 	// prevents user from spamming keys on menu
 	fgets(buffer, size, stdin);
+	char *trimmedCharArr = trimwhitespace(buffer);
 	rewind(stdin);
-	if (strlen(buffer) != 2) // 2 because fgets() also capture the \n
+	
+	if (strlen(trimmedCharArr) != 1)
 	{
 		return 1;
 	}
+	// because we are checking trimmedCharArr, gonna make sure buffer is trimmed
+	strcpy(buffer, trimmedCharArr);
 	return 0;
 	// above line can be simplified to "return strlen(buffer != 2);"
 }
@@ -58,4 +62,19 @@ int chkFileExist(char* dir)
 		return 1;
 	}
 	return 0;
+}
+
+char *trimwhitespace(char *str)
+{
+	char *end;
+	// Trim leading space
+	while (isspace((unsigned char)*str)) str++;
+	if (*str == 0)  // All spaces?
+		return str;
+	// Trim trailing space
+	end = str + strlen(str) - 1;
+	while (end > str && isspace((unsigned char)*end)) end--;
+	// Write new null terminator character
+	end[1] = '\0';
+	return str;
 }
