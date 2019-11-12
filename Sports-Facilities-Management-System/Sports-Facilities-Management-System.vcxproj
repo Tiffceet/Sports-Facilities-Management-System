@@ -119,11 +119,13 @@
     <ClCompile Include="booking.c" />
     <ClCompile Include="staff.c" />
     <ClCompile Include="stdcxx.c" />
+    <ClCompile Include="userinfo.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="staff.h" />
     <ClInclude Include="stdcxx.h" />
     <ClInclude Include="booking.h" />
+    <ClInclude Include="userinfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
