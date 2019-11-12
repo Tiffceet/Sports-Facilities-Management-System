@@ -118,10 +118,12 @@
     <ClCompile Include="main.c" />
     <ClCompile Include="booking.c" />
     <ClCompile Include="stdcxx.c" />
+    <ClCompile Include="userinfo.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdcxx.h" />
     <ClInclude Include="booking.h" />
+    <ClInclude Include="userinfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -24,12 +24,18 @@
     <ClCompile Include="stdcxx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="userinfo.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdcxx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="booking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="userinfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
