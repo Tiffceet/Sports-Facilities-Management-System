@@ -3,7 +3,10 @@
 
 typedef struct {
 
-	char name[]
+	char name[30];
+	char id[30];
+	char
+
 
 
 

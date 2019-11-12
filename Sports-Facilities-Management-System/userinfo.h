@@ -1,7 +1,6 @@
 #pragma once
 #define USERINFO_H
-void studentId();
-void name();
-void gender();
-void ic();
-void password();
+void addInfo();
+void searchInfo();
+void modifyInfo();
+void displayInfo();
