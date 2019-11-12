@@ -117,9 +117,11 @@
   <ItemGroup>
     <ClCompile Include="main.c" />
     <ClCompile Include="booking.c" />
+    <ClCompile Include="staff.c" />
     <ClCompile Include="stdcxx.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="staff.h" />
     <ClInclude Include="stdcxx.h" />
     <ClInclude Include="booking.h" />
   </ItemGroup>
