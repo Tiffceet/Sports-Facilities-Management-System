@@ -28,9 +28,10 @@ typedef struct
 
 // function declarations
 void init();
-int getUserMenuChoice(char buffer[], int size);
+void getUserMenuChoice(char buffer[], int size, char *errMsg);
 void getSystemDate(char dateVar[]);
 void getSystemTime(char timeVar[]);
 int chkFileExist(char* dir);
 char *trimwhitespace(char *str);
+void s_input(char *str, int size);
 #endif

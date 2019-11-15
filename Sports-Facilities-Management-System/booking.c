@@ -28,7 +28,7 @@ void bookingDisplayAll()
 {
 	if (!chkFileExist(bookingFilePath))
 	{
-		printf("Missing booking.txt.\nIts all developers' fault. Contact the developers.\n");
+		printf("No records found.\n");
 		return;
 	}
 }
@@ -45,10 +45,7 @@ int bookingMenu()
 	printf("5. Return to console\n");
 	printf("\nMenu Choice: ");
 	char choice[10];
-	if (getUserMenuChoice(choice, 9))
-	{
-		return 1; // stop menu processing if input is invalid (not one character long)
-	}
+	getUserMenuChoice(choice, 9, "Menu Choice: ");
 	switch (choice[0])
 	{
 	case '1':

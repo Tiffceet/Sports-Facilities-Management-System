@@ -30,10 +30,7 @@ int mainMenu()
 
 	// prevents user from spamming keys on menu
 	char choice[100];
-	if (getUserMenuChoice(choice, 99))
-	{
-		return 1;
-	}
+	getUserMenuChoice(choice, 99, "                                                 Enter menu choice: ");
 
 	// menu selection
 	switch (choice[0])

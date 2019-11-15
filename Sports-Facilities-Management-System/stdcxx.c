@@ -17,21 +17,21 @@ void init()
 // function for everyone to collect user choice for menu selection
 // store user input in buffer and check if the choice is 1 character long
 // please let buffer size > 2
-int getUserMenuChoice(char buffer[], int size) 
+void getUserMenuChoice(char buffer[], int size, char *errMsg) 
 {
+retry:
 	// prevents user from spamming keys on menu
 	fgets(buffer, size, stdin);
 	char *trimmedCharArr = trimwhitespace(buffer);
 	rewind(stdin);
-	
+
 	if (strlen(trimmedCharArr) != 1)
 	{
-		return 1;
+		printf("%s", errMsg);
+		goto retry;
 	}
 	// because we are checking trimmedCharArr, gonna make sure buffer is trimmed
 	strcpy(buffer, trimmedCharArr);
-	return 0;
-	// above line can be simplified to "return strlen(buffer != 2);"
 }
 
 // get system date in yyyy-mm-dd
@@ -77,4 +77,18 @@ char *trimwhitespace(char *str)
 	// Write new null terminator character
 	end[1] = '\0';
 	return str;
+}
+
+// get string input function -> the safe way
+void s_input(char *str, int size)
+{
+	rewind(stdin);
+	fgets(str, size, stdin);
+	// replace \n with \0
+	char *loc = strchr(str, '\n');
+	if (loc && *(loc + 1) == '\0')
+	{
+		*loc = '\0';
+	}
+	rewind(stdin);
 }
