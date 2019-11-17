@@ -73,7 +73,6 @@ int chkFileExist(char* dir)
 		fclose(f);
 		return 1;
 	}
-	fclose(f);
 	return 0;
 }
 
