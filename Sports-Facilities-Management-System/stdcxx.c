@@ -60,11 +60,20 @@ void getSystemTime(char timeVar[])
 int chkFileExist(char* dir)
 {
 	FILE *f;
+	long fsize = 0;
 	if (f = fopen(dir, "r"))
 	{
+		fseek(f, 0, SEEK_END); // move file pointer to the end of file
+		fsize = ftell(f);
+		if (fsize == 0) // if file is empty
+		{
+			fclose(f);
+			return 0;
+		}
 		fclose(f);
 		return 1;
 	}
+	fclose(f);
 	return 0;
 }
 
