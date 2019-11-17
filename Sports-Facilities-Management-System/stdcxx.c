@@ -6,11 +6,15 @@ void init()
 	if (!temp) // If appdata is somehow gone, uses relative folder path "data"
 	{
 		strcpy(APPDATA_PATH, "data");
+		strcpy(CACHE_FILE, "data\\cache.txt");
+		strcpy(CACHE_FILE_BIN, "data\\cache.bin");
 	}
 	else
 	{
 		system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS"); // make sure SFMS folder exists
 		sprintf(APPDATA_PATH, "%s\\SFMS", temp); // append SFMS to appdata path
+		sprintf(CACHE_FILE, "%s\\cache.txt",APPDATA_PATH);
+		sprintf(CACHE_FILE_BIN, "%s\\cache.bin", APPDATA_PATH);
 	}
 }
 
@@ -91,4 +95,32 @@ void s_input(char *str, int size)
 		*loc = '\0';
 	}
 	rewind(stdin);
+}
+
+int validateDate(int dd, int mm, int yy)
+{
+	//check year
+	if (yy >= 1900 && yy <= 9999)
+	{
+		//check month
+		if (mm >= 1 && mm <= 12)
+		{
+			//check days
+			if ((dd >= 1 && dd <= 31) && (mm == 1 || mm == 3 || mm == 5 || mm == 7 || mm == 8 || mm == 10 || mm == 12))
+				return 1;
+			else if ((dd >= 1 && dd <= 30) && (mm == 4 || mm == 6 || mm == 9 || mm == 11))
+				return 1;
+			else if ((dd >= 1 && dd <= 28) && (mm == 2))
+				return 1;
+			else if (dd == 29 && mm == 2 && (yy % 400 == 0 || (yy % 4 == 0 && yy % 100 != 0)))
+				return 1;
+			else
+				return 0;
+		}
+		else
+			return 0;
+	}
+	else	
+		return 0;
+	return 0;
 }

@@ -16,6 +16,8 @@
 
 // Env variables declarations
 char APPDATA_PATH[1024];
+char CACHE_FILE_BIN[1024];
+char CACHE_FILE[1024];
 typedef struct
 {
 	int y, m, d;
@@ -34,4 +36,5 @@ void getSystemTime(char timeVar[]);
 int chkFileExist(char* dir);
 char *trimwhitespace(char *str);
 void s_input(char *str, int size);
+int validateDate(int dd, int mm, int yy);
 #endif
