@@ -13,7 +13,7 @@ void init()
 	{
 		system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS"); // make sure SFMS folder exists
 		sprintf(APPDATA_PATH, "%s\\SFMS", temp); // append SFMS to appdata path
-		sprintf(CACHE_FILE, "%s\\cache.txt",APPDATA_PATH);
+		sprintf(CACHE_FILE, "%s\\cache.txt", APPDATA_PATH);
 		sprintf(CACHE_FILE_BIN, "%s\\cache.bin", APPDATA_PATH);
 	}
 }
@@ -21,7 +21,7 @@ void init()
 // function for everyone to collect user choice for menu selection
 // store user input in buffer and check if the choice is 1 character long
 // please let buffer size > 2
-void getUserMenuChoice(char buffer[], int size, char *errMsg) 
+void getUserMenuChoice(char buffer[], int size, char *errMsg)
 {
 retry:
 	// prevents user from spamming keys on menu
@@ -52,7 +52,7 @@ void getSystemDate(char dateVar[])
 void getSystemTime(char timeVar[])
 {
 	time_t t = time(NULL);
-	struct tm tm = *localtime(&t);	
+	struct tm tm = *localtime(&t);
 	sprintf(timeVar, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
 }
 
@@ -120,7 +120,8 @@ int validateDate(int dd, int mm, int yy)
 				return 1;
 			else if ((dd >= 1 && dd <= 28) && (mm == 2))
 				return 1;
-			else if (dd == 29 && mm == 2 && (yy % 400 == 0 || (yy % 4 == 0 && yy % 100 != 0)))
+			// else if (dd == 29 && mm == 2 && (yy % 400 == 0 || (yy % 4 == 0 && yy % 100 != 0)))
+			else if (dd == 29 && mm == 2 && yy % 4 == 0)
 				return 1;
 			else
 				return 0;
@@ -128,7 +129,53 @@ int validateDate(int dd, int mm, int yy)
 		else
 			return 0;
 	}
-	else	
+	else
 		return 0;
 	return 0;
+}
+
+// make sure time is correct
+int validateTime(int h, int m, int s)
+{
+	if (h < 0 || h >23)
+	{
+		return 0;
+	}
+	if (m < 0 || m > 59)
+	{
+		return 0;
+	}
+	if (s < 0 || s > 59)
+	{
+		return 0;
+	}
+	return 1;
+}
+
+// return 1 if time1 is later than time2
+// return -1 if time2 is later than time1
+// return 0 if both time are the same
+int compareTime(int h1, int m1, int s1, int h2, int m2, int s2)
+{
+	if (h1 == h2 && m1 == m2 && s1 == s2) return 0;
+	if (h1 > h2) return 1;
+	if (h2 > h1) return -1;
+	if (m1 > m2) return 1;
+	if (m2 > m1) return -1;
+	if (s1 > s2) return 1;
+	if (s2 > s1) return -1;
+}
+
+// return 1 if date1 is later than date2
+// return -1 if date2 is later than date1
+// return 0 if both time are the same
+int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2)
+{
+	if (dd1 == dd2 && mm1 == mm2 && yy1 == yy2) return 0;
+	if (yy1 > yy2) return 1;
+	if (yy2 < yy1) return -1;
+	if (mm1 > mm2) return 1;
+	if (mm2 < mm1) return -1;
+	if (dd1 > dd2) return 1;
+	if (dd2 < dd1) return -1;
 }
