@@ -11,7 +11,7 @@ void init()
 	}
 	else
 	{
-		system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS"); // make sure SFMS folder exists
+		system("IF NOT EXIST \"%appdata%\\SFMS\" mkdir \"%appdata%\\SFMS\""); // make sure SFMS folder exists
 		sprintf(APPDATA_PATH, "%s\\SFMS", temp); // append SFMS to appdata path
 		sprintf(CACHE_FILE, "%s\\cache.txt", APPDATA_PATH);
 		sprintf(CACHE_FILE_BIN, "%s\\cache.bin", APPDATA_PATH);

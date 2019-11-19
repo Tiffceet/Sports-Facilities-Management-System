@@ -1,10 +1,10 @@
 #include "fusage.h"
 #include "stdcxx.h"
 
-typedef struct
-{
-	int day, month, year;
-}Date;
+//typedef struct
+//{
+//	int day, month, year;
+//}Date;
 Date currentDate;
 typedef struct
 {
@@ -61,10 +61,10 @@ void fUsageRecord()
 	do
 	{
 		printf("Today's Date(DD/MM/YYYY) : ");
-		scanf("%d/%d/%d", &fUsage.currentDate.day, &fUsage.currentDate.month, &fUsage.currentDate.year);
+		scanf("%d/%d/%d", &fUsage.currentDate.d, &fUsage.currentDate.m, &fUsage.currentDate.y);
 		printf("Search Time : ");
 		scanf("%s", &fUsage.time);
-	}
+	} while (1); // fix while here later
 
 	printf("Today's Date\t\tTime\t\tUser ID\t\tFacility ID\t\tUsage Type\n");
 	printf("============\t\t====\t\t=======\t\t===========\t\t==========\n");
