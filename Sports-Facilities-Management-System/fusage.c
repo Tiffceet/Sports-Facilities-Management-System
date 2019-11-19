@@ -21,7 +21,7 @@ typedef struct
 }StaffValidation;
 StaffValidation stfValid;
 
-void main()
+void fusagemain()
 {
 	staffLogin();
 	fUsageMenu();
