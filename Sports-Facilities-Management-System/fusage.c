@@ -82,7 +82,11 @@ void fUsageAddRecord()
 		exit(-1);
 	}
 
+}
 
+void fUsageSearchRecord()
+{
+	printf("-----\n");
 }
 
 void fUsageModify()
@@ -100,26 +104,23 @@ int fUsageMenu()
 	printf("=====================\n");
 	printf("Facility Usage Module\n");
 	printf("=====================\n");
-	printf("1. View Record\n");
-	printf("2. Add\n");
+	printf("1. Add Record\n");
+	printf("2. Search Record\n");
 	printf("3. Modify Record\n");
-	printf("4. Display Facility Usage Status\n");
-	printf("5. Return to Menu\n");
+	printf("4. Return to Menu\n");
 
 	char choice[10];
 	printf("\nEnter Menu Choice : ");
 	scanf("%s", &choice);
 	switch (choice[0])
 	{
-	case'1':fUsageRecord();
+	case'1':fUsageAddRecord();
 		break;
-	case'2':fUsageAddRecord();
+	case'2':fUsageSearchRecord();
 		break;
 	case'3':fUsageModify();
 		break;
-	case'4':fUsageDisplay();
-		break;
-	case'5':
+	case'4':
 		return 0;
 	default:
 		return 1;

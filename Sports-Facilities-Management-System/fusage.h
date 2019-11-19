@@ -4,6 +4,7 @@
 void staffLogin();
 void fUsageRecord();
 void fUsageAddRecord();
+void fUsageSearchRecord();
 void fUsageModify();
 void fUsageDisplay();
 int fUsageMenu();
