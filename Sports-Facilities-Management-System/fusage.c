@@ -64,7 +64,7 @@ void fUsageRecord()
 		scanf("%d/%d/%d", &fUsage.currentDate.day, &fUsage.currentDate.month, &fUsage.currentDate.year);
 		printf("Search Time : ");
 		scanf("%s", &fUsage.time);
-	};
+	}
 
 	printf("Today's Date\t\tTime\t\tUser ID\t\tFacility ID\t\tUsage Type\n");
 	printf("============\t\t====\t\t=======\t\t===========\t\t==========\n");
