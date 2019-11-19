@@ -2,7 +2,6 @@
 #include "staff.h"
 
 
-int i;
 
 //struct {
 //
@@ -13,7 +12,7 @@ typedef struct// struture for to store staff
 {
 	char stfName[30];
 	char stfPassW[100];
-	char stfConPassW[100];
+	char stfConPassW[100];// confirm password
 	char stfID[6];
 	char stfPosi[10];
 }Staff;
@@ -22,12 +21,15 @@ typedef struct// struture for to store staff
 void staffmain()
 {
 	addStaffList();
-	readStaffList();
+	
 	system("pause");
 }
 
 void addStaffList()//For adding new staff
 {
+	int i, ans;//for loop
+	char idEntered[6]; //to check if id entered is being used
+
 	Staff staffs[20];
 	FILE*stf;
 
@@ -39,7 +41,7 @@ void addStaffList()//For adding new staff
 		return;
 	}
 	
-	for (i = 0; i < 2; i++)
+	for (i = 0; i < 20; i++)
 	{
 		printf("Enter staff name : ");
 		rewind(stdin);
@@ -48,14 +50,43 @@ void addStaffList()//For adding new staff
 		printf("Enter staff Passwords(MINIMUM 12): ");
 		scanf("%[^\n]", staffs[i].stfPassW);
 		rewind(stdin); 
-		printf("Enter staff ID : ");
-		scanf("%[^\n]", staffs[i].stfID);
+		printf("Reenter passowrd to confirm :");
+		scanf("%[^\n]",staffs[i].stfConPassW);
+	    rewind(stdin);
+		while (strcmp(staffs[i].stfPassW, staffs[i].stfConPassW) != 0)
+		{
+			printf("Passwords does not match please reenter !\n");
+			rewind(stdin);
+			printf("Enter staff Passwords(MINIMUM 12) :");
+			scanf("%[^\n]", staffs[i].stfPassW);
+			rewind(stdin);
+			printf("Reenter passowrd to confirm :");
+			scanf("%[^\n]", staffs[i].stfConPassW);
+			rewind(stdin);
+		}
+		printf("Enter staff ID(6 characteristics max): ");
+		scanf("%[^\n]", idEntered);
 		rewind(stdin);
+		for (i = 0; i < 20; i++)
+		{
+			while (strcmp(idEntered, staffs[i].stfID) == 0)
+			{
+				printf("ID used!\n");
+				printf("Reenter ID :");
+				scanf("%[^\n]", idEntered);
+				rewind(stdin);
+				
+			}
+			if (strlen(staffs[i].stfID)==0)
+				{
+					strcpy(staffs[i].stfID, idEntered);
+				}
+		}
 		printf("Enter staff position :");
 		scanf("%[^\n]", staffs[i].stfPosi);
 		rewind(stdin);
 
-		fwrite(&staffs, sizeof(Staff), 1, stf);
+		fwrite(&staffs[i], sizeof(Staff), 1, stf);
 	}
 	fclose(stf);
 	return;
@@ -63,6 +94,8 @@ void addStaffList()//For adding new staff
 
 void readStaffList()
 {
+	int i=0;
+
 	FILE*stfRead;
 	Staff staffScanList[20];//to store date scaned from file
 
@@ -73,14 +106,14 @@ void readStaffList()
 		printf("Can't find file (read)");
 		return;
 	}
-
-	for (i = 0; i < 2; i++)
-	{
-		while (fread(&staffScanList[i], sizeof(staffScanList[i]), 1, stfRead) != 0)
+	
+	
+		while (fread(&staffScanList[0], sizeof(Staff), 1, stfRead) != 0)
 		{
-			printf("Name:%s\nID:%s\nPosition:%s\n", staffScanList[i].stfName,staffScanList[i].stfID,staffScanList[i].stfPosi);
+			printf("Name:%s\nID:%s\nPosition:%s\n", staffScanList[0].stfName,staffScanList[0].stfID,staffScanList[0].stfPosi);
+			
 		}
-	}
+		
 	fclose(stfRead);
 	return;
 }

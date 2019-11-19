@@ -30,11 +30,18 @@ typedef struct
 
 // function declarations
 void init();
+
+// functions related to inputs
 void getUserMenuChoice(char buffer[], int size, char *errMsg);
-void getSystemDate(char dateVar[]);
-void getSystemTime(char timeVar[]);
 int chkFileExist(char* dir);
 char *trimwhitespace(char *str);
 void s_input(char *str, int size);
+
+// functions related to date and time verification
+void getSystemDate(char dateVar[]);
+void getSystemTime(char timeVar[]);
 int validateDate(int dd, int mm, int yy);
+int validateTime(int h, int m, int s);
+int compareTime(int h1, int m1, int s1, int h2, int m2, int s2);
+int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2);
 #endif
