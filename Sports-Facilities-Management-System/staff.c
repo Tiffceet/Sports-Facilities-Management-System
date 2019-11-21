@@ -7,17 +7,34 @@ typedef struct// struture for to store staff
 	char stfName[30];
 	char stfPassW[100];
 	char stfConPassW[100];// confirm password
-	char stfID[6];
+	char stfID[7];
 	char stfPosi[10];
 }Staff;
 
 Staff staffCache[30];
 
+int readStfList()
+{
+	int count = 0;
+	FILE*readstf;
+
+	readstf = fopen("staffNameList.bin", "rb");
+
+	while (fread(&staffCache[count], sizeof(Staff), 1, readstf) != 0)
+	{
+		count++;
+	}
+	fclose(readstf);
+	return count;
+}
+
 void addStaffList()//For adding new staff
 {
-	int i, ans;//for loop
-	char idEntered[6]; //to check if id entered is being used
-
+	int i, ans,totstaff;//for loop
+	char idEntered[7]; //to check if id entered is being used
+	
+	// read file + get count of item in file
+	totstaff = readStfList();
 	Staff addStaff;
 	FILE*stf;
 
@@ -29,8 +46,8 @@ void addStaffList()//For adding new staff
 		return;
 	}
 
-	for (i = 0; i < 20; i++)
-	{
+
+	
 		printf("Enter staff name : ");//ADD VALIDATION
 		rewind(stdin);
 		scanf("%[^\n]", addStaff.stfName);
@@ -55,9 +72,9 @@ void addStaffList()//For adding new staff
 		printf("Enter staff ID(6 characteristics max): ");//ADD VALIDATION
 		scanf("%[^\n]", idEntered);
 		rewind(stdin);
-		for (i = 0; i < 20; i++)
+		for (i = 0; i < totstaff; i++)
 		{
-			while (strcmp(idEntered, addStaff.stfID) == 0)//NEED TO LET USER RETYPE
+			while (strcmp(idEntered, staffCache[i].stfID) == 0)
 			{
 				printf("ID used!\n");
 				printf("Reenter ID :");
@@ -65,63 +82,30 @@ void addStaffList()//For adding new staff
 				rewind(stdin);
 
 			}
-			if (strlen(addStaff.stfID) == 0)
-			{
-				strcpy(addStaff.stfID, idEntered);//NEED TO CHANGE THE POINTER
-			}
 		}
+		strcpy(addStaff.stfID, idEntered);//NEED TO CHANGE THE POINTER
+		
 		printf("Enter staff position :");//ADD VALIDATION/CODE
 		scanf("%[^\n]", addStaff.stfPosi);
 		rewind(stdin);
 
 		fwrite(&addStaff, sizeof(Staff), 1, stf);
-	}
+	
 	fclose(stf);
-	return;
 }
 
 void displayStaffList()
 {
-	int i = 0;
-
-	FILE*stfDis;
-	// Staff staffDisplayList[20];//to read and display date scaned from file
-
-
-	stfDis = fopen("staffNameList.bin", "rb");
-
-	if (!1)
+	
+	int i = 0,count;
+	count=readStfList();
+	for(i=0;i<count;i++)
 	{
-		printf("Can't find file (read)");
-		return;
-	}
-
-
-	while (fread(&staffCache[0], sizeof(Staff), 1, stfDis) != 0)
-	{
-		printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[0].stfName, staffCache[0].stfID, staffCache[0].stfPosi);
+		printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
 
 	}
-
-	fclose(stfDis);
-	return;
 }
 
-int readStfList()
-{
-	int count = 0;
-	FILE*readstf;
-	// Staff staffs[20];
-
-	readstf = fopen("staffNameList.bin", "rb");
-
-	while (fread(&staffCache[count], sizeof(Staff), 1, readstf) != 0)
-	{
-		count++;
-	}
-	fclose(readstf);
-	return count;
-}
 
 void staffSearchName()
 {
@@ -150,7 +134,7 @@ void pwRecover()
 
 void staffMain()
 {
-	//addStaffList();
+	addStaffList();
 	displayStaffList();
 	system("pause");
 }
