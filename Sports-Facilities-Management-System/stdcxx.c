@@ -63,7 +63,7 @@ void getSystemTime(char timeVar[])
 int chkFileExist(FILE *f)
 {
 	long fsize = 0;
-	if (!f)
+	if (f)
 	{
 		fseek(f, 0, SEEK_END); // move file pointer to the end of file
 		fsize = ftell(f);
