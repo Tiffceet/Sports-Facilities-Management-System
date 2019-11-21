@@ -111,7 +111,9 @@ int fUsageMenu()
 
 	char choice[10];
 	printf("\nEnter Menu Choice : ");
+	rewind(stdin);
 	scanf("%s", &choice);
+	rewind(stdin);
 	switch (choice[0])
 	{
 	case'1':fUsageAddRecord();

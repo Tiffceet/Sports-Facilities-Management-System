@@ -2,6 +2,7 @@
 #ifndef FUSAGE_H
 #define FUSAGE_H
 void staffLogin();
+void fusagemain();
 void fUsageRecord();
 void fUsageAddRecord();
 void fUsageSearchRecord();

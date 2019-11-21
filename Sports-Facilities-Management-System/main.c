@@ -1,6 +1,8 @@
 #include "stdcxx.h"
 #include "booking.h"
-
+#include "fusage.h"
+#include "userinfo.h"
+#include "staff.h"
 int mainMenu();
 int main(void)
 {
@@ -37,16 +39,18 @@ int mainMenu()
 	switch (choice[0])
 	{
 	case '1':
-
+		staffmain();
 		break;
 	case '2':
 		break;
 	case '3':
+		userinfoMain();
 		break;
 	case '4':
 		bookingMain();
 		break;
 	case '5':
+		fusagemain();
 		break;
 	case '6':
 		exit(0); // maybe we should do some file validation (checks if all files are closed properly)
