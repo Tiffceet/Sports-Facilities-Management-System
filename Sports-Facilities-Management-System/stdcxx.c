@@ -23,19 +23,21 @@ void init()
 // please let buffer size > 2
 void getUserMenuChoice(char buffer[], int size, char *errMsg)
 {
-retry:
-	// prevents user from spamming keys on menu
-	fgets(buffer, size, stdin);
-	char *trimmedCharArr = trimwhitespace(buffer);
-	rewind(stdin);
+	while (1) {
+		// prevents user from spamming keys on menu
+		fgets(buffer, size, stdin);
+		char *trimmedCharArr = trimwhitespace(buffer);
+		rewind(stdin);
 
-	if (strlen(trimmedCharArr) != 1)
-	{
-		printf("%s", errMsg);
-		goto retry;
+		if (strlen(trimmedCharArr) != 1)
+		{
+			printf("%s", errMsg);
+			continue;
+		}
+		// because we are checking trimmedCharArr, gonna make sure buffer is trimmed
+		strcpy(buffer, trimmedCharArr);
+		break;
 	}
-	// because we are checking trimmedCharArr, gonna make sure buffer is trimmed
-	strcpy(buffer, trimmedCharArr);
 }
 
 // get system date in yyyy-mm-dd
