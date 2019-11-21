@@ -166,6 +166,7 @@ int compareTime(int h1, int m1, int s1, int h2, int m2, int s2)
 	if (m2 > m1) return -1;
 	if (s1 > s2) return 1;
 	if (s2 > s1) return -1;
+	return -2;
 }
 
 // return 1 if date1 is later than date2
@@ -180,4 +181,5 @@ int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2)
 	if (mm2 < mm1) return -1;
 	if (dd1 > dd2) return 1;
 	if (dd2 < dd1) return -1;
+	return -2;
 }

@@ -270,3 +270,4 @@ void userInfo()
 	return 1;
 }
 
+void userinfoMain() {}
