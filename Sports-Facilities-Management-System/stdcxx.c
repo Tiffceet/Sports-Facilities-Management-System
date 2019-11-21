@@ -25,6 +25,7 @@ void getUserMenuChoice(char buffer[], int size, char *errMsg)
 {
 	while (1) {
 		// prevents user from spamming keys on menu
+		rewind(stdin);
 		fgets(buffer, size, stdin);
 		char *trimmedCharArr = trimwhitespace(buffer);
 		rewind(stdin);
