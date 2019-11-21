@@ -33,7 +33,7 @@ void init();
 
 // functions related to inputs
 void getUserMenuChoice(char buffer[], int size, char *errMsg);
-int chkFileExist(char* dir);
+int chkFileExist(FILE *f);
 char *trimwhitespace(char *str);
 void s_input(char *str, int size);
 

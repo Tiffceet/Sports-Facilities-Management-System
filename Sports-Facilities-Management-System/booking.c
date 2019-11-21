@@ -26,11 +26,13 @@ void bookingModifyRecords()
 
 void bookingDisplayAll()
 {
-	if (!chkFileExist(bookingFilePath))
+	FILE *f = fopen(bookingFilePath, "r");
+	if (!chkFileExist(f))
 	{
 		printf("No records found.\n");
 		return;
 	}
+	fclose(f);
 }
 
 int bookingMenu()
@@ -65,21 +67,10 @@ int bookingMenu()
 
 }
 
-void bookingMakeSureFileExist()
-{
-	FILE *f;
-	if (!chkFileExist(bookingFilePath))
-	{
-		f = fopen(bookingFilePath, "w");
-		fclose(f);
-	}
-}
-
 void bookingMain()
 {
 	// define filepath
 	sprintf(bookingFilePath, "%s\\%s", APPDATA_PATH, "booking.txt");
-	bookingMakeSureFileExist();
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{

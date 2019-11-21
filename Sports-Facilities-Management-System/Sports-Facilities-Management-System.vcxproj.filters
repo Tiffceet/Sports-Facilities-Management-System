@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="booking.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="stdcxx.c">
+    <ClCompile Include="fusage.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="staff.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="userinfo.c">
+    <ClCompile Include="stdcxx.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fusage.c">
+    <ClCompile Include="userinfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
