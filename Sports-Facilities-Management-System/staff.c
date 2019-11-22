@@ -28,7 +28,7 @@ int readStfList()
 	return count;
 }
 
-void addStaffList()//For adding new staff
+void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
 	int i, ans,totstaff;//for loop
 	char idEntered[7]; //to check if id entered is being used
@@ -57,7 +57,7 @@ void addStaffList()//For adding new staff
 			rewind(stdin);
 		}
 		
-		printf("Enter staff Passwords(MINIMUM 8): ");//ADD VALIDATION
+		printf("Enter staff Passwords(MINIMUM 8): ");
 		scanf("%[^\n]", addStaff.stfPassW);
 		rewind(stdin);
 		while (strlen(addStaff.stfPassW) < 8)
@@ -120,7 +120,7 @@ void addStaffList()//For adding new staff
 		}
 		strcpy(addStaff.stfID, idEntered);
 		
-		printf("Enter staff position :");//ADD VALIDATION/CODE
+		printf("Enter staff position :");
 		scanf("%[^\n]", addStaff.stfPosi);
 		rewind(stdin);
 
@@ -129,7 +129,7 @@ void addStaffList()//For adding new staff
 	fclose(stf);
 }
 
-void displayStaffList()
+void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
 	
 	int i = 0,count;
@@ -142,23 +142,171 @@ void displayStaffList()
 }
 
 
-void staffSearchName()
+void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
+	char staffNameSearch[100],ans;
+	int i = 0, totstaff,stfcount = 0;
+	totstaff = readStfList();
+	
+	do
+	{
+		displayStaffList();
 
+		printf("Enter name staff name to search :");
+		scanf("%[^\n]", staffNameSearch);
+		rewind(stdin);
+		for (i = 0; i < totstaff; i++)
+		{
+			stfcount++;
+			if (strcmp(staffNameSearch, staffCache[i].stfName) == 0)
+			{
+				printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
+				totstaff = 0;
+			}
+			else if (stfcount >= totstaff)
+			{
+				printf("There's no such person please reenter staff name.\n");
+			}
+			else;
+		}
+		printf("Do you want to search for someone else?(y = yes,anything else = menus)");
+		scanf("%c", &ans);
+		rewind(stdin);
+	}while (ans == 'y');
 }
 
-void staffSearchID()
+void staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
+	char stfID[7],ans;
+	int i = 0, totstaff, stfcount = 0;
+	totstaff = readStfList();
 
+	do
+	{
+		displayStaffList();
+
+		printf("Enter name staff ID to search :");
+		scanf("%[^\n]", stfID);
+		rewind(stdin);
+		for (i = 0; i < totstaff; i++)
+		{
+			stfcount++;
+			if (strcmp(stfID, staffCache[i].stfID) == 0)
+			{
+				printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
+				totstaff = 0;
+			}
+			else if (stfcount >= totstaff)
+			{
+				printf("There's no such person please reenter staff ID.\n");
+			}
+			else;
+		}
+		printf("Do you want to search for someone else?(y = yes anything else = continue)");
+		scanf("%c", &ans);
+		rewind(stdin);
+	} while (ans == 'y');
 }
 
 void login()
 {
-	printf("");
+	
 }
 
-void changeStfList()
+void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER LOOKING DISPLAY
 {
+	int ans, totstaff, i;
+	totstaff = readStfList();
+	Staff staffChange;
+	//staffSearchID();
+	printf("What do you want to change about this staff?\n");
+	printf("1. Name\n");
+	printf("2. PassWord\n");
+	printf("3. ID\n");
+	printf("4. Position\n");
+	printf("5. exit\n");
+
+	printf("Enter a choice :");
+	scanf("%d", &ans);
+	rewind(stdin);
+	while (isdigit(ans) != 0)//NEED TO MAKE THIS WORK SOME HOW
+	{
+		printf("Enter a number :");
+		scanf("%d", &ans);
+		rewind(stdin);
+	}
+
+	switch (ans)
+	{
+
+	case 1 :
+		printf("Enter new name :");
+		scanf("%[^\n]", staffChange.stfName);
+		rewind(stdin);
+		while (strlen(staffChange.stfName) > 29)
+		{
+			printf("Reenter name it's too long.\n");
+			printf("Enter staff name : ");
+			scanf("%[\n]", staffChange.stfName);
+			rewind(stdin);
+		}
+		break;
+	case 2 :
+		printf("Enter new password(MINUMUM 8):");
+		scanf("%[^\n]", staffChange.stfPassW);
+		rewind(stdin);
+		while (strlen(staffChange.stfPassW) < 8)
+		{
+			printf("password too short please reenter : \n");
+			printf("Enter staff Passwords(MINIMUM 8): ");
+			scanf("%[^\n]", staffChange.stfPassW);
+			rewind(stdin);
+		}
+		break;
+	case 3 :
+		printf("Enter new staff ID(6 characters): ");
+		scanf("%[^\n]", staffChange.stfID);
+		rewind(stdin);
+		while (strlen(staffChange.stfID) != 6)
+		{
+			printf("Needs to be 6 characters please reenter : \n");
+			printf("Enter staff ID(6 characters): ");
+			scanf("%[^\n]", staffChange.stfID);
+			rewind(stdin);
+		}
+		for (i = 0; i < totstaff; i++)
+		{
+			while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
+			{
+				printf("ID used!\n");
+				printf("Reenter ID :");
+				scanf("%[^\n]", staffChange.stfID);
+				rewind(stdin);
+				while (strlen(staffChange.stfID) != 6)
+				{
+					printf("Needs to be 6 characters please reenter : \n");
+					printf("Enter staff ID(6 characters): ");
+					scanf("%[^\n]", staffChange.stfID);
+					rewind(stdin);
+				}
+
+			}
+		}
+		break;
+	case 4 :
+		printf("Enter new staff position :");
+		scanf("%[^\n]", staffChange.stfPosi);
+		rewind(stdin);
+		break;
+	case 5 :
+		printf("Exiting(Enter any key to continue :)");
+		scanf("%d", &ans);
+		exit(0);
+		break;
+
+	default:
+		printf("\n");//NEED ADD SHIT TO LOOP
+	}
 
 }
 
@@ -169,7 +317,10 @@ void pwRecover()
 
 void staffMain()
 {
-	addStaffList();
-	displayStaffList();
+	changeStfList();
+	//addStaffList();
+	//displayStaffList();
+	//staffSearchName();
+	//staffSearchID();
 	system("pause");
 }
