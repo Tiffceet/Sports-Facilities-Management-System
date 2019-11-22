@@ -46,15 +46,28 @@ void addStaffList()//For adding new staff
 		return;
 	}
 
-
-	
-		printf("Enter staff name : ");//ADD VALIDATION
-		rewind(stdin);
+		printf("Enter staff name : ");
 		scanf("%[^\n]", addStaff.stfName);
 		rewind(stdin);
-		printf("Enter staff Passwords(MINIMUM 12): ");//ADD VALIDATION
+		while (strlen(addStaff.stfName) > 29)
+		{
+			printf("Reenter name it's too long.\n");
+			printf("Enter staff name : ");
+			scanf("%[\n]", addStaff.stfName);
+			rewind(stdin);
+		}
+		
+		printf("Enter staff Passwords(MINIMUM 8): ");//ADD VALIDATION
 		scanf("%[^\n]", addStaff.stfPassW);
 		rewind(stdin);
+		while (strlen(addStaff.stfPassW) < 8)
+		{
+			printf("password too short please reenter : \n");
+			printf("Enter staff Passwords(MINIMUM 8): ");
+			scanf("%[^\n]", addStaff.stfPassW);
+			rewind(stdin);
+		}
+		
 		printf("Reenter password to confirm :");
 		scanf("%[^\n]", addStaff.stfConPassW);
 		rewind(stdin);
@@ -62,16 +75,31 @@ void addStaffList()//For adding new staff
 		{
 			printf("Passwords does not match please reenter !\n");
 			rewind(stdin);
-			printf("Enter staff Passwords(MINIMUM 12) :");//ADD VALIDATION
+			printf("Enter staff Passwords(MINIMUM 8) :");
 			scanf("%[^\n]", addStaff.stfPassW);
 			rewind(stdin);
+			while (strlen(addStaff.stfPassW) < 8)
+			{
+				printf("password too short please reenter : \n");
+				printf("Enter staff Passwords(MINIMUM 8): ");
+				scanf("%[^\n]", addStaff.stfPassW);
+				rewind(stdin);
+			}
 			printf("Reenter passowrd to confirm :");
 			scanf("%[^\n]", addStaff.stfConPassW);
 			rewind(stdin);
 		}
-		printf("Enter staff ID(6 characteristics max): ");//ADD VALIDATION
+
+		printf("Enter staff ID(6 characters): ");
 		scanf("%[^\n]", idEntered);
 		rewind(stdin);
+		while (strlen(idEntered) != 6)
+		{
+			printf("Needs to be 6 characters please reenter : \n");
+			printf("Enter staff ID(6 characters): ");
+			scanf("%[^\n]", idEntered);
+			rewind(stdin);
+		}
 		for (i = 0; i < totstaff; i++)
 		{
 			while (strcmp(idEntered, staffCache[i].stfID) == 0)
@@ -80,10 +108,17 @@ void addStaffList()//For adding new staff
 				printf("Reenter ID :");
 				scanf("%[^\n]", idEntered);
 				rewind(stdin);
+				while (strlen(idEntered) != 6)
+				{
+					printf("Needs to be 6 characters please reenter : \n");
+					printf("Enter staff ID(6 characters): ");
+					scanf("%[^\n]", idEntered);
+					rewind(stdin);
+				}
 
 			}
 		}
-		strcpy(addStaff.stfID, idEntered);//NEED TO CHANGE THE POINTER
+		strcpy(addStaff.stfID, idEntered);
 		
 		printf("Enter staff position :");//ADD VALIDATION/CODE
 		scanf("%[^\n]", addStaff.stfPosi);

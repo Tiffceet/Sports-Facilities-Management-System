@@ -39,7 +39,7 @@ int mainMenu()
 	switch (choice[0])
 	{
 	case '1':
-		staffmain();
+		staffMain();
 		break;
 	case '2':
 		break;
