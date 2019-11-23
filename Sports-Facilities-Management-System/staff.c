@@ -175,10 +175,10 @@ void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	}while (ans == 'y');
 }
 
-void staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
+int staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
 	char stfID[7],ans;
-	int i = 0, totstaff, stfcount = 0;
+	int i = 0, totstaff, stfcount = 0,staffAdd;
 	totstaff = readStfList();
 
 	do
@@ -206,6 +206,8 @@ void staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 		scanf("%c", &ans);
 		rewind(stdin);
 	} while (ans == 'y');
+	staffAdd = i;
+	return staffAdd;
 }
 
 void login()
@@ -215,10 +217,14 @@ void login()
 
 void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER LOOKING DISPLAY
 {
-	int ans, totstaff, i;
+	char choice[10];
+	
+	int oldStaffAdd = 0, totstaff, i;
 	totstaff = readStfList();
 	Staff staffChange;
-	//staffSearchID();
+	oldStaffAdd=staffSearchID();
+	Staff*staffOld = &staffCache[oldStaffAdd ];
+
 	printf("What do you want to change about this staff?\n");
 	printf("1. Name\n");
 	printf("2. PassWord\n");
@@ -226,87 +232,83 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 	printf("4. Position\n");
 	printf("5. exit\n");
 
-	printf("Enter a choice :");
-	scanf("%d", &ans);
-	rewind(stdin);
-	while (isdigit(ans) != 0)//NEED TO MAKE THIS WORK SOME HOW
+	do
 	{
-		printf("Enter a number :");
-		scanf("%d", &ans);
+		printf("Enter a choice :");
+		getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
 		rewind(stdin);
-	}
-
-	switch (ans)
-	{
-
-	case 1 :
-		printf("Enter new name :");
-		scanf("%[^\n]", staffChange.stfName);
-		rewind(stdin);
-		while (strlen(staffChange.stfName) > 29)
+		switch (choice[0])
 		{
-			printf("Reenter name it's too long.\n");
-			printf("Enter staff name : ");
-			scanf("%[\n]", staffChange.stfName);
+
+		case '1':
+			printf("Enter new name :");
+			scanf("%[^\n]", staffChange.stfName);
 			rewind(stdin);
-		}
-		break;
-	case 2 :
-		printf("Enter new password(MINUMUM 8):");
-		scanf("%[^\n]", staffChange.stfPassW);
-		rewind(stdin);
-		while (strlen(staffChange.stfPassW) < 8)
-		{
-			printf("password too short please reenter : \n");
-			printf("Enter staff Passwords(MINIMUM 8): ");
+			while (strlen(staffChange.stfName) > 29)
+			{
+				printf("Reenter name it's too long.\n");
+				printf("Enter staff name : ");
+				scanf("%[\n]", staffChange.stfName);
+				rewind(stdin);
+			}
+			break;
+		case '2':
+			printf("Enter new password(MINUMUM 8):");
 			scanf("%[^\n]", staffChange.stfPassW);
 			rewind(stdin);
-		}
-		break;
-	case 3 :
-		printf("Enter new staff ID(6 characters): ");
-		scanf("%[^\n]", staffChange.stfID);
-		rewind(stdin);
-		while (strlen(staffChange.stfID) != 6)
-		{
-			printf("Needs to be 6 characters please reenter : \n");
-			printf("Enter staff ID(6 characters): ");
+			while (strlen(staffChange.stfPassW) < 8)
+			{
+				printf("password too short please reenter : \n");
+				printf("Enter staff Passwords(MINIMUM 8): ");
+				scanf("%[^\n]", staffChange.stfPassW);
+				rewind(stdin);
+			}
+			break;
+		case '3':
+			printf("Enter new staff ID(6 characters): ");
 			scanf("%[^\n]", staffChange.stfID);
 			rewind(stdin);
-		}
-		for (i = 0; i < totstaff; i++)
-		{
-			while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
+			while (strlen(staffChange.stfID) != 6)
 			{
-				printf("ID used!\n");
-				printf("Reenter ID :");
+				printf("Needs to be 6 characters please reenter : \n");
+				printf("Enter staff ID(6 characters): ");
 				scanf("%[^\n]", staffChange.stfID);
 				rewind(stdin);
-				while (strlen(staffChange.stfID) != 6)
+			}
+			for (i = 0; i < totstaff; i++)
+			{
+				while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
 				{
-					printf("Needs to be 6 characters please reenter : \n");
-					printf("Enter staff ID(6 characters): ");
+					printf("ID used!\n");
+					printf("Reenter ID :");
 					scanf("%[^\n]", staffChange.stfID);
 					rewind(stdin);
+					while (strlen(staffChange.stfID) != 6)
+					{
+						printf("Needs to be 6 characters please reenter : \n");
+						printf("Enter staff ID(6 characters): ");
+						scanf("%[^\n]", staffChange.stfID);
+						rewind(stdin);
+					}
+
 				}
-
 			}
-		}
-		break;
-	case 4 :
-		printf("Enter new staff position :");
-		scanf("%[^\n]", staffChange.stfPosi);
-		rewind(stdin);
-		break;
-	case 5 :
-		printf("Exiting(Enter any key to continue :)");
-		scanf("%d", &ans);
-		exit(0);
-		break;
+			break;
+		case '4':
+			printf("Enter new staff position :");
+			scanf("%[^\n]", staffChange.stfPosi);
+			rewind(stdin);
+			break;
+		case '5':
+			printf("Exiting");
+			exit(0);
+			break;
 
-	default:
-		printf("\n");//NEED ADD SHIT TO LOOP
-	}
+		default:
+			printf("Invalid choice !\n");
+		}
+		printf("These are the changes that you made:\n");
+	} while (choice != '5');
 
 }
 
