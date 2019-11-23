@@ -43,20 +43,24 @@ void getUserMenuChoice(char buffer[], int size, char *errMsg)
 
 // get system date in yyyy-mm-dd
 // will write date into dateVar passed into func
-void getSystemDate(char dateVar[])
+void getSystemDate(Date *dateVar)
 {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
-	sprintf(dateVar, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	dateVar->y = tm.tm_year + 1900;
+	dateVar->m = tm.tm_mon + 1;
+	dateVar->d = tm.tm_mday;
 }
 
 // get system time in hh:mm:ss
 // will write time into timeVar passed into func
-void getSystemTime(char timeVar[])
+void getSystemTime(Time *timeVar)
 {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
-	sprintf(timeVar, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+	timeVar->h = tm.tm_hour;
+	timeVar->m = tm.tm_min;
+	timeVar->s = tm.tm_sec;
 }
 
 // check if file exists
