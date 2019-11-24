@@ -1,5 +1,5 @@
-#include<stdlib.h>
-#include<stdio.h>
+#include "stdcxx.h"
+#include "facility.h"
 
 typedef struct
 {
@@ -18,41 +18,44 @@ int facilityMenu()
 	printf("(1) Add New Facility\n");
 	printf("(2) Search Faciity\n");
 	printf("(3) Display All Facility\n");
-	printf("Enter Your Choice: ");
 	char choice[10];
+	printf("Enter Your Choice: ");
+	rewind(stdin);
+	scanf("%s", &choice);
+	rewind(stdin);
+
 	switch (choice[0])
 	{
 	case '1':
+		addNewFacility();
 		break;
 	case '2':
+		searchFacility();
 		break;
 	case '3':
+		displayAllFacility();
 		break;
-	case '4':
-		break;
-	case '5':
-		return 0;
 	default:
 		return 1;
 	}
-	return 1;
 
 }
 
 void addNewFacility()
 {
 	int a;
-	Facility facility[10]; 
+	Facility facility[10];
 	FILE*facilityFile;
 	facilityFile = fopen("facility.txt", "a");
 
-	if (facilityFile==NULL)
+	if (facilityFile == NULL)
 	{
 		printf("Cannot open facilityFile.");
-		return;
+		system("pasue");
+		exit(-1);
 	}
 
-	for (a = 0; a< 10; a++)
+	for (a = 0; a < 10; a++)
 	{
 		printf("Facility: ");
 		rewind(stdin);
