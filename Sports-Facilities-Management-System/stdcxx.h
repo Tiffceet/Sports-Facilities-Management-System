@@ -38,8 +38,8 @@ char *trimwhitespace(char *str);
 void s_input(char *str, int size);
 
 // functions related to date and time verification
-void getSystemDate(char dateVar[]);
-void getSystemTime(char timeVar[]);
+void getSystemDate(Date *dateVar);
+void getSystemTime(Time *timeVar);
 int validateDate(int dd, int mm, int yy);
 int validateTime(int h, int m, int s);
 int compareTime(int h1, int m1, int s1, int h2, int m2, int s2);
