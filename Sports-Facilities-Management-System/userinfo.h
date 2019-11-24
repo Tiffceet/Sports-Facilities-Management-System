@@ -8,6 +8,7 @@ void displayInfo();
 void userinfoMain();
 void userInfo();
 void registerInfo();
+char UserInfoFilePath[1024];
 typedef struct {
 
 	char name[100];

@@ -12,7 +12,24 @@ void registerInfo()
 	char id[16];
 
 
+	count = fopen("count.dat", "rb");
+
+	if (chkFileExist(count))
+	{
+		fread(&i, sizeof(i), 1, count);
+	}
+
+
+
 	userinfo = fopen("userInfo.dat", "ab");
+	if (chkFileExist(userinfo))
+	{
+		printf("File doesnt exist\n");
+			system("pause");
+			return;
+	}
+
+
 	printf("Enter your user ID(8 - 15 characters) = ");
 	rewind(stdin);
 	scanf("%s", userData1[i].id);
@@ -22,12 +39,14 @@ void registerInfo()
 		if (strlen(id) < 8 || strlen(id) > 15)
 		{
 			printf("Enter a id that is between 8 to 15 words(-1 to exit)  = ");
+			rewind(stdin);
 			scanf("%s", userData1[i].id);
 		}
 
 		else
 		{
 			printf("Enter a id that hasnt been taken(-1 to exit)  = ");
+			rewind(stdin);
 			scanf("%s", userData1[i].id);
 		}
 	}
@@ -111,6 +130,13 @@ void registerInfo()
 		}
 
 	}
+
+
+	++i;
+
+	count = fopen("count.dat", "wb");
+	fwrite(&i, sizeof(i), 1, count);
+	fclose(count);
 }
 
 void modifyInfo()
@@ -123,11 +149,12 @@ void modifyInfo()
 	char chckPass[20];
 	userData user1[100];
 	FILE *userinfo1;
+	userinfo1 = fopen("userinfo.dat", "rb");
 
-
-	while ((userinfo1 = fopen("userinfo.dat", "rb")) == NULL)
+	while (!chkFileExist(userinfo1))
 	{
 		printf("File userinfo doesnt exist\n");
+		system("pause");
 		return;
 	}
 	userinfo1 = fopen("userinfo.dat", "rb");
@@ -150,9 +177,11 @@ void modifyInfo()
 			while (x == 0)
 			{
 				printf("Enter new password = ");
+				rewind(stdin);
 				scanf("%s", newPass);
 
 				printf("Enter again password for checking = ");
+				rewind(stdin);
 				scanf("%s", chckPass);
 
 				if (strcmp(newPass, chckPass) != 0)
@@ -186,39 +215,57 @@ void displayInfo()
 	char password[20];
 	userData user1[100];
 	FILE *userinfo1;
+	userinfo1 = fopen("userinfo.dat", "rb");
 
-
-	while ((userinfo1 = fopen("userinfo.dat", "rb")) == NULL)
+	while (!chkFileExist(userinfo1))
 	{
 		printf("File userinfo doesnt exist\n");
 		return;
 	}
-	userinfo1 = fopen("userinfo.dat", "rb");
+	
 	for (i = 0; i < 100; i++)
 	{
 		fread(&user1[i], sizeof(userData), 1, userinfo1);
 	}
 
 	printf("Enter user id = ");
+	rewind(stdin);
 	scanf("%s", id);
 
 	printf("Enter user password = ");
+	rewind(stdin);
 	scanf("%s", password);
-
-	for (i = 0; i < 100; i++)
+	while (1)
 	{
-		if (strcmp(user1[i].id, id) == 0 && strcmp(user1[i].password, password) == 0)
+		for (i = 0; i < 100; i++)
 		{
-			printf("Your id is %s ", user1[i].id);
-			printf("Your name is %s ", user1[i].name);
-			printf("Your gender is %c ", user1[i].gender);
-			printf("Your contact number is %s", user1[i].contact);
+			if (strcmp(user1[i].id, id) == 0 && strcmp(user1[i].password, password) == 0)
+			{
+				printf("Your id is %s\n", user1[i].id);
+				printf("Your name is %s\n", user1[i].name);
+				printf("Your gender is %c\n", user1[i].gender);
+				printf("Your contact number is %s\n", user1[i].contact);
+				system("pause");
+				return;
+
+			}
+
+			else if ((strcmp(user1[99].id, id) != 0 || strcmp(user1[99].password, password) != 0 ) && i == 99)
+			{
+				printf("Pls enter a valid user ID and password = ");
+				rewind(stdin);
+				scanf("%s", id);
+
+				printf("Enter password = ");
+				rewind(stdin);
+				scanf("%s", password);
+
+
+			}
+
 		}
 
-
 	}
-
-
 
 
 
@@ -227,10 +274,32 @@ void displayInfo()
 
 void searchInfo()
 {
+	int i = 0;
+	char id[15];
+	char password[20];
+	userData user1[100];
+	FILE *userinfo1;
+	userinfo1 = fopen("userinfo.dat", "rb");
+
+	while (!chkFileExist(userinfo1))
+	{
+		printf("File userinfo doesnt exist\n");
+		return;
+	}
+
+	for (i = 0; i < 100; i++)
+	{
+		fread(&user1[i], sizeof(userData), 1, userinfo1);
+	}
 
 
+	printf("Enter user id = ");
+	rewind(stdin);
+	scanf("%s", id);
 
-
+	printf("Enter user password = ");
+	rewind(stdin);
+	scanf("%s", password);
 
 
 
@@ -270,4 +339,8 @@ void userInfo()
 	return 1;
 }
 
-void userinfoMain() {}
+void userinfoMain() {
+	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, "userinfo.dat");
+	void userInfo();
+
+}
