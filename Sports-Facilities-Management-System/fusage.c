@@ -38,7 +38,7 @@ void staffLogin()
 	rewind(stdin);
 	scanf("%s", stfValid.password);
 	rewind(stdin);
-	/*while (strcmp(stfValid.staffID, staffCache.stfID) != 0 && strcmp(stfValid.password, staffCache.stfPassW) != 0)
+	/*while (strcmp(stfValid.staffID,) != 0 && strcmp(stfValid.password,) != 0)
 	{
 		printf("\nWrong ID or Password\n");
 		printf("Enter Staff ID : ");
@@ -349,6 +349,7 @@ int fUsageMenu()
 	printf("1. Add Record\n");
 	printf("2. Search Record\n");
 	printf("3. Modify Record\n");
+	printf("4. Return to Menu\n");
 		
 	printf("Enter menu choice: ", "");
 	getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");

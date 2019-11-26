@@ -23,45 +23,51 @@ void init()
 // please let buffer size > 2
 void getUserMenuChoice(char buffer[], int size, char *errMsg)
 {
-retry:
-	// prevents user from spamming keys on menu
-	fgets(buffer, size, stdin);
-	char *trimmedCharArr = trimwhitespace(buffer);
-	rewind(stdin);
+	while (1) {
+		// prevents user from spamming keys on menu
+		rewind(stdin);
+		fgets(buffer, size, stdin);
+		char *trimmedCharArr = trimwhitespace(buffer);
+		rewind(stdin);
 
-	if (strlen(trimmedCharArr) != 1)
-	{
-		printf("%s", errMsg);
-		goto retry;
+		if (strlen(trimmedCharArr) != 1)
+		{
+			printf("%s", errMsg);
+			continue;
+		}
+		// because we are checking trimmedCharArr, gonna make sure buffer is trimmed
+		strcpy(buffer, trimmedCharArr);
+		break;
 	}
-	// because we are checking trimmedCharArr, gonna make sure buffer is trimmed
-	strcpy(buffer, trimmedCharArr);
 }
 
 // get system date in yyyy-mm-dd
 // will write date into dateVar passed into func
-void getSystemDate(char dateVar[])
+void getSystemDate(Date *dateVar)
 {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
-	sprintf(dateVar, "%04d-%02d-%02d", tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+	dateVar->y = tm.tm_year + 1900;
+	dateVar->m = tm.tm_mon + 1;
+	dateVar->d = tm.tm_mday;
 }
 
 // get system time in hh:mm:ss
 // will write time into timeVar passed into func
-void getSystemTime(char timeVar[])
+void getSystemTime(Time *timeVar)
 {
 	time_t t = time(NULL);
 	struct tm tm = *localtime(&t);
-	sprintf(timeVar, "%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+	timeVar->h = tm.tm_hour;
+	timeVar->m = tm.tm_min;
+	timeVar->s = tm.tm_sec;
 }
 
 // check if file exists
-int chkFileExist(char* dir)
+int chkFileExist(FILE *f)
 {
-	FILE *f;
 	long fsize = 0;
-	if (f = fopen(dir, "r"))
+	if (f)
 	{
 		fseek(f, 0, SEEK_END); // move file pointer to the end of file
 		fsize = ftell(f);
@@ -70,7 +76,7 @@ int chkFileExist(char* dir)
 			fclose(f);
 			return 0;
 		}
-		fclose(f);
+		fseek(f, 0, SEEK_SET);
 		return 1;
 	}
 	return 0;
@@ -164,6 +170,7 @@ int compareTime(int h1, int m1, int s1, int h2, int m2, int s2)
 	if (m2 > m1) return -1;
 	if (s1 > s2) return 1;
 	if (s2 > s1) return -1;
+	return -2;
 }
 
 // return 1 if date1 is later than date2
@@ -178,4 +185,5 @@ int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2)
 	if (mm2 < mm1) return -1;
 	if (dd1 > dd2) return 1;
 	if (dd2 < dd1) return -1;
+	return -2;
 }

@@ -3,6 +3,7 @@
 #define FUSAGE_H
 void fusagemain();
 void staffLogin();
+void fusagemain();
 void fUsageRecord();
 void fUsageAddRecord();
 void fUsageSearchRecord();
