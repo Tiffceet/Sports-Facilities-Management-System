@@ -2,7 +2,7 @@
 #ifndef USERINFO_H
 #define USERINFO_H
 void userEntry();
-void searchInfo();
+int searchInfo();
 void modifyInfo();
 void displayInfo();
 void userinfoMain();
