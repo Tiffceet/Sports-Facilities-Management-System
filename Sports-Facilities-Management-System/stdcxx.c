@@ -1,5 +1,5 @@
 #include "stdcxx.h"
-// function to define all env variables
+
 void init()
 {
 	char *temp = getenv("APPDATA");
@@ -18,9 +18,6 @@ void init()
 	}
 }
 
-// function for everyone to collect user choice for menu selection
-// store user input in buffer and check if the choice is 1 character long
-// please let buffer size > 2
 void getUserMenuChoice(char buffer[], int size, char *errMsg)
 {
 	while (1) {
@@ -41,8 +38,6 @@ void getUserMenuChoice(char buffer[], int size, char *errMsg)
 	}
 }
 
-// get system date in yyyy-mm-dd
-// will write date into dateVar passed into func
 void getSystemDate(Date *dateVar)
 {
 	time_t t = time(NULL);
@@ -52,8 +47,6 @@ void getSystemDate(Date *dateVar)
 	dateVar->d = tm.tm_mday;
 }
 
-// get system time in hh:mm:ss
-// will write time into timeVar passed into func
 void getSystemTime(Time *timeVar)
 {
 	time_t t = time(NULL);
@@ -63,7 +56,6 @@ void getSystemTime(Time *timeVar)
 	timeVar->s = tm.tm_sec;
 }
 
-// check if file exists
 int chkFileExist(FILE *f)
 {
 	long fsize = 0;
@@ -97,7 +89,6 @@ char *trimwhitespace(char *str)
 	return str;
 }
 
-// get string input function -> the safe way
 void s_input(char *str, int size)
 {
 	rewind(stdin);
@@ -140,7 +131,6 @@ int validateDate(int dd, int mm, int yy)
 	return 0;
 }
 
-// make sure time is correct
 int validateTime(int h, int m, int s)
 {
 	if (h < 0 || h >23)
@@ -158,9 +148,6 @@ int validateTime(int h, int m, int s)
 	return 1;
 }
 
-// return 1 if time1 is later than time2
-// return -1 if time2 is later than time1
-// return 0 if both time are the same
 int compareTime(int h1, int m1, int s1, int h2, int m2, int s2)
 {
 	if (h1 == h2 && m1 == m2 && s1 == s2) return 0;
@@ -173,9 +160,6 @@ int compareTime(int h1, int m1, int s1, int h2, int m2, int s2)
 	return -2;
 }
 
-// return 1 if date1 is later than date2
-// return -1 if date2 is later than date1
-// return 0 if both time are the same
 int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2)
 {
 	if (dd1 == dd2 && mm1 == mm2 && yy1 == yy2) return 0;

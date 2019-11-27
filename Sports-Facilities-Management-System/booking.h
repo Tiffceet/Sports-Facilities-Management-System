@@ -28,6 +28,7 @@ void bookingModifyRecords();
 void bookingDisplayAll();
 
 // Util Functions
+int readBookingDataIntoStructArray(BookingData *data, int size);
 void incrementBookingID(char *oldStaffID);
 void askUserForBookingDate(Date *userPickedDate);
 void checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);

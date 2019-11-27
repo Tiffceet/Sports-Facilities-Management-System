@@ -76,40 +76,7 @@ void bookingBook()
 	// find latestBooking ID + count of items in file
 	char latestBookingID[10];
 	latestBookingID[0] = '\0';
-	FILE *f = fopen(bookingFilePath, "r");
-	int idx = 0; // keep track of how many records are there
-	// if file exist, get latest bookingID
-	if (chkFileExist(f))
-	{
-		while (fscanf(f, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
-			data[idx].bookingID,
-			&data[idx].currentDate.d,
-			&data[idx].currentDate.m,
-			&data[idx].currentDate.y,
-			&data[idx].currentTime.h,
-			&data[idx].currentTime.m,
-			&data[idx].currentTime.s,
-			&data[idx].bookingDate.d,
-			&data[idx].bookingDate.m,
-			&data[idx].bookingDate.y,
-			&data[idx].timeSlotsBooked[0],
-			&data[idx].timeSlotsBooked[1],
-			&data[idx].timeSlotsBooked[2],
-			&data[idx].timeSlotsBooked[3],
-			&data[idx].timeSlotsBooked[4],
-			&data[idx].timeSlotsBooked[5],
-			data[idx].usrID,
-			data[idx].staffID,
-			data[idx].facilityID
-		) != EOF) {
-			strcpy(latestBookingID, data[idx].bookingID);
-			idx++;
-		}
-	}
-	else 
-	{
-		f = fopen(bookingFilePath, "w");
-	}
+	int count = readBookingDataIntoStructArray(&data, 100);
 	incrementBookingID(latestBookingID); // increment bookingID
 	printBookingInfo();
 	// Ask user to select facility
@@ -172,10 +139,46 @@ void bookingDisplayAll()
 	fclose(f);
 }
 
-// ========================================
+// ============================================================================================
 // Utilities Functions go below this point
-// ========================================
+// ============================================================================================
 // make sure to initialise first byte of oldBookID to '\0'
+
+// Return amount of data entries found
+int readBookingDataIntoStructArray(BookingData *data, int size)
+{
+	FILE *f = fopen(bookingFilePath, "r");
+	if (!chkFileExist(f))
+	{
+		return 0;
+	}
+	int count = 0;
+	while (fscanf(f, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
+		data[count].bookingID,
+		&data[count].currentDate.d,
+		&data[count].currentDate.m,
+		&data[count].currentDate.y,
+		&data[count].currentTime.h,
+		&data[count].currentTime.m,
+		&data[count].currentTime.s,
+		&data[count].bookingDate.d,
+		&data[count].bookingDate.m,
+		&data[count].bookingDate.y,
+		&data[count].timeSlotsBooked[0],
+		&data[count].timeSlotsBooked[1],
+		&data[count].timeSlotsBooked[2],
+		&data[count].timeSlotsBooked[3],
+		&data[count].timeSlotsBooked[4],
+		&data[count].timeSlotsBooked[5],
+		data[count].usrID,
+		data[count].staffID,
+		data[count].facilityID
+	) != EOF) {
+		count++;
+	}
+	fclose(f);
+	return count;
+}
 void incrementBookingID(char *oldBookID)
 {
 	// if oldBookID is not initialised, set it to initial value
