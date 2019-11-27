@@ -27,9 +27,10 @@ void bookingSeachRecords();
 void bookingModifyRecords();
 void bookingDisplayAll();
 
-// Util Functions
+// Util Functions & Sub Functions
 int readBookingDataIntoStructArray(BookingData *data, int size);
+void writeBookingDataIntoFile(BookingData *data, int dataCount);
 void incrementBookingID(char *oldStaffID);
 void askUserForBookingDate(Date *userPickedDate);
-void checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
+int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
 #endif

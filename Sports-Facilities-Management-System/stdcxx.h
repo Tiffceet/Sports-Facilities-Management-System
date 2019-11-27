@@ -28,44 +28,50 @@ typedef struct
 	int h, m, s;
 } Time;
 
-// ========================================
+// ===================================================================================================
 // function declarations
-// ========================================
+// ===================================================================================================
 
 // Function to define all env variables
 void init();
 
-// ========================================
+// ===================================================================================================
 // functions related to inputs
-// ========================================
+// ===================================================================================================
 
 // Function for everyone to collect user choice for menu selection
 // Store user input in buffer and check if the choice is 1 character long
 // Please let buffer size > 2
 void getUserMenuChoice(char buffer[], int size, char *errMsg);
+
 // Check if file exists
 // Return true if file exist
 int chkFileExist(FILE *f);
+
 char *trimwhitespace(char *str);
+
 // Get string input function -> the safe way
 void s_input(char *str, int size);
 
-// ========================================
+// ===================================================================================================
 // functions related to date and time verification
-// ========================================
+// ===================================================================================================
 
 // Get system date in yyyy-mm-dd
 // Will write date into dateVar passed into func
 void getSystemDate(Date *dateVar);
+
 // Get system time in hh:mm:ss
 // Will write time into timeVar passed into func
 void getSystemTime(Time *timeVar);
 int validateDate(int dd, int mm, int yy);
 int validateTime(int h, int m, int s);
+
 // return 1 if time1 is later than time2
 // return -1 if time2 is later than time1
 // return 0 if both time are the same
 int compareTime(int h1, int m1, int s1, int h2, int m2, int s2);
+
 // return 1 if date1 is later than date2
 // return -1 if date2 is later than date1
 // return 0 if both time are the same

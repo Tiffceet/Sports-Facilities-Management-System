@@ -49,18 +49,18 @@ int bookingMenu()
 
 void printBookingInfo()
 {
-	printf("=====================================================================================================================\n");
-	printf("|                                                   Booking Info                                                    |\n");
-	printf("=====================================================================================================================\n");
-	printf("| 1. Please refrain from monopolising facility by making booking for a whole day                                    |\n");
-	printf("| 2. Booking for multiple time slots is allowed                                                                     |\n");
-	printf("| 3. Timeslots as follows:                                                                                          |\n");
-	printf("|      - Weekdays (Mon - Fri) < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm, 5pm-7pm, 7pm-9pm >                             |\n");
-	printf("|      - Weekends (Sat & Sun) < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm                   >                             |\n");
-	printf("| 4. Please proceed to payment counter after booking                                                                |\n");
-	printf("|                                                                                                                   |\n");
-	printf("=====================================================================================================================\n");
-	printf("=====================================================================================================================\n");
+	printf(" =====================================================================================================================\n");
+	printf(" |                                                   Booking Info                                                    |\n");
+	printf(" =====================================================================================================================\n");
+	printf(" | 1. Please refrain from monopolising facility by making booking for a whole day                                    |\n");
+	printf(" | 2. Booking for multiple time slots is allowed                                                                     |\n");
+	printf(" | 3. Timeslots as follows:                                                                                          |\n");
+	printf(" |      - Weekdays (Mon - Fri) < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm, 5pm-7pm, 7pm-9pm >                             |\n");
+	printf(" |      - Weekends (Sat & Sun) < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm                   >                             |\n");
+	printf(" | 4. Please proceed to payment counter after booking                                                                |\n");
+	printf(" |                                                                                                                   |\n");
+	printf(" =====================================================================================================================\n");
+	printf(" =====================================================================================================================\n");
 }
 
 void bookingBook()
@@ -76,9 +76,20 @@ void bookingBook()
 	// find latestBooking ID + count of items in file
 	char latestBookingID[10];
 	latestBookingID[0] = '\0';
-	int count = readBookingDataIntoStructArray(&data, 100);
+	FILE *f = fopen(bookingFilePath, "r");
+	// if file doesnt exist, open in write mode
+	if (chkFileExist(f))
+	{
+		while (fscanf(f, "%[^,]%*[^\n]\n", &latestBookingID) != EOF);
+		fclose(f);
+	}
+
+	int count = readBookingDataIntoStructArray(&data, 100); // read file into struct array + get entries count
+
 	incrementBookingID(latestBookingID); // increment bookingID
 	printBookingInfo();
+
+	char userPickedfacilityID[100];
 	// Ask user to select facility
 	printf("Select one of the following facilities: \n");
 	/*
@@ -86,36 +97,80 @@ void bookingBook()
 	Need to count how many facilities are there?
 	*/
 	printf("\nEnter the facility ID you wish to book: ");
-	char userPickedfacilityID[100];
 	s_input(userPickedfacilityID, 99);
 	/*
 	Insert code to check for facilities availablity
 	*/
-	// If available, ask user for date
-	Date userPickedDate;
-	askUserForBookingDate(&userPickedDate);
 
+	int isTimeSlotAvailable;
 	int timeSlotsAvailable[6] = { 1,1,1,1,1,1 };
-	checkForTimeslotsAvailablity(&timeSlotsAvailable, &data, idx, &userPickedDate, userPickedfacilityID);
+	Date userPickedDate;
+	do {
+		if (err)
+		{
+			printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date");
+		}
+		err = 1;
+		// If available, ask user for date
+		askUserForBookingDate(&userPickedDate);
 
-	int atLeastOneSlotisAvailable = 0;
+		// check for availablity		
+		isTimeSlotAvailable = checkForTimeslotsAvailablity(&timeSlotsAvailable, &data, count, &userPickedDate, userPickedfacilityID);
+	} while (!isTimeSlotAvailable);
+	err = 0;
+
 	printf("Timeslots: \n");
-	printf("\t1. 7am-9am");
+	printf("\t1. 7am-9am ");
 	if (timeSlotsAvailable[0]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	printf("\t2. 9am-11am");
 	if (timeSlotsAvailable[1]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t3. 1pm-3pm");
+	printf("\t3. 1pm-3pm ");
 	if (timeSlotsAvailable[2]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t4. 3pm-5pm");
+	printf("\t4. 3pm-5pm ");
 	if (timeSlotsAvailable[3]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t5. 5pm-7pm");
+	printf("\t5. 5pm-7pm ");
 	if (timeSlotsAvailable[4]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t6. 7pm-9pm");
+	printf("\t6. 7pm-9pm ");
 	if (timeSlotsAvailable[5]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 
-	
+	// NOTE TO MYSELF: LOL I HAVE THIS WEIRD SHIT CRITERIA WHERE IF ITS WEEKENDS THEN NO BOOKING FOR USER REEEEE
+	int timeslotIDX;
+	do {
+		if (err)
+		{
+			printf("Timeslot you have chosen is not available.\nPlease pick another timeslot.\n");
+		}
+		char timeslotPicked[10];
+		do {
+			if (err)
+			{
+				printf("Please select timeslot from 1 - 6\n");
+			}
+			err = 1;
+			printf("Please, pick a timeslot(1-6): ");
+			getUserMenuChoice(timeslotPicked, 9, "Invalid selection.\nPlease, pick a timeslot(1-6): ");
 
-	fclose(f);
+		} while (timeslotPicked[0] < '1' || timeslotPicked[0] > '6');
+		err = 1;
+		timeslotIDX = strtol(timeslotPicked, NULL, 10) - 1;
+	} while (!timeSlotsAvailable[timeslotIDX]); // while that timeslot is booked
+	err = 0;
+
+	// NEED TO FKING ADD COMFIRMATIONA AND WHOLE LOT OF SHIT
+
+	// Gather all info
+	strcpy(data[count].bookingID, latestBookingID);
+	getSystemDate(&data[count].currentDate);
+	getSystemTime(&data[count].currentTime);
+	data[count].bookingDate.d = userPickedDate.d;
+	data[count].bookingDate.m = userPickedDate.m;
+	data[count].bookingDate.y = userPickedDate.y;
+	data[count].timeSlotsBooked[timeslotIDX] = 1;
+	strcpy(data[count].usrID, "U0001");
+	strcpy(data[count].staffID, "S0001");
+	strcpy(data[count].facilityID, userPickedfacilityID);
+	writeBookingDataIntoFile(&data, count + 1);
+
 }
 
 void bookingSeachRecords()
@@ -140,7 +195,7 @@ void bookingDisplayAll()
 }
 
 // ============================================================================================
-// Utilities Functions go below this point
+// Utilities & Sub Functions go below this point
 // ============================================================================================
 // make sure to initialise first byte of oldBookID to '\0'
 
@@ -179,6 +234,38 @@ int readBookingDataIntoStructArray(BookingData *data, int size)
 	fclose(f);
 	return count;
 }
+
+void writeBookingDataIntoFile(BookingData *data, int dataCount)
+{
+	FILE *f = fopen(bookingFilePath, "w");
+	for (int a = 0; a < dataCount; a++)
+	{
+		fprintf(f, "%s,%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%s,%s,%s\n",
+			data[a].bookingID,
+			data[a].currentDate.d,
+			data[a].currentDate.m,
+			data[a].currentDate.y,
+			data[a].currentTime.h,
+			data[a].currentTime.m,
+			data[a].currentTime.s,
+			data[a].bookingDate.d,
+			data[a].bookingDate.m,
+			data[a].bookingDate.y,
+			data[a].timeSlotsBooked[0],
+			data[a].timeSlotsBooked[1],
+			data[a].timeSlotsBooked[2],
+			data[a].timeSlotsBooked[3],
+			data[a].timeSlotsBooked[4],
+			data[a].timeSlotsBooked[5],
+			data[a].usrID,
+			data[a].staffID,
+			data[a].facilityID
+			);
+	}
+	fclose(f);
+}
+
+// Starts with B000001
 void incrementBookingID(char *oldBookID)
 {
 	// if oldBookID is not initialised, set it to initial value
@@ -206,27 +293,36 @@ void incrementBookingID(char *oldBookID)
 	}
 }
 
+// Ask user to pick booking Date
+// Note: date that is today is not allowed
 void askUserForBookingDate(Date *userPickedDate)
 {
+	Date currentDate;
+	getSystemDate(&currentDate);
+	int err = 0;
 	int r; // r to check scanf() result
 	do {
 		if (err)
 		{
-			printf("Invalid Date, try again.\n");
+			printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
 		}
 		err = 1;
-		printf("Booking Date ? <dd/mm/yyyy>");
+		printf("Booking Date ? <dd/mm/yyyy> ");
 		rewind(stdin);
 		r = scanf("%d/%d/%d", &userPickedDate->d, &userPickedDate->m, &userPickedDate->y);
 		rewind(stdin);
-	} while (r != 3 || !validateDate(userPickedDate->d, userPickedDate->m, userPickedDate->y));
+	} while (r != 3 ||
+		!validateDate(userPickedDate->d, userPickedDate->m, userPickedDate->y) ||
+		compareDate(userPickedDate->d, userPickedDate->m, userPickedDate->y, currentDate.d, currentDate.m, currentDate.y) != 1
+		);
 	err = 0; // always reset error code after use
 }
 
 // Run through struct array to check what time slots is available
 // Set timeslot to 0 if the timeslot is not free
 // timeslot array need to be size 6 (6 timeslots stated)
-void checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID)
+// Return True if there are timeslots available
+int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID)
 {
 	for (int a = 0; a < dataSize; a++)
 	{
@@ -239,7 +335,19 @@ void checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize
 				{
 					timeslot[b] = 0;
 				}
+				else
+				{
+					timeslot[b] = 1;
+				}
 			}
 		}
 	}
+	for (int a = 0; a < 6; a++)
+	{
+		if (timeslot[a]) // if any of the timeslot is available
+		{
+			return 1;
+		}
+	}
+	return 0;
 }
