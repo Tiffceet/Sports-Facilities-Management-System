@@ -1,5 +1,22 @@
+#include "stdcxx.h"
 #ifndef BOOKING_H
 #define BOOKING_H
+
+typedef struct
+{
+	char bookingID[10];
+	Date currentDate;
+	Time currentTime;
+	Date bookingDate;
+	int timeSlotsBooked[6];
+	char usrID[20];
+	char staffID[20];
+	char facilityID[20];
+} BookingData;
+
+// Global variable
+char bookingFilePath[1024];
+int err; // to keep track of input errors
 
 // Main functions
 void bookingMain();
@@ -14,7 +31,4 @@ void bookingDisplayAll();
 void incrementBookingID(char *oldStaffID);
 void askUserForBookingDate(Date *userPickedDate);
 void checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
-// Global variable
-char bookingFilePath[1024];
-int err; // to keep track of input errors
 #endif

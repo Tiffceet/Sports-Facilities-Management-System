@@ -1,16 +1,5 @@
 #include "booking.h"
 #include "stdcxx.h"
-typedef struct
-{
-	char bookingID[10];
-	Date currentDate;
-	Time currentTime;
-	Date bookingDate;
-	int timeSlotsBooked[6];
-	char usrID[20];
-	char staffID[20];
-	char facilityID[20];
-} BookingData;
 
 void bookingMain()
 {
