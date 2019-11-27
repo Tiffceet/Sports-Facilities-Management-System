@@ -3,6 +3,7 @@
 #include "fusage.h"
 #include "userinfo.h"
 #include "staff.h"
+#include "facility.h"
 int mainMenu();
 int main(void)
 {
@@ -42,6 +43,7 @@ int mainMenu()
 		staffMain();
 		break;
 	case '2':
+		facilityMenu();
 		break;
 	case '3':
 		userinfoMain();
