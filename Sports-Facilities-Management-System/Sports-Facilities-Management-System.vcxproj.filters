@@ -33,6 +33,9 @@
     <ClCompile Include="userinfo.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Facility.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdcxx.h">
@@ -48,6 +51,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fusage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="facility.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

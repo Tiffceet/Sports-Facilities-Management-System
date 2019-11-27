@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Facility.c" />
     <ClCompile Include="fusage.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="booking.c" />
@@ -126,6 +127,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="facility.h" />
     <ClInclude Include="fusage.h" />
     <ClInclude Include="staff.h" />
     <ClInclude Include="stdcxx.h" />
