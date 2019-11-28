@@ -7,7 +7,7 @@ typedef struct// struture for to store staff
 	char stfName[30];
 	char stfPassW[100];
 	char stfConPassW[100];// confirm password
-	char stfID[7];
+	char stfID[6];
 	char stfPosi[10];
 }Staff;
 
@@ -31,9 +31,9 @@ int readStfList()
 void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
 	int i, ans,totstaff;//for loop
-	char idEntered[7]; //to check if id entered is being used
+	char idEntered[6]; //to check if id entered is being used
 	
-	// read file + get count of item in file
+	// read file + get count of item in files
 	totstaff = readStfList();
 	Staff addStaff;
 	FILE*stf;
@@ -42,7 +42,7 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 
 	if (!stf)//For checking exsitent of file.
 	{
-		printf("can't open");
+		printf("Can't open");
 		return;
 	}
 
@@ -90,13 +90,13 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 			rewind(stdin);
 		}
 
-		printf("Enter staff ID(6 characters): ");
+		printf("Enter staff ID(4 characters): ");
 		scanf("%[^\n]", idEntered);
 		rewind(stdin);
-		while (strlen(idEntered) != 6)
+		while (strlen(idEntered) != 4)
 		{
-			printf("Needs to be 6 characters please reenter : \n");
-			printf("Enter staff ID(6 characters): ");
+			printf("Needs to be 4 characters please reenter!\n");
+			printf("Enter staff ID(4 characters): ");
 			scanf("%[^\n]", idEntered);
 			rewind(stdin);
 		}
@@ -108,10 +108,10 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 				printf("Reenter ID :");
 				scanf("%[^\n]", idEntered);
 				rewind(stdin);
-				while (strlen(idEntered) != 6)
+				while (strlen(idEntered) != 4)
 				{
-					printf("Needs to be 6 characters please reenter : \n");
-					printf("Enter staff ID(6 characters): ");
+					printf("Needs to be 4 characters please reenter : \n");
+					printf("Enter staff ID(4 characters): ");
 					scanf("%[^\n]", idEntered);
 					rewind(stdin);
 				}
@@ -134,6 +134,10 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	
 	int i = 0,count;
 	count=readStfList();
+	if (count == 0)
+	{
+		printf("There is currently no staff that is registered.\n");
+	}
 	for(i=0;i<count;i++)
 	{
 		printf("Name:%s\nID:%s\nPosition:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
@@ -177,7 +181,7 @@ void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 
 int staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
-	char stfID[7],ans;
+	char stfID[6],ans;
 	int i = 0, totstaff, stfcount = 0,staffAdd,stafffound=0;
 	totstaff = readStfList();
 
@@ -196,7 +200,6 @@ int staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 			{
 				printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
 				stafffound = 1;
-				// totstaff = 0;
 				break;
 			}
 			else if (stfcount >= totstaff)
@@ -293,13 +296,13 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 			}
 			break;
 		case '3':
-			printf("Enter new staff ID(6 characters): ");
+			printf("Enter new staff ID(4 characters): ");
 			scanf("%[^\n]", staffChange.stfID);
 			rewind(stdin);
-			while (strlen(staffChange.stfID) != 6)
+			while (strlen(staffChange.stfID) != 4)
 			{
-				printf("Needs to be 6 characters please reenter : \n");
-				printf("Enter staff ID(6 characters): ");
+				printf("Needs to be 4 characters please reenter : \n");
+				printf("Enter staff ID(4 characters): ");
 				scanf("%[^\n]", staffChange.stfID);
 				rewind(stdin);
 			}
@@ -311,10 +314,10 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 					printf("Reenter ID :");
 					scanf("%[^\n]", staffChange.stfID);
 					rewind(stdin);
-					while (strlen(staffChange.stfID) != 6)
+					while (strlen(staffChange.stfID) != 4)
 					{
-						printf("Needs to be 6 characters please reenter : \n");
-						printf("Enter staff ID(6 characters): ");
+						printf("Needs to be 4 characters please reenter : \n");
+						printf("Enter staff ID(4 characters): ");
 						scanf("%[^\n]", staffChange.stfID);
 						rewind(stdin);
 					}
@@ -329,8 +332,7 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 			break;
 		case '5':
 			printf("Exiting");
-			exit(0);
-			break;
+			return;
 
 		default:
 			printf("Invalid choice !\n");
@@ -375,6 +377,14 @@ void pwRecover()
 
 void staffMain()
 {
+	FILE*stflist;
+	stflist = fopen("staffNameList.bin", "ab");
+	if (!stflist)
+	{
+		printf("Can't open file");
+		return;
+	}
+	fclose(stflist);
 	int err = 0;
 	char choice[10];
 	do
@@ -398,6 +408,7 @@ void staffMain()
 
 		case '1':
 			displayStaffList();
+			printf("Enter anything to continue.");
 			scanf("%d", choice);
 			break;
 		case '2':
