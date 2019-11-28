@@ -108,7 +108,7 @@ void bookingBook()
 	do {
 		if (err)
 		{
-			printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date");
+			printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date\n");
 		}
 		err = 1;
 		// If available, ask user for date
@@ -334,10 +334,6 @@ int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize,
 				if (data[a].timeSlotsBooked[b]) // if this slot is booked
 				{
 					timeslot[b] = 0;
-				}
-				else
-				{
-					timeslot[b] = 1;
 				}
 			}
 		}
