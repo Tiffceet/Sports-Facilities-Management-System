@@ -3,7 +3,7 @@
 
 // Unable to move initialisation to booking.h ? 
 // initialise timeslots
-char TIMESLOTS[6][15] = { "7am - 9am", "9am - 11am", "1pm - 3pm", "3pm - 5pm", "5pm - 7pm", "7pm - 9pm" };
+const char TIMESLOTS[6][15] = { "7am - 9am", "9am - 11am", "1pm - 3pm", "3pm - 5pm", "5pm - 7pm", "7pm - 9pm" };
 void bookingMain()
 {
 	// define filepath
@@ -169,10 +169,10 @@ void bookingBook()
 			}
 			// NEED TO FKING ADD COMFIRMATIONA AND WHOLE LOT OF SHIT
 			
-			printf("Please read the booking details again for confirmation. (Y=Comfirm)\n");
+			printf("Please read the booking details again for confirmation. (Y=Comfirm) ? ");
 			char bookingComfirmChoice[10];
 			getUserMenuChoice(bookingComfirmChoice, 9, "Please read the booking details again for confirmation. (Y=Comfirm) ? ");
-			if (tolower(choice[0]) != 'y')
+			if (tolower(bookingComfirmChoice[0]) != 'y')
 			{
 				break;
 			}
