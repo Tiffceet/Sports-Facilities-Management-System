@@ -11,11 +11,11 @@ void registerInfo();
 char UserInfoFilePath[1024];
 typedef struct {
 
-	char name[100];
-	char id[15];
+	char name[25];
+	char id[5];
 	char gender;
-    char contact[100];
-	char password[100];
+	char contact[12];
+	char password[12];
 }userData;
 
 #endif
