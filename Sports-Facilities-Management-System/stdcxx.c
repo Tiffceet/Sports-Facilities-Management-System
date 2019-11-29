@@ -164,10 +164,10 @@ int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2)
 {
 	if (dd1 == dd2 && mm1 == mm2 && yy1 == yy2) return 0;
 	if (yy1 > yy2) return 1;
-	if (yy2 < yy1) return -1;
+	if (yy2 > yy1) return -1;
 	if (mm1 > mm2) return 1;
-	if (mm2 < mm1) return -1;
+	if (mm2 > mm1) return -1;
 	if (dd1 > dd2) return 1;
-	if (dd2 < dd1) return -1;
+	if (dd2 > dd1) return -1;
 	return -2;
 }

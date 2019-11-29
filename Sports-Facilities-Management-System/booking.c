@@ -250,6 +250,104 @@ void bookingDisplayAll()
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "======================================================================================================================");
 	printf("\n%d record(s) found. \n", count);
+
+	char filterChoice[10];
+	printf("\nDo you wish to add filters ? (Y = yes) ");
+	getUserMenuChoice(filterChoice, 9, "Do you wish to add filters ? (Y = yes, other to return to menu) \n");
+	if (tolower(filterChoice[0]) == 'y')
+	{
+		bookingDisplayFilters(&data[0], count);
+	}
+
+}
+
+void bookingDisplayFilters(BookingData *data, int dataCount)
+{
+	Date dotFrom, dotTo, bookFrom, bookTo;
+	char dateSTR[30];
+	int r; // keep track of scanf() result
+	int timeslot[6];
+	char facilityID[100][100], staffID[100][100], userID[100][100];
+	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
+	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
+	char filterChoice[10];
+	do{
+		char statusText[6][100];
+		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
+		if (isSet[1]) break; else strcpy(statusText[1], "Not Set");
+		if (isSet[2]) break; else strcpy(statusText[2], "Not Set");
+		if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
+		if (isSet[4]) break; else strcpy(statusText[4], "Not Set");
+		if (isSet[5]) break; else strcpy(statusText[5], "Not Set");
+		printf("\n[ Filters ]\n");
+		printf("[1] Date of Transactions : %s\n", statusText[0]);
+		printf("[2] Booking Date         : %s\n", statusText[1]);
+		printf("[3] TimeslotBooked       : %s\n", statusText[2]);
+		printf("[4] FacilityBooked       : %s\n", statusText[3]);
+		printf("[5] Staff involved       : %s\n", statusText[4]);
+		printf("[6] User Involved        : %s\n", statusText[5]);
+		printf("\nEnter 'X' to apply filters\n\nAdd/Change Filter (1-6)? ");
+		getUserMenuChoice(filterChoice, 9, "Add/Change Filter (1-6)? ");
+		switch (filterChoice[0])
+		{
+		case '1':
+			do
+			{
+				printf("\nEnter 'X' to unset filter\nPlease make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy): ");
+				s_input(dateSTR, 29);
+				if (strcmp(trimwhitespace(dateSTR), "X") == 0) 
+				{
+					isSet[0] = 0;
+					break;
+				}
+				else
+				{
+					isSet[0] = 1;
+				}
+				r = sscanf(dateSTR, "%d/%d/%d", &dotFrom.d, &dotFrom.m, &dotFrom.y);
+			} while (r != 3 || !validateDate(dotFrom.d, dotFrom.m, dotFrom.y));
+			if (!isSet[0]) // if it was unset when user was prompted for date
+			{
+				break;
+			}
+			do
+			{
+				printf("Enter date thats after Starting Date\n");
+				printf("\tENDS AT ? (dd/mm/yyyy): ");
+				s_input(dateSTR, 29);
+				r = sscanf(dateSTR, "%d/%d/%d", &dotTo.d, &dotTo.m, &dotTo.y);
+			} while (r != 3 || !validateDate(dotTo.d, dotTo.m, dotTo.y) ||
+				compareDate(dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y) == 1);
+			isSet[0] = 1;
+			break;
+		case '2':
+			break;
+		case '3':
+			break;
+		case '4':
+			break;
+		case '5':
+			break;
+		case '6':
+			break;
+		case 'X':
+		case 'x':
+			for (int a = 0; a < dataCount; a++)
+			{
+				printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
+					data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
+					data[a].bookingID,
+					data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
+					TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
+					data[a].facilityID,
+					data[a].usrID,
+					data[a].staffID);
+			}
+			break;
+		default:
+			break;
+		}
+	} while (filterChoice[0] != 'X');
 	system("pause");
 }
 
