@@ -103,9 +103,9 @@ void bookingBook()
 	char choice[10];
 	do{
 		char facilityStatus[100], bookingDateStatus[100], timeslotStatus[100];
-		if (isSet[0]) strcpy(facilityStatus, userPickedfacilityID); else strcpy(facilityStatus, "Not Set");
-		if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "Not Set");
-		if (isSet[2]) strcpy(timeslotStatus,TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "Not Set");
+		if (isSet[0]) strcpy(facilityStatus, userPickedfacilityID); else strcpy(facilityStatus, "<!> Not Set <!>");
+		if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "<!> Not Set <!>");
+		if (isSet[2]) strcpy(timeslotStatus,TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "<!> Not Set <!>");
 		printf(" <----------------------------------------------------->\n");
 		printf(" ->                  Booking Details                  <-\n");
 		printf(" <----------------------------------------------------->\n");
@@ -215,7 +215,8 @@ void bookingDisplayAll()
 	FILE *f = fopen(bookingFilePath, "r");
 	if (!chkFileExist(f))
 	{
-		printf("No records found.\n");
+		printf("\n<!> ERR: No records found. <!>\n");
+		system("pause");
 		return;
 	}
 	fclose(f);
@@ -395,6 +396,7 @@ int getTimeslotBooked(int *timeslot)
 			return a;
 		}
 	}
+	return -1;
 }
 // ============================================================================================
 // ============================================================================================
@@ -423,15 +425,6 @@ int bipChangeFacility(char *userPickedfacilityID)
 // Return 1 if bookingDate changed successfully
 int bipChangeBookingDate(Date *bookingDate)
 {
-	/*int isTimeSlotAvailable;
-	int timeSlotsAvailable[6] = { 1,1,1,1,1,1 };*/
-	//do {
-	/*if (err)
-	{
-		printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date\n");
-	}
-	err = 1;*/
-
 	// If available, ask user for date
 	Date currentDate;
 	getSystemDate(&currentDate);
@@ -451,10 +444,6 @@ int bipChangeBookingDate(Date *bookingDate)
 		!validateDate(bookingDate->d, bookingDate->m, bookingDate->y) ||
 		compareDate(bookingDate->d, bookingDate->m, bookingDate->y, currentDate.d, currentDate.m, currentDate.y) != 1
 		);
-
-		// check for availablity		
-		// isTimeSlotAvailable = checkForTimeslotsAvailablity(&timeSlotsAvailable[0], &data[0], count, &userPickedDate, userPickedfacilityID);
-	//} while (!isTimeSlotAvailable);
 	err = 0;
 	return 1;
 }

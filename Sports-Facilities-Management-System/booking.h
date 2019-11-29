@@ -37,4 +37,5 @@ int getTimeslotBooked(int *timeslot);
 // Functions for BIP (Book-In-Progress)
 int bipChangeFacility(char *userPickedfacilityID);
 int bipChangeBookingDate(Date *bookingDate);
+int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
 #endif
