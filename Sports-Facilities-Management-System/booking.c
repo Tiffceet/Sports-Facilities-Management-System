@@ -1,6 +1,9 @@
 #include "booking.h"
 #include "stdcxx.h"
 
+// Unable to move initialisation to booking.h ? 
+// initialise timeslots
+char TIMESLOTS[6][15] = { "7am - 9am", "9am - 11am", "1pm - 3pm", "3pm - 5pm", "5pm - 7pm", "7pm - 9pm" };
 void bookingMain()
 {
 	// define filepath
@@ -37,6 +40,7 @@ int bookingMenu()
 	case '3':
 		break;
 	case '4':
+		bookingDisplayAll();
 		break;
 	case '5':
 		return 0;
@@ -81,10 +85,10 @@ void bookingBook()
 	if (chkFileExist(f))
 	{
 		while (fscanf(f, "%[^,]%*[^\n]\n", &latestBookingID) != EOF);
-		fclose(f);
+		fclose(f); // if file exist, means its pointer is not closed -> refer to chkFileExist()
 	}
 
-	int count = readBookingDataIntoStructArray(&data, 100); // read file into struct array + get entries count
+	int count = readBookingDataIntoStructArray(&data[0], 100); // read file into struct array + get entries count
 
 	incrementBookingID(latestBookingID); // increment bookingID
 	printBookingInfo();
@@ -115,7 +119,7 @@ void bookingBook()
 		askUserForBookingDate(&userPickedDate);
 
 		// check for availablity		
-		isTimeSlotAvailable = checkForTimeslotsAvailablity(&timeSlotsAvailable, &data, count, &userPickedDate, userPickedfacilityID);
+		isTimeSlotAvailable = checkForTimeslotsAvailablity(&timeSlotsAvailable[0], &data[0], count, &userPickedDate, userPickedfacilityID);
 	} while (!isTimeSlotAvailable);
 	err = 0;
 
@@ -169,7 +173,7 @@ void bookingBook()
 	strcpy(data[count].usrID, "U0001");
 	strcpy(data[count].staffID, "S0001");
 	strcpy(data[count].facilityID, userPickedfacilityID);
-	writeBookingDataIntoFile(&data, count + 1);
+	writeBookingDataIntoFile(&data[0], count + 1);
 
 }
 
@@ -192,6 +196,25 @@ void bookingDisplayAll()
 		return;
 	}
 	fclose(f);
+	BookingData data[100];
+	int count = readBookingDataIntoStructArray(&data[0], 100);
+	printf("%s\n", "======================================================================================================================");
+	printf("%s\n", "|                                               Booking Transactions                                                 |");
+	printf("%s\n", "======================================================================================================================");
+	printf("%s\n", "| DateofTransaction BookingID BookingDate TimeslotBooked FacilityBooked                 Booked by    Registered by   |");
+	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
+	printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
+		2,2,2014,20,30,
+		"B000001",
+		4,4,2014,
+		TIMESLOTS[1],
+		"Badminton Court",
+		"User",
+		"Staff");
+	for (int a = 0; a < count; a++)
+	{
+
+	}
 }
 
 // ============================================================================================
@@ -200,6 +223,7 @@ void bookingDisplayAll()
 // make sure to initialise first byte of oldBookID to '\0'
 
 // Return amount of data entries found
+// Do fclose() before calling this function
 int readBookingDataIntoStructArray(BookingData *data, int size)
 {
 	FILE *f = fopen(bookingFilePath, "r");
@@ -266,6 +290,7 @@ void writeBookingDataIntoFile(BookingData *data, int dataCount)
 }
 
 // Starts with B000001
+// To prevent invalid string, please set oldBookID[0] = '\0' before passing it to this function
 void incrementBookingID(char *oldBookID)
 {
 	// if oldBookID is not initialised, set it to initial value
