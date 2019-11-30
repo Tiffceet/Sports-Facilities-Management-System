@@ -27,6 +27,7 @@ void bookingSeachRecords();
 void bookingModifyRecords();
 void bookingDisplayAll();
 void bookingDisplayFilters(BookingData *data, int dataCount);
+int filterDOT(int *isSet, Date *dotFrom, Date *dotTo);
 
 // Util Functions & Sub Functions
 int readBookingDataIntoStructArray(BookingData *data, int size);

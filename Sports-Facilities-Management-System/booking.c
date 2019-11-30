@@ -264,8 +264,6 @@ void bookingDisplayAll()
 void bookingDisplayFilters(BookingData *data, int dataCount)
 {
 	Date dotFrom, dotTo, bookFrom, bookTo;
-	char dateSTR[30];
-	int r; // keep track of scanf() result
 	int timeslot[6];
 	char facilityID[100][100], staffID[100][100], userID[100][100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
@@ -291,34 +289,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 		switch (filterChoice[0])
 		{
 		case '1':
-			do
-			{
-				printf("\nEnter 'X' to unset filter\nPlease make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy): ");
-				s_input(dateSTR, 29);
-				if (strcmp(trimwhitespace(dateSTR), "X") == 0) 
-				{
-					isSet[0] = 0;
-					break;
-				}
-				else
-				{
-					isSet[0] = 1;
-				}
-				r = sscanf(dateSTR, "%d/%d/%d", &dotFrom.d, &dotFrom.m, &dotFrom.y);
-			} while (r != 3 || !validateDate(dotFrom.d, dotFrom.m, dotFrom.y));
-			if (!isSet[0]) // if it was unset when user was prompted for date
-			{
-				break;
-			}
-			do
-			{
-				printf("Enter date thats after Starting Date\n");
-				printf("\tENDS AT ? (dd/mm/yyyy): ");
-				s_input(dateSTR, 29);
-				r = sscanf(dateSTR, "%d/%d/%d", &dotTo.d, &dotTo.m, &dotTo.y);
-			} while (r != 3 || !validateDate(dotTo.d, dotTo.m, dotTo.y) ||
-				compareDate(dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y) == 1);
-			isSet[0] = 1;
+			isSet[0] = filterDOT(&isSet[0], &dotFrom, &dotTo);
 			break;
 		case '2':
 			break;
@@ -349,6 +320,33 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 		}
 	} while (filterChoice[0] != 'X');
 	system("pause");
+}
+
+// return 1 if filter for date of transaction is set successfully
+int filterDOT(int *isSet, Date *dotFrom, Date *dotTo)
+{
+	char dateSTR[30];
+	int r; // keep track of scanf() result
+	do
+	{
+		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\nPlease make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy): ");
+		s_input(dateSTR, 29);
+		if (strcmp(trimwhitespace(dateSTR), "X") == 0)
+		{
+			isSet[0] = 0;
+			return 0;
+		}
+		r = sscanf(dateSTR, "%d/%d/%d", &dotFrom->d, &dotFrom->m, &dotFrom->y);
+	} while (r != 3 || !validateDate(dotFrom->d, dotFrom->m, dotFrom->y));
+	do
+	{
+		printf("Enter date thats after Starting Date\n");
+		printf("\tENDS AT ? (dd/mm/yyyy): ");
+		s_input(dateSTR, 29);
+		r = sscanf(dateSTR, "%d/%d/%d", &dotTo->d, &dotTo->m, &dotTo->y);
+	} while (r != 3 || !validateDate(dotTo->d, dotTo->m, dotTo->y) ||
+		compareDate(dotFrom->d, dotFrom->m, dotFrom->y, dotTo->d, dotTo->m, dotTo->y) == 1);
+	return 1;
 }
 
 // ============================================================================================
