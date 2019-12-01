@@ -3,7 +3,7 @@
 
 // Unable to move initialisation to booking.h ? 
 // initialise timeslots
-const char TIMESLOTS[6][15] = { "7am - 9am", "9am - 11am", "1pm - 3pm", "3pm - 5pm", "5pm - 7pm", "7pm - 9pm" };
+const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
 	// define filepath
@@ -264,16 +264,34 @@ void bookingDisplayAll()
 void bookingDisplayFilters(BookingData *data, int dataCount)
 {
 	Date dotFrom, dotTo, bookFrom, bookTo;
-	int timeslot[6];
+	int timeslot[6] = {0,0,0,0,0,0}; // for TimeslotBooked
 	char facilityID[100][100], staffID[100][100], userID[100][100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
 	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
 	char filterChoice[10];
 	do{
-		char statusText[6][100];
+		char statusText[6][100] = {"", "", "" , "" , "" , ""};
 		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
-		if (isSet[1]) break; else strcpy(statusText[1], "Not Set");
-		if (isSet[2]) break; else strcpy(statusText[2], "Not Set");
+		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
+		if (isSet[2]) 
+		{
+			int firstTime = 1;
+			for (int a = 0; a < 6; a++)
+			{
+				if (timeslot[a])
+				{
+					if(firstTime){
+						sprintf(statusText[2], "%s", TIMESLOTS[a]);
+						firstTime = 0;
+					}
+					else
+					{
+						sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+					}
+				}
+			}
+		}
+		else strcpy(statusText[2], "Not Set");
 		if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
 		if (isSet[4]) break; else strcpy(statusText[4], "Not Set");
 		if (isSet[5]) break; else strcpy(statusText[5], "Not Set");
@@ -289,11 +307,13 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 		switch (filterChoice[0])
 		{
 		case '1':
-			isSet[0] = filterDOT(&isSet[0], &dotFrom, &dotTo);
+			isSet[0] = dispfilterDOT(&isSet[0], &dotFrom, &dotTo);
 			break;
 		case '2':
+			isSet[1] = dispfilterBookingDate(&bookFrom, &bookTo);
 			break;
 		case '3':
+			isSet[2] = dispfilterTimeslotBooked(&timeslot);
 			break;
 		case '4':
 			break;
@@ -303,8 +323,9 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			break;
 		case 'X':
 		case 'x':
+			// Apply filters
 			for (int a = 0; a < dataCount; a++)
-			{
+			{ // ALOT OF IF_ELSE WILL BE HERE
 				printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
 					data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 					data[a].bookingID,
@@ -323,13 +344,14 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 }
 
 // return 1 if filter for date of transaction is set successfully
-int filterDOT(int *isSet, Date *dotFrom, Date *dotTo)
+int dispfilterDOT(int *isSet, Date *dotFrom, Date *dotTo)
 {
 	char dateSTR[30];
 	int r; // keep track of scanf() result
 	do
 	{
-		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\nPlease make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy): ");
+		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\n");
+		printf("Please make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy) : ");
 		s_input(dateSTR, 29);
 		if (strcmp(trimwhitespace(dateSTR), "X") == 0)
 		{
@@ -349,6 +371,71 @@ int filterDOT(int *isSet, Date *dotFrom, Date *dotTo)
 	return 1;
 }
 
+// return 1 if filter for booking date is successfully set
+int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo)
+{
+	char dateSTR[30];
+	int r; // keep track of scanf() result
+	do
+	{
+		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\n");
+		printf("Please make sure date entered is valid.\nBooking Date\n\tSTARTING FROM ? (dd/mm/yyyy) : ");
+		s_input(dateSTR, 29);
+		if (strcmp(trimwhitespace(dateSTR), "X") == 0)
+		{
+			return 0;
+		}
+		r = sscanf(dateSTR, "%d/%d/%d", &bookingDateFrom->d, &bookingDateFrom->m, &bookingDateFrom->y);
+	} while (r != 3 || !validateDate(bookingDateFrom->d, bookingDateFrom->m, bookingDateFrom->y));
+	do
+	{
+		printf("Enter date thats after Starting Date\n");
+		printf("\tENDS AT ? (dd/mm/yyyy): ");
+		s_input(dateSTR, 29);
+		r = sscanf(dateSTR, "%d/%d/%d", &bookingDateTo->d, &bookingDateTo->m, &bookingDateTo->y);
+	} while (r != 3 || !validateDate(bookingDateTo->d, bookingDateTo->m, bookingDateTo->y) ||
+		compareDate(bookingDateFrom->d, bookingDateFrom->m, bookingDateFrom->y, bookingDateTo->d, bookingDateTo->m, bookingDateTo->y) == 1);
+	return 1;
+}
+
+// return 1 if timeslotBooked filter is updated successfully
+int dispfilterTimeslotBooked(int *timeslot)
+{
+	char rawInput[10];	
+	char choice[10];
+	int tsPicked, firstTime = 1; // firstTime to check if its the first iteration in loop, tsPicked to get IDX of timeslot picked by user
+	do{
+		do{
+			if (firstTime) {
+				printf("Timeslot:\n");
+				for (int a = 0; a < 6; a++) {
+					printf("\t[%d] %s ", a + 1, TIMESLOTS[a]);
+					if (timeslot[a]) printf("<selected>\n"); else printf("<unselected>\n");
+				}
+				printf("\n<INFO> Enter 'X' to unset all filter <INFO>\n");
+				printf("\n<INFO> Choose timeslot that is already selected will unselect it. <INFO>\n\n");
+			}
+			printf("Pick timeslot (1-6): ");
+			getUserMenuChoice(rawInput, 9, "Pick timeslot (1-6): ");
+			if (tolower(rawInput[0]) == 'x')
+			{
+				timeslot[0] = 0; timeslot[1] = 0; timeslot[2] = 0; timeslot[3] = 0; timeslot[4] = 0; timeslot[5] = 0;
+				return 0;
+			}
+		} while (rawInput[0] < '1' || rawInput[0] > '6');
+		tsPicked = strtol(rawInput, NULL, 10) - 1;
+		timeslot[tsPicked] = !timeslot[tsPicked];
+		printf("Timeslot:\n");
+		for (int a = 0; a < 6; a++) {
+			printf("\t[%d] %s ", a + 1, TIMESLOTS[a]);
+			if (timeslot[a]) printf("<selected>\n"); else printf("<unselected>\n");
+		}
+		printf("Add more timeslot for filtering (y=yes) ? ");
+		getUserMenuChoice(choice, 9, "Add more timeslot for filtering (y=yes) ? ");
+		firstTime = 0;
+	} while (tolower(choice[0]) == 'y');
+	return 1;
+}
 // ============================================================================================
 // Utilities & Sub Functions go below this point
 // ============================================================================================
@@ -553,18 +640,11 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 		return 0;
 	}
 	printf("Timeslots: \n");
-	printf("\t1. 7am-9am ");
-	if (timeslotAvailable[0]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t2. 9am-11am");
-	if (timeslotAvailable[1]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t3. 1pm-3pm ");
-	if (timeslotAvailable[2]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t4. 3pm-5pm ");
-	if (timeslotAvailable[3]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t5. 5pm-7pm ");
-	if (timeslotAvailable[4]) printf(" <Available>\n"); else printf(" <Not Available>\n");
-	printf("\t6. 7pm-9pm ");
-	if (timeslotAvailable[5]) printf(" <Available>\n"); else printf(" <Not Available>\n");
+	for (int a = 0; a < 6; a++)
+	{
+		printf("\t1. %s ", TIMESLOTS[a]);
+		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
+	}
 
 	// NOTE TO MYSELF: LOL I HAVE THIS WEIRD SHIT CRITERIA WHERE IF ITS WEEKENDS THEN NO BOOKING FOR USER REEEEE
 	char userPickedtimeslotSTR[10]; // for string input
