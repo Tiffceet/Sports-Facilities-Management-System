@@ -18,6 +18,80 @@ void init()
 	}
 }
 
+int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
+{
+	rewind(stdin);
+	unsigned char input1, input2;
+	char titleFormat[300];
+	int curPos = 1;
+	if(strlen(title) % 2 == 0){
+		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (70 - strlen(title))/2, (70 - strlen(title)) / 2);
+	}
+	else
+	{
+		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (70 - strlen(title)) / 2, (70 - strlen(title)) / 2 + 1);
+	}
+	do{
+		system("cls");
+		printf("%14s   ____              __        ____         _ ___ __  _           ____        __          \n", "");
+		printf("%14s  / __/__  ___  ____/ /____   / __/__ _____(_) (_) /_(_)__ ___   / __/_ _____/ /____ __ _ \n", "");
+		printf("%14s _\\ \\/ _ \\/ _ \\/ __/ __(_-<  / _// _ `/ __/ / / / __/ / -_|_-<  _\\ \\/ // (_-< __/ -_)  ' \\\n", "");
+		printf("%14s/___/ .__/\\___/_/  \\__/___/ /_/  \\_,_/\\__/_/_/_/\\__/_/\\__/___/ /___/\\_, /___|__/\\__/_/_/_/\n", "");
+		printf("%14s   /_/                                                             /___/                  \n\n", "");
+		printf("%22s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
+		// printf("%s;\n", titleFormat);
+		printf(titleFormat, "", "",title, "");
+		printf("%22s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
+		printf("%22s|                                                                        |\n", "");
+		for (int a = 0; a < choiceCount; a++)
+		{
+			if(curPos == a+1){
+				printf("%22s| %3s %2d. %-62s |\n", "", "->", a+1,choiceText[a]);			
+			}
+			else
+			{
+				printf("%22s| %3s %2d. %-62s |\n", "", "", a + 1, choiceText[a]);
+			}
+
+		}
+		printf("%22s|                                                                        |\n", "");
+		printf("%22s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n\n", "");
+		printf("%22s* \\               Press 'Up' & 'Down' to move selection.               / *\n", "");
+		printf("%22s   \\ *              Press 'ENTER' to comfirm selection              * /\n", "");
+		input1 = _getch();
+		if (input1 == 0) // if fn keys are pressed
+		{
+			// simply ignore
+			_getch();
+			continue;
+		}
+		if (input1 == 13) // if enter key is pressed
+		{
+			return curPos;
+		}
+		if (input1 == 224) // if arrow key is pressed
+		{
+			input2 = _getch();
+			if (input2 == 80) // if Down is pressed
+			{
+				curPos++;
+			}
+			if (input2 == 72) // if Up is pressed
+			{
+				curPos--;
+			}
+		}
+		if (curPos < 1)
+		{
+			curPos = choiceCount;
+		}
+		if (curPos > choiceCount)
+		{
+			curPos = 1;
+		}
+	} while (1);
+}
+
 void getUserMenuChoice(char buffer[], int size, char *errMsg)
 {
 	while (1) {

@@ -12,6 +12,7 @@
 #include <string.h>
 #include <time.h>
 #include <math.h>
+#include <conio.h>
 #pragma warning(disable: 4996)
 
 // Env variables declarations
@@ -34,6 +35,9 @@ typedef struct
 
 // Function to define all env variables
 void init();
+
+// Function for every module's main menu
+int globalMainMenu(char* title, int choiceCount, char choiceText[][100]);
 
 // ===================================================================================================
 // functions related to inputs

@@ -19,7 +19,7 @@ void bookingMain()
 
 int bookingMenu()
 {
-	printf("==============\n");
+	/*printf("==============\n");
 	printf("Booking Module\n");
 	printf("==============\n");
 	printf("1. Book\n");
@@ -29,20 +29,22 @@ int bookingMenu()
 	printf("5. Return to console\n");
 	printf("\nMenu Choice: ");
 	char choice[10];
-	getUserMenuChoice(choice, 9, "Menu Choice: ");
-	switch (choice[0])
+	getUserMenuChoice(choice, 9, "Menu Choice: ");*/
+	char choiceText[][100] = { "Book", "Search Records", "Modify records", "Display all bookings", "Return to console" };
+	int choice = globalMainMenu("Booking Module", 5, choiceText);
+	switch (choice)
 	{
-	case '1':
+	case 1:
 		bookingBook(); // add do while loop to ask user if want to book mores
 		break;
-	case '2':
+	case 2:
 		break;
-	case '3':
+	case 3:
 		break;
-	case '4':
+	case 4:
 		bookingDisplayAll();
 		break;
-	case '5':
+	case 5:
 		return 0;
 	default:
 		return 1;
@@ -114,9 +116,9 @@ void bookingBook()
 		printf(" | Timeslot     : %-36.36s |\n", timeslotStatus);
 		printf(" <----------------------------------------------------->\n\n");
 		printf(" Select: \n");
-		printf(" \t[1] Change Facility\n");
-		printf(" \t[2] Change Booking Date\n");
-		printf(" \t[3] Change Timeslot\n");
+		printf(" \t[1] Set Facility\n");
+		printf(" \t[2] Set Booking Date\n");
+		printf(" \t[3] Set Timeslot\n");
 		printf(" \t[4] Comfirm Booking\n");
 		printf(" \t[5] Cancel Booking\n\n");
 		printf(" Choice ? ");
@@ -189,6 +191,16 @@ void bookingBook()
 			strcpy(data[count].staffID, "S0001");
 			strcpy(data[count].facilityID, userPickedfacilityID);
 			writeBookingDataIntoFile(&data[0], count + 1);
+			printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
+				data[count].staffID,
+				data[count].usrID,
+				data[count].facilityID,
+				data[count].bookingDate.d, 
+				data[count].bookingDate.m,
+				data[count].bookingDate.y,
+				TIMESLOTS[getTimeslotBooked(data[count].timeSlotsBooked)]
+				);
+			system("pause");
 			return;
 		case '5':
 			return;
@@ -313,7 +325,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			isSet[1] = dispfilterBookingDate(&bookFrom, &bookTo);
 			break;
 		case '3':
-			isSet[2] = dispfilterTimeslotBooked(&timeslot);
+			isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
 			break;
 		case '4':
 			break;
@@ -643,7 +655,7 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 	printf("Timeslots: \n");
 	for (int a = 0; a < 6; a++)
 	{
-		printf("\t%d. %s ",a, TIMESLOTS[a]);
+		printf("\t%d. %s ",a+1, TIMESLOTS[a]);
 		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	}
 
