@@ -339,7 +339,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 		default:
 			break;
 		}
-	} while (filterChoice[0] != 'X');
+	} while (tolower(filterChoice[0]) != 'x');
 	system("pause");
 }
 
@@ -350,6 +350,7 @@ int dispfilterDOT(int *isSet, Date *dotFrom, Date *dotTo)
 	int r; // keep track of scanf() result
 	do
 	{
+
 		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\n");
 		printf("Please make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy) : ");
 		s_input(dateSTR, 29);
@@ -642,7 +643,7 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 	printf("Timeslots: \n");
 	for (int a = 0; a < 6; a++)
 	{
-		printf("\t1. %s ", TIMESLOTS[a]);
+		printf("\t%d. %s ",a, TIMESLOTS[a]);
 		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	}
 
