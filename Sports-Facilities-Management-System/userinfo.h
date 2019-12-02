@@ -8,14 +8,16 @@ void displayInfo();
 void userinfoMain();
 void userInfo();
 void registerInfo();
+void modifyInfo2();
+int totalNumUser();
 char UserInfoFilePath[1024];
 typedef struct {
 
 	char name[100];
 	char id[15];
 	char gender;
-    char contact[100];
+	char contact[100];
 	char password[100];
 }userData;
-
+userData user1, user2[100];
 #endif
