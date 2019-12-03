@@ -8,8 +8,14 @@ int totalNumUser()
 	int i = 0;
 	FILE * userinfo1;
 	userinfo1 = fopen(UserInfoFilePath, "rb");
+	if (!chkFileExist(userinfo1))
+	{
+		printf("No registration has been made yet\n");
+		system("pause");
+		userInfo();
+	}
 
-\	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
+	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
 	{
 
 
@@ -34,22 +40,20 @@ void registerInfo()
 
 
 	userinfo = fopen(UserInfoFilePath, "ab");
-	/*if (!chkFileExist(userinfo))
+	if (userInfo == NULL)
 	{
-		printf("File doesnt exist\n");
-		userinfo = fopen(UserInfoFilePath, "ab");
-	} else{
-		fclose(userinfo);
-		userinfo = fopen(UserInfoFilePath, "ab");
-	}*/
+		printf("File userinfo can't be created\n");
+		system("pause");
+		userInfo();
+	}
 	
 	printf("Enter your user ID(4 characters) = ");
 	rewind(stdin);
 	scanf("%s", userData1.id);
-	while (strlen(userData1.id) != 4)
+	while (strlen(userData1.id) != 4 || userData1.id == NULL)
 	{
 
-		if (strlen(id) != 4)
+		if (strlen(id) != 4 || userData1.id == NULL)
 		{
 			printf("Enter a id that is 4 characters  = ");
 			rewind(stdin);
@@ -140,12 +144,14 @@ void registerInfo()
 			fclose(userinfo);
 			system("pause");
 			x = 1;
+			userInfo();
 		}
 		else if (toupper(confirmation) == 'N')
 		{
 			x = 1;
 			printf("User has not been regis congrats and enjoy your day\n");
-			return;
+			system("pause");
+			userInfo();
 		}
 		else
 		{
@@ -154,7 +160,7 @@ void registerInfo()
 		}
 
 	}
-
+	
 
 }
 void modifyInfo2()
@@ -166,7 +172,7 @@ void modifyInfo2()
 	FILE *userinfo1;
 	userinfo1 = fopen(UserInfoFilePath, "rb");
 	x = totalNumUser();
-	while (userinfo1 == NULL)
+	while (!chkFileExist(userinfo1))
 	{
 		printf("File userinfo doesnt exist\n");
 		system("pause");
@@ -211,6 +217,7 @@ void modifyInfo2()
 				}
 				fclose(userinfo1);
 				system("pause");
+				userInfo();
 				break;
 			case '2':userinfo1 = fopen(UserInfoFilePath, "wb");
 
@@ -223,6 +230,7 @@ void modifyInfo2()
 				}
 				fclose(userinfo1);
 				system("pause");
+				userInfo();
 				break;
 			case '3':
 
@@ -237,6 +245,7 @@ void modifyInfo2()
 				}
 				fclose(userinfo1);
 				system("pause");
+				userInfo();
 				break;
 			}
 		}
@@ -256,7 +265,7 @@ void displayInfo()
 	FILE *userinfo1;
 	userinfo1 = fopen(UserInfoFilePath, "rb");
 	x = totalNumUser();
-	while (userinfo1 == NULL)
+	while (!userinfo1 )
 	{
 		printf("File userinfo doesnt exist\n");
 		system("pause");
@@ -274,6 +283,7 @@ void displayInfo()
 	}
 	fclose(userinfo1);
 	system("pause");
+	userInfo();
 }
 
 
@@ -338,6 +348,7 @@ void searchInfo()
 
 
 	}
+	userInfo();
 }
 
 void userInfo()
@@ -375,7 +386,8 @@ void userInfo()
 }
 
 void userinfoMain() {
-	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, UserInfoFilePath);
+	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, "userinfo.dat");
+	
 	userInfo();
 
 }
