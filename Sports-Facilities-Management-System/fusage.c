@@ -1,34 +1,23 @@
 #include "fusage.h"
 #include "stdcxx.h"
 
-typedef struct
-{
-	Date date;
-	char time[30];
-	char userID[30], facilityID[20];
-	char usageType[20];
-}FacilityUsage;
 FacilityUsage fUsage[100];
-
-typedef struct
-{
-	char staffID[30], password[30];
-}StaffValidation;
-StaffValidation stfValid;
-
 int count;
 
 void fusagemain()
 {
 	staffLogin();
 	fUsageRecord();
-	fUsageMenu();
-	fUsageDisplay();
-	system("pause");
+	while (fUsageMenu())
+	{
+		continue;
+	}
 }
 
 void staffLogin()
 {
+	system("cls");
+	StaffValidation stfValid;
 	printf("Staff Login\n");
 	printf("===========\n");
 	printf("Enter Staff ID : ");
@@ -57,27 +46,27 @@ void fUsageRecord()
 	if (!chkFileExist(f))
 	{
 		printf("File of facilityinfo.txt cannot open\n");
+		system("pause");
 		return 0;
 	}
 
-	printf("======================\n");
+	/*printf("======================\n");
 	printf("Facility Status Record\n");
-	printf("======================\n");
+	printf("======================\n");*/
 	
-	printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
-	printf("====\t\t====\t\t=======\t\t===========\t==========\n");
+	/*printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+	printf("====\t\t====\t\t=======\t\t===========\t==========\n");*/
 	for (int i = 0; i < 100; i++)
 	{
 		while (fscanf(f, "\n%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
 			&fUsage[i].date.d, &fUsage[i].date.m, &fUsage[i].date.y,
 			fUsage[i].time, fUsage[i].userID, fUsage[i].facilityID, fUsage[i].usageType) != EOF)
 		{
-			printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
-				fUsage[i].date.y, fUsage[i].time, fUsage[i].userID, fUsage[i].facilityID, fUsage[i].usageType);
+			/*printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
+				fUsage[i].date.y, fUsage[i].time, fUsage[i].userID, fUsage[i].facilityID, fUsage[i].usageType);*/
 			count++;
 		}
 	}
-	printf("Total Record is : %d\n", count);
 	fclose(f);
 }
 
@@ -87,6 +76,7 @@ void fUsageAddRecord()
 	if (!chkFileExist(f))
 	{
 		printf("File of facilityinfo.txt cannot open\n");
+		system("pause");
 		return 0;
 	}
 	char ctn;
@@ -97,18 +87,18 @@ void fUsageAddRecord()
 
 	do
 	{
-		printf("Enter Date (DD/MM/YYYY)               : ");
+		printf("Enter Date < DD/MM/YYYY >                                            : ");
 		scanf("%d/%d/%d", &fUsage->date.d, &fUsage->date.m, &fUsage->date.y);
-		printf("Enter Time (10am - 10pm)              : ");
+		printf("Enter Time < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm, 5pm-7pm, 7pm-9pm > : ");
 		rewind(stdin);
 		scanf("%[^\n]", fUsage->time);
-		printf("Enter User ID (10 characters)         : ");
+		printf("Enter User ID < 4 characters >                                       : ");
 		rewind(stdin);
 		scanf("%[^\n]", fUsage->userID);
-		printf("Enter Facility ID (5 characters)      : ");
+		printf("Enter Facility ID < 5 characters >                                   : ");
 		rewind(stdin);
 		scanf("%[^\n]", fUsage->facilityID);
-		printf("Enter Usage Type (walked-in / booked) : ");
+		printf("Enter Usage Type < walked-in / booked >                              : ");
 		rewind(stdin);
 		scanf("%[^\n]", fUsage->usageType);
 		rewind(stdin);
@@ -129,6 +119,7 @@ void fUsageAddRecord()
 			fUsage->time, fUsage->userID, fUsage->facilityID, fUsage->usageType);
 	} while (toupper(ctn) == 'Y');
 	fclose(f);
+	system("pause");
 }
 
 void fUsageSearchRecord()
@@ -139,6 +130,7 @@ void fUsageSearchRecord()
 	if (!chkFileExist(f))
 	{
 		printf("File of facilityinfo.txt cannot open\n");
+		system("pause");
 		return 0;
 	}
 
@@ -167,11 +159,12 @@ void fUsageSearchRecord()
 		}
 	}
 	fclose(f);
+	system("pause");
 }
 
 void fUsageModify()
 {
-	char uID[11];
+	char uID[5];
 	char selection[30];
 	int aftD, aftM, aftY;
 	char aftTime[30], aftUserID[30], aftFacilityID[20], aftUsageType[20];
@@ -180,6 +173,7 @@ void fUsageModify()
 	if (!chkFileExist(f))
 	{
 		printf("File of facilityinfo.txt cannot open\n");
+		system("pause");
 		return 0;
 	}
 	printf("=============================\n");
@@ -210,17 +204,16 @@ void fUsageModify()
 			printf("Facility ID : %s\n", fUsage[i].facilityID);
 			printf("Usage Type  : %s\n", fUsage[i].usageType);
 
-			printf("Enter Details to Modify (Date/Time/UserID/FacilityID/UsageType) : ");
+			printf("Enter Details to Modify (Date/Time/FacilityID/UsageType) : ");
 			rewind(stdin);
 			scanf("%[^\n]", selection);
 			rewind(stdin);
 			while (strcmp(selection, "Date") != 0 && strcmp(selection, "Time") != 0 &&
-				strcmp(selection, "UserID") != 0 && strcmp(selection, "FacilityID") != 0 &&
-				strcmp(selection, "UsageType") != 0)
+				strcmp(selection, "FacilityID") != 0 && strcmp(selection, "UsageType") != 0)
 			{
 				printf("Invalid Input !!!\n");
 				printf("Re-enter :\n");
-				printf("Enter Details to Modify (Date/Time/UserID/FacilityID/UsageType) : ");
+				printf("Enter Details to Modify (Date/Time/FacilityID/UsageType) : ");
 				rewind(stdin);
 				scanf("%[^\n]", selection);
 				rewind(stdin);
@@ -256,23 +249,6 @@ void fUsageModify()
 				fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
 					fUsage->date.d, fUsage->date.m, fUsage->date.y,
 					aftTime, fUsage->userID, fUsage->facilityID, fUsage->usageType);
-			}
-			if (strcmp(selection, "UserID") == 0)
-			{
-				printf("User ID : ");
-				rewind(stdin);
-				scanf("%[^\n]", aftUserID);
-				printf("\nRecord After Modify\n");
-				printf("===================\n");
-				printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-					fUsage[i].date.m, fUsage[i].date.y);
-				printf("Time        : %s\n", fUsage[i].time);
-				printf("User ID     : %s\n", aftUserID);
-				printf("Facility ID : %s\n", fUsage[i].facilityID);
-				printf("Usage Type  : %s\n", fUsage[i].usageType);
-				fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-					fUsage->date.d, fUsage->date.m, fUsage->date.y,
-					fUsage->time, aftUserID, fUsage->facilityID, fUsage->usageType);
 			}
 			if (strcmp(selection, "FacilityID") == 0)
 			{
@@ -311,6 +287,7 @@ void fUsageModify()
 		}
 	}
 	fclose(f);
+	system("pause");
 }
 
 void fUsageDisplay()
@@ -319,6 +296,7 @@ void fUsageDisplay()
 	if (!chkFileExist(f))
 	{
 		printf("File of facilityinfo.txt cannot open\n");
+		system("pause");
 		return 0;
 	}
 	printf("======================\n");
@@ -340,34 +318,35 @@ void fUsageDisplay()
 
 int fUsageMenu()
 {
-	int err = 0;
-	char choice[10];
-
-	printf("=====================\n");
+	/*printf("=====================\n");
 	printf("Facility Usage Module\n");
 	printf("=====================\n");
 	printf("1. Add Record\n");
 	printf("2. Search Record\n");
 	printf("3. Modify Record\n");
-	printf("4. Return to Menu\n");
+	printf("4. Return to Menu\n");*/
 		
-	printf("Enter menu choice: ", "");
-	getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-	rewind(stdin);
+	char choiceText[][100] = { "Add Facilities Usage","Search Facilities Usage Record","Modify Facilities Usage Detail","Display all Facilities Usage","Return to console" };
+	int choice = globalMainMenu("Facilities Usage Module", 5, choiceText);
 	system("cls");
-	switch (choice[0])
+	switch (choice)
 	{
-	case'1':fUsageAddRecord();
+	case 1:
+		fUsageAddRecord();
 		break;
-	case'2':fUsageSearchRecord();
+	case 2:
+		fUsageSearchRecord();
 		break;
-	case'3':fUsageModify();
+	case 3:
+		fUsageModify();
 		break;
-	case'4':return 0;
+	case 4:
+		fUsageDisplay();
 		break;
+	case 5:
+		return 0;
 	default:
 		return 1;
 	}
-
-	return choice[0];
+	return 1;
 }
