@@ -23,7 +23,7 @@ void bookingMain();
 int bookingMenu();
 void printBookingInfo();
 void bookingBook();
-void bookingSeachRecords();
+void bookingSearchRecords();
 void bookingModifyRecords();
 void bookingDisplayAll();
 void bookingDisplayFilters(BookingData *data, int dataCount);
