@@ -7,9 +7,9 @@ int totalNumUser()
 {
 	int i = 0;
 	FILE * userinfo1;
-	userinfo1 = fopen("userInfo.dat", "rb");
+	userinfo1 = fopen(UserInfoFilePath, "rb");
 
-	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
+\	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
 	{
 
 
@@ -33,13 +33,16 @@ void registerInfo()
 
 
 
-	userinfo = fopen("userInfo.dat", "ab");
-	if (chkFileExist(userinfo))
+	userinfo = fopen(UserInfoFilePath, "ab");
+	/*if (!chkFileExist(userinfo))
 	{
 		printf("File doesnt exist\n");
-		system("pause");
-		return;
-	}
+		userinfo = fopen(UserInfoFilePath, "ab");
+	} else{
+		fclose(userinfo);
+		userinfo = fopen(UserInfoFilePath, "ab");
+	}*/
+	
 	printf("Enter your user ID(4 characters) = ");
 	rewind(stdin);
 	scanf("%s", userData1.id);
@@ -63,10 +66,10 @@ void registerInfo()
 	strcpy(nameChck, userData1.name);
 	for (i = 0; i < strlen(nameChck); i++)
 	{
-		while (isalpha(nameChck[i]) == 0 && nameChck[i] != '\0')
+		while (isalpha(nameChck[i]) == 0 )
 		{
 			printf("Please enter alphabets only.\n");
-			printf("Please enter your name (without spacing)      :  ");
+			printf("Please enter your name (without spacing):  ");
 			rewind(stdin);
 			scanf("%[^\n]", &nameChck);
 			i = 0;
@@ -75,10 +78,22 @@ void registerInfo()
 	strcpy(userData1.name, nameChck);
 	
 	
-	strcpy(userData1.name, nameChck);
-	printf("Enter your password = ");
+	
+	printf("Enter your password(minimum 6 - 12) = ");
 	rewind(stdin);
 	scanf("%s", userData1.password);
+	while (strlen(userData1.password) < 6 || strlen(userData1.password) > 12  )
+	{
+
+		if (strlen(userData1.password) < 6 || strlen(userData1.password) > 12 )
+		{
+			printf("Enter the password with at least minimum 6 - 12 words = ");
+			rewind(stdin);
+			scanf("%s", userData1.password);
+		}
+
+
+	}
 
 	printf("Renter your password = ");
 	rewind(stdin);
@@ -149,7 +164,7 @@ void modifyInfo2()
 	int i = 0;
 	int x = 0;
 	FILE *userinfo1;
-	userinfo1 = fopen("userinfo.dat", "rb");
+	userinfo1 = fopen(UserInfoFilePath, "rb");
 	x = totalNumUser();
 	while (userinfo1 == NULL)
 	{
@@ -185,7 +200,7 @@ void modifyInfo2()
 			getUserMenuChoice(choice, 6, "Menu Choice: ");
 			switch (choice[0])
 			{
-			case '1':userinfo1 = fopen("userinfo.dat", "wb");
+			case '1':userinfo1 = fopen(UserInfoFilePath, "wb");
 
 				printf("Enter new ID = ");
 				scanf("%s", s);
@@ -197,7 +212,7 @@ void modifyInfo2()
 				fclose(userinfo1);
 				system("pause");
 				break;
-			case '2':userinfo1 = fopen("userinfo.dat", "wb");
+			case '2':userinfo1 = fopen(UserInfoFilePath, "wb");
 
 				printf("Enter new password = ");
 				scanf("%s", s);
@@ -211,7 +226,7 @@ void modifyInfo2()
 				break;
 			case '3':
 
-				userinfo1 = fopen("userinfo.dat", "wb");
+				userinfo1 = fopen(UserInfoFilePath, "wb");
 
 				printf("Enter new contact = ");
 				scanf("%s", s);
@@ -239,7 +254,7 @@ void displayInfo()
 	int i = 0;
 	int x = 0;
 	FILE *userinfo1;
-	userinfo1 = fopen("userinfo.dat", "rb");
+	userinfo1 = fopen(UserInfoFilePath, "rb");
 	x = totalNumUser();
 	while (userinfo1 == NULL)
 	{
@@ -259,7 +274,6 @@ void displayInfo()
 	}
 	fclose(userinfo1);
 	system("pause");
-	return 0;
 }
 
 
@@ -270,7 +284,7 @@ void searchInfo()
 	char password[20];
 	userData user1;
 	FILE *userinfo1;
-	userinfo1 = fopen("userinfo.dat", "rb");
+	userinfo1 = fopen(UserInfoFilePath, "rb");
 
 	while (!chkFileExist(userinfo1))
 	{
@@ -315,7 +329,7 @@ void searchInfo()
 			printf("Gender is = %c\n", user1.gender);
 			printf("Contact number is = %s\n", user1.contact);
 			system("pause");
-			return 1;
+			return;
 
 
 
@@ -361,7 +375,7 @@ void userInfo()
 }
 
 void userinfoMain() {
-	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, "userinfo.dat");
+	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, UserInfoFilePath);
 	userInfo();
 
 }
