@@ -34,7 +34,7 @@ void registerInfo()
 
 
 	userinfo = fopen("userInfo.dat", "ab");
-	if (!chkFileExist(userinfo))
+	if (chkFileExist(userinfo))
 	{
 		printf("File doesnt exist\n");
 		system("pause");
@@ -60,6 +60,19 @@ void registerInfo()
 	printf("Enter your name = ");
 	rewind(stdin);
 	scanf("%[^\n]", userData1.name);
+	strcpy(nameChck, userData1.name);
+	for (i = 0; i < strlen(nameChck); i++)
+	{
+		while (isalpha(nameChck[i]) == 0 && nameChck[i] != '\0')
+		{
+			printf("Please enter alphabets only.\n");
+			printf("Please enter your name (without spacing)      :  ");
+			rewind(stdin);
+			scanf("%[^\n]", &nameChck);
+			i = 0;
+		}
+	}
+	strcpy(userData1.name, nameChck);
 	
 	
 	strcpy(userData1.name, nameChck);
