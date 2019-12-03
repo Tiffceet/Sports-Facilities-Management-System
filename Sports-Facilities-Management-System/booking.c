@@ -1,5 +1,9 @@
 #include "booking.h"
 #include "stdcxx.h"
+#include "facility.h"
+#include "fusage.h"
+#include "staff.h"
+#include "userinfo.h"
 
 // Unable to move initialisation to booking.h ? 
 // initialise timeslots
@@ -61,8 +65,7 @@ void printBookingInfo()
 	printf(" | 1. Please refrain from monopolising facility by making booking for a whole day                                    |\n");
 	printf(" | 2. Booking for multiple time slots is allowed                                                                     |\n");
 	printf(" | 3. Timeslots as follows:                                                                                          |\n");
-	printf(" |      - Weekdays (Mon - Fri) < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm, 5pm-7pm, 7pm-9pm >                             |\n");
-	printf(" |      - Weekends (Sat & Sun) < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm                   >                             |\n");
+	printf(" |      < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm, 5pm-7pm, 7pm-9pm >                             |\n");
 	printf(" | 4. Please proceed to payment counter after booking                                                                |\n");
 	printf(" |                                                                                                                   |\n");
 	printf(" =====================================================================================================================\n");
@@ -212,7 +215,7 @@ void bookingBook()
 	// End of Sub Menu	
 }
 
-void bookingSeachRecords()
+void bookingSearchRecords()
 {
 
 }
@@ -366,7 +369,7 @@ int dispfilterDOT(int *isSet, Date *dotFrom, Date *dotTo)
 		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\n");
 		printf("Please make sure date entered is valid.\nDate of Transactions\n\tSTARTING FROM ? (dd/mm/yyyy) : ");
 		s_input(dateSTR, 29);
-		if (strcmp(trimwhitespace(dateSTR), "X") == 0)
+		if (strcmp(trimwhitespace(dateSTR), "X") == 0 || dateSTR[0] == 'x')
 		{
 			isSet[0] = 0;
 			return 0;
@@ -394,7 +397,7 @@ int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo)
 		printf("\n<INFO> Enter 'X' to unset filter <INFO>\n\n");
 		printf("Please make sure date entered is valid.\nBooking Date\n\tSTARTING FROM ? (dd/mm/yyyy) : ");
 		s_input(dateSTR, 29);
-		if (strcmp(trimwhitespace(dateSTR), "X") == 0)
+		if (strcmp(trimwhitespace(dateSTR), "X") == 0 || dateSTR[0] == 'x')
 		{
 			return 0;
 		}

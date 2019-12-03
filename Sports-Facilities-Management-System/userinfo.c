@@ -9,7 +9,7 @@ int totalNumUser()
 	FILE * userinfo1;
 	userinfo1 = fopen(UserInfoFilePath, "rb");
 
-\	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
+	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
 	{
 
 
