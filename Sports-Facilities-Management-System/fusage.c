@@ -73,7 +73,7 @@ void fUsageRecord()
 void fUsageAddRecord()
 {
 	FILE* f = fopen("facilityinfo.txt", "a");
-	if (!chkFileExist(f))
+	if (f == NULL)
 	{
 		printf("File of facilityinfo.txt cannot open\n");
 		system("pause");
@@ -169,7 +169,7 @@ void fUsageModify()
 	int aftD, aftM, aftY;
 	char aftTime[30], aftUserID[30], aftFacilityID[20], aftUsageType[20];
 
-	FILE* f = fopen("facilityinfo.txt", "a");
+	FILE* f = fopen("facilityinfo.txt", "r");
 	if (!chkFileExist(f))
 	{
 		printf("File of facilityinfo.txt cannot open\n");
@@ -183,106 +183,94 @@ void fUsageModify()
 	printf("Enter User Id to Modify : ");
 	rewind(stdin);
 	scanf("%[^\n]", uID);
-	while (strcmp(fUsage->userID, uID) != 0)
-	{
-		printf("Invalid Input !!!\n");
-		printf("Re-enter User ID to Modify : ");
-		rewind(stdin);
-		scanf("%[^\n]", uID);
-		rewind(stdin);
-	}
+	rewind(stdin);
 	for (int i = 0; i < count; i++)
 	{
-		if (strcmp(fUsage[i].userID, uID) == 0)
+		while (fscanf(f, "\n%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+			&fUsage[i].date.d, &fUsage[i].date.m, &fUsage[i].date.y,
+			fUsage[i].time, fUsage[i].userID, fUsage[i].facilityID, fUsage[i].usageType) != EOF)
 		{
-			printf("\nRecord Before Modify\n");
-			printf("====================\n");
-			printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-				fUsage[i].date.m, fUsage[i].date.y);
-			printf("Time        : %s\n", fUsage[i].time);
-			printf("User ID     : %s\n", fUsage[i].userID);
-			printf("Facility ID : %s\n", fUsage[i].facilityID);
-			printf("Usage Type  : %s\n", fUsage[i].usageType);
-
-			printf("Enter Details to Modify (Date/Time/FacilityID/UsageType) : ");
-			rewind(stdin);
-			scanf("%[^\n]", selection);
-			rewind(stdin);
-			while (strcmp(selection, "Date") != 0 && strcmp(selection, "Time") != 0 &&
-				strcmp(selection, "FacilityID") != 0 && strcmp(selection, "UsageType") != 0)
+			if (strcmp(fUsage[i].userID, uID) == 0)
 			{
-				printf("Invalid Input !!!\n");
-				printf("Re-enter :\n");
-				printf("Enter Details to Modify (Date/Time/FacilityID/UsageType) : ");
+				printf("\nRecord Before Modify\n");
+				printf("====================\n");
+				printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
+					fUsage[i].date.m, fUsage[i].date.y);
+				printf("Time        : %s\n", fUsage[i].time);
+				printf("User ID     : %s\n", fUsage[i].userID);
+				printf("Facility ID : %s\n", fUsage[i].facilityID);
+				printf("Usage Type  : %s\n", fUsage[i].usageType);
+
+				printf("\n+=====================================+\n");
+				printf("|          Details to Modify          |\n");
+				printf("+=====================================+\n");
+				printf("| >> Date <<                          |\n");
+				printf("| >> Time <<                          |\n");
+				printf("| >> FacilityID <<                    |\n");
+				printf("+=====================================+\n");
+				printf("Enter Details to Modify : ");
 				rewind(stdin);
 				scanf("%[^\n]", selection);
 				rewind(stdin);
-			}
-			if (strcmp(selection, "Date") == 0)
-			{
-				printf("Date : ");
-				scanf("%d/%d/%d", &aftD, &aftM, &aftY);
-				printf("\nRecord After Modify\n");
-				printf("===================\n");
-				printf("Date        : %02d/%02d/%d\n", aftD, aftM, aftY);
-				printf("Time        : %s\n", fUsage[i].time);
-				printf("User ID     : %s\n", fUsage[i].userID);
-				printf("Facility ID : %s\n", fUsage[i].facilityID);
-				printf("Usage Type  : %s\n", fUsage[i].usageType);
-				fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-					aftD, aftM, aftY, fUsage->time, fUsage->userID,
-					fUsage->facilityID, fUsage->usageType);
-			}
-			if (strcmp(selection, "Time") == 0)
-			{
-				printf("Time : ");
-				rewind(stdin);
-				scanf("%[^\n]", aftTime);
-				printf("\nRecord After Modify\n");
-				printf("===================\n");
-				printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-					fUsage[i].date.m, fUsage[i].date.y);
-				printf("Time        : %s\n", aftTime);
-				printf("User ID     : %s\n", fUsage[i].userID);
-				printf("Facility ID : %s\n", fUsage[i].facilityID);
-				printf("Usage Type  : %s\n", fUsage[i].usageType);
-				fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-					fUsage->date.d, fUsage->date.m, fUsage->date.y,
-					aftTime, fUsage->userID, fUsage->facilityID, fUsage->usageType);
-			}
-			if (strcmp(selection, "FacilityID") == 0)
-			{
-				printf("Facility ID : ");
-				rewind(stdin);
-				scanf("%[^\n]", aftFacilityID);
-				printf("\nRecord After Modify\n");
-				printf("===================\n");
-				printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-					fUsage[i].date.m, fUsage[i].date.y);
-				printf("Time        : %s\n", fUsage[i].time);
-				printf("User ID     : %s\n", fUsage[i].userID);
-				printf("Facility ID : %s\n", aftFacilityID);
-				printf("Usage Type  : %s\n", fUsage[i].usageType);
-				fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-					fUsage->date.d, fUsage->date.m, fUsage->date.y,
-					fUsage->time, fUsage->userID, aftFacilityID, fUsage->usageType);
-			}
-			if (strcmp(selection, "UsageType") == 0)
-			{
-				printf("Usage Type : ");
-				rewind(stdin);
-				scanf("%[^\n]", aftUsageType);
-				printf("\nRecord After Modify\n");
-				printf("===================\n");
-				printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-					fUsage[i].date.m, fUsage[i].date.y);
-				printf("Time        : %s\n", fUsage[i].time);
-				printf("User ID     : %s\n", fUsage[i].userID);
-				printf("Facility ID : %s\n", fUsage[i].facilityID);
-				printf("Usage Type  : %s\n", aftUsageType);
-				fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-					fUsage->date.d, fUsage->date.m, fUsage->date.y,
-					fUsage->time, fUsage->userID, fUsage->facilityID, aftUsageType);
+				while (strcmp(selection, "Date") != 0 && strcmp(selection, "Time") != 0 &&
+					strcmp(selection, "FacilityID") != 0)
+				{
+					printf("Invalid Input !!!\n");
+					printf("Re-enter Details to Modify (Date/Time/FacilityID) : ");
+					rewind(stdin);
+					scanf("%[^\n]", selection);
+					rewind(stdin);
+				}
+				if (strcmp(selection, "Date") == 0)
+				{
+					printf("Date : ");
+					scanf("%d/%d/%d", &aftD, &aftM, &aftY);
+					printf("\nRecord After Modify\n");
+					printf("===================\n");
+					printf("Date        : %02d/%02d/%d\n", aftD, aftM, aftY);
+					printf("Time        : %s\n", fUsage[i].time);
+					printf("User ID     : %s\n", fUsage[i].userID);
+					printf("Facility ID : %s\n", fUsage[i].facilityID);
+					printf("Usage Type  : %s\n", fUsage[i].usageType);
+					fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
+						aftD, aftM, aftY, fUsage->time, fUsage->userID,
+						fUsage->facilityID, fUsage->usageType);
+				}
+				if (strcmp(selection, "Time") == 0)
+				{
+					printf("Time : ");
+					rewind(stdin);
+					scanf("%[^\n]", aftTime);
+					printf("\nRecord After Modify\n");
+					printf("===================\n");
+					printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
+						fUsage[i].date.m, fUsage[i].date.y);
+					printf("Time        : %s\n", aftTime);
+					printf("User ID     : %s\n", fUsage[i].userID);
+					printf("Facility ID : %s\n", fUsage[i].facilityID);
+					printf("Usage Type  : %s\n", fUsage[i].usageType);
+					fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
+						fUsage->date.d, fUsage->date.m, fUsage->date.y,
+						aftTime, fUsage->userID, fUsage->facilityID, fUsage->usageType);
+				}
+				if (strcmp(selection, "FacilityID") == 0)
+				{
+					printf("Facility ID : ");
+					rewind(stdin);
+					scanf("%[^\n]", aftFacilityID);
+					printf("\nRecord After Modify\n");
+					printf("===================\n");
+					printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
+						fUsage[i].date.m, fUsage[i].date.y);
+					printf("Time        : %s\n", fUsage[i].time);
+					printf("User ID     : %s\n", fUsage[i].userID);
+					printf("Facility ID : %s\n", aftFacilityID);
+					printf("Usage Type  : %s\n", fUsage[i].usageType);
+					fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
+						fUsage->date.d, fUsage->date.m, fUsage->date.y,
+						fUsage->time, fUsage->userID, aftFacilityID, fUsage->usageType);
+				}
+				
 			}
 		}
 	}
