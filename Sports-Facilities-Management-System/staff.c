@@ -2,14 +2,14 @@
 #include "staff.h"
 
 
-typedef struct// struture for to store staff
-{
-	char stfName[30];
-	char stfPassW[100];
-	char stfConPassW[100];// confirm password
-	char stfID[6];
-	char stfPosi[10];
-}Staff;
+//typedef struct// struture for to store staff
+//{
+//	char stfName[30];
+//	char stfPassW[100];
+//	char stfConPassW[100];// confirm password
+//	char stfID[6];
+//	char stfPosi[10];
+//}Staff;
 
 Staff staffCache[30];
 
@@ -151,32 +151,41 @@ void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	char staffNameSearch[100],ans;
 	int i = 0, totstaff,stfcount = 0;
 	totstaff = readStfList();
-	
-	do
-	{
-		displayStaffList();
 
-		printf("Enter name staff name to search :");
-		scanf("%[^\n]", staffNameSearch);
-		rewind(stdin);
-		for (i = 0; i < totstaff; i++)
+	if (totstaff != 0)
+	{
+
+		do
 		{
-			stfcount++;
-			if (strcmp(staffNameSearch, staffCache[i].stfName) == 0)
+			displayStaffList();
+
+			printf("Enter name staff name to search :");
+			scanf("%[^\n]", staffNameSearch);
+			rewind(stdin);
+			for (i = 0; i < totstaff; i++)
 			{
-				printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
-				totstaff = 0;
+				stfcount++;
+				if (strcmp(staffNameSearch, staffCache[i].stfName) == 0)
+				{
+					printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
+					totstaff = 0;
+				}
+				else if (stfcount >= totstaff)
+				{
+					printf("There's no such person please reenter staff name.\n");
+				}
+				else;
 			}
-			else if (stfcount >= totstaff)
-			{
-				printf("There's no such person please reenter staff name.\n");
-			}
-			else;
-		}
-		printf("Do you want to search for someone else?(y = yes,anything else = menus)");
-		scanf("%c", &ans);
-		rewind(stdin);
-	}while (ans == 'y');
+			printf("Do you want to search for someone else?(y = yes,anything else = menus)");
+			scanf("%c", &ans);
+			rewind(stdin);
+		} while (ans == 'y');
+	}
+	else
+	{
+		printf("No record exist.\n");
+		system("pause");
+	}
 }
 
 int staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
@@ -184,50 +193,52 @@ int staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	char stfID[6],ans;
 	int i = 0, totstaff, stfcount = 0,staffAdd,stafffound=0;
 	totstaff = readStfList();
-
+	if (totstaff != 0)
+	{
 	do
 	{
 		system("cls");
 		displayStaffList();
-
-		printf("Enter name staff ID to search :");
-		scanf("%[^\n]", stfID);
-		rewind(stdin);
-		for (i = 0; i < totstaff; i++)
-		{
-			stfcount++;
-			if (strcmp(stfID, staffCache[i].stfID) == 0)
+		
+			printf("Enter name staff ID to search :");
+			scanf("%[^\n]", stfID);
+			rewind(stdin);
+			for (i = 0; i < totstaff; i++)
 			{
-				printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
-				stafffound = 1;
-				break;
+				stfcount++;
+				if (strcmp(stfID, staffCache[i].stfID) == 0)
+				{
+					printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
+					stafffound = 1;
+					break;
+				}
+				else if (stfcount >= totstaff)
+				{
+					printf("There's no such person please reenter staff ID.\n");
+				}
 			}
-			else if (stfcount >= totstaff)
+			if (stafffound != 1)
 			{
-				printf("There's no such person please reenter staff ID.\n");
-			}
-		}
-		if (stafffound!=1)
-		{
-			printf("Enter 'y' to reenter :");
-			scanf("%c", &ans);
-				while(ans!='y')
+				printf("Enter 'y' to reenter :");
+				scanf("%c", &ans);
+				while (ans != 'y')
 				{
 					printf("\n");
 					printf("You did not enter 'y'! :");
 					scanf("%c", &ans);
 				}
-		}
-		else
-		{
-			printf("\n");
-			printf("Do you want to search for someone else?(y = yes anything else = continue)");
-			scanf("%c", &ans);
-		}
-		rewind(stdin);
-	} while (ans == 'y');
-	staffAdd = i;
-	return staffAdd;
+			}
+			else
+			{
+				printf("\n");
+				printf("Do you want to search for someone else?(y = yes anything else = continue)");
+				scanf("%c", &ans);
+			}
+			rewind(stdin);
+		} while (ans == 'y');
+		staffAdd = i;
+		return staffAdd;
+	}
 }
 
 void login()
@@ -245,129 +256,135 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 	oldStaffAdd=staffSearchID();
 	FILE*stfopen;
 
-	stfopen =fopen("staffNameList.bin", "ab");
-
-	strcpy(staffChange.stfID, staffCache[oldStaffAdd].stfID);
-	strcpy(staffChange.stfName, staffCache[oldStaffAdd].stfName);
-	strcpy(staffChange.stfPassW, staffCache[oldStaffAdd].stfPassW);
-	strcpy(staffChange.stfPosi, staffCache[oldStaffAdd].stfPosi);
-
-
-	do
+	if (totstaff != 0)
 	{
-		system("cls");
-		printf("Name:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
+		stfopen = fopen("staffNameList.bin", "ab");
 
-		printf("What do you want to change about this staff?\n");
-		printf("1. Name\n");
-		printf("2. PassWord\n");
-		printf("3. ID\n");
-		printf("4. Position\n");
-		printf("5. exit\n");
+		strcpy(staffChange.stfID, staffCache[oldStaffAdd].stfID);
+		strcpy(staffChange.stfName, staffCache[oldStaffAdd].stfName);
+		strcpy(staffChange.stfPassW, staffCache[oldStaffAdd].stfPassW);
+		strcpy(staffChange.stfPosi, staffCache[oldStaffAdd].stfPosi);
 
-		printf("Enter a choice :");
-		getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-		rewind(stdin);
-		switch (choice[0])
+		do
 		{
+			system("cls");
+			printf("Name:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
 
-		case '1':
-			printf("Enter new name :");
-			scanf("%[^\n]", staffChange.stfName);
+			printf("What do you want to change about this staff?\n");
+			/*printf("1. Name\n");
+			printf("2. PassWord\n");
+			printf("3. ID\n");
+			printf("4. Position\n");
+			printf("5. exit\n");*/
+
+			char choiceText[][100] = { "Name", "Password", "ID", "Position", "Exit" };
+			int choice = globalMainMenu("<!> Staff infomation editor <!>", 5, choiceText);
 			rewind(stdin);
-			while (strlen(staffChange.stfName) > 29)
+			switch (choice)
 			{
-				printf("Reenter name it's too long.\n");
-				printf("Enter staff name : ");
-				scanf("%[\n]", staffChange.stfName);
+
+			case 1:
+				printf("Enter new name :");
+				scanf("%[^\n]", staffChange.stfName);
 				rewind(stdin);
-			}
-			break;
-		case '2':
-			printf("Enter new password(MINUMUM 8):");
-			scanf("%[^\n]", staffChange.stfPassW);
-			rewind(stdin);
-			while (strlen(staffChange.stfPassW) < 8)
-			{
-				printf("password too short please reenter : \n");
-				printf("Enter staff Passwords(MINIMUM 8): ");
+				while (strlen(staffChange.stfName) > 29)
+				{
+					printf("Reenter name it's too long.\n");
+					printf("Enter staff name : ");
+					scanf("%[\n]", staffChange.stfName);
+					rewind(stdin);
+				}
+				break;
+			case 2:
+				printf("Enter new password(MINUMUM 8):");
 				scanf("%[^\n]", staffChange.stfPassW);
 				rewind(stdin);
-			}
-			break;
-		case '3':
-			printf("Enter new staff ID(4 characters): ");
-			scanf("%[^\n]", staffChange.stfID);
-			rewind(stdin);
-			while (strlen(staffChange.stfID) != 4)
-			{
-				printf("Needs to be 4 characters please reenter : \n");
-				printf("Enter staff ID(4 characters): ");
+				while (strlen(staffChange.stfPassW) < 8)
+				{
+					printf("password too short please reenter : \n");
+					printf("Enter staff Passwords(MINIMUM 8): ");
+					scanf("%[^\n]", staffChange.stfPassW);
+					rewind(stdin);
+				}
+				break;
+			case 3:
+				printf("Enter new staff ID(4 characters): ");
 				scanf("%[^\n]", staffChange.stfID);
 				rewind(stdin);
-			}
-			for (i = 0; i < totstaff; i++)
-			{
-				while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
+				while (strlen(staffChange.stfID) != 4)
 				{
-					printf("ID used!\n");
-					printf("Reenter ID :");
+					printf("Needs to be 4 characters please reenter : \n");
+					printf("Enter staff ID(4 characters): ");
 					scanf("%[^\n]", staffChange.stfID);
 					rewind(stdin);
-					while (strlen(staffChange.stfID) != 4)
+				}
+				for (i = 0; i < totstaff; i++)
+				{
+					while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
 					{
-						printf("Needs to be 4 characters please reenter : \n");
-						printf("Enter staff ID(4 characters): ");
+						printf("ID used!\n");
+						printf("Reenter ID :");
 						scanf("%[^\n]", staffChange.stfID);
 						rewind(stdin);
+						while (strlen(staffChange.stfID) != 4)
+						{
+							printf("Needs to be 4 characters please reenter : \n");
+							printf("Enter staff ID(4 characters): ");
+							scanf("%[^\n]", staffChange.stfID);
+							rewind(stdin);
+						}
+
 					}
-
 				}
+				break;
+			case 4:
+				printf("Enter new staff position :");
+				scanf("%[^\n]", staffChange.stfPosi);
+				rewind(stdin);
+				break;
+			case 5:
+				printf("Exiting");
+				return;
+
+			default:
+				printf("Invalid choice !\n");
 			}
-			break;
-		case '4':
-			printf("Enter new staff position :");
-			scanf("%[^\n]", staffChange.stfPosi);
-			rewind(stdin);
-			break;
-		case '5':
-			printf("Exiting");
-			return;
 
-		default:
-			printf("Invalid choice !\n");
-		}
+			printf("These are the changes that you made:\n");
+			printf("(OLD)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n", staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
+			printf("(NEW)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffChange.stfName, staffChange.stfPassW, staffChange.stfID, staffChange.stfPosi);
 
-		printf("These are the changes that you made:\n");
-		printf("(OLD)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n", staffCache[oldStaffAdd].stfName,staffCache[oldStaffAdd].stfPassW,staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
-		printf("(NEW)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffChange.stfName, staffChange.stfPassW, staffChange.stfID, staffChange.stfPosi);
-
-		printf("Do you want to commit to the changes?()y=yes");
-		getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-		if (tolower(choice[0]) == 'y')
-		{
-			strcpy(staffCache[oldStaffAdd].stfName,staffChange.stfName);
-			strcpy(staffCache[oldStaffAdd].stfID, staffChange.stfID);
-			strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
-			strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
-			fclose(stfopen);
-			stfopen = fopen("staffNameList.bin", "wb");
-			for (int a = 0; a < totstaff; a++)
+			printf("Do you want to commit to the changes?(y=yes)");
+			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
+			if (tolower(choice) == 'y')
 			{
-				fwrite(&staffCache[a], sizeof(Staff), 1, stfopen);
+				strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
+				strcpy(staffCache[oldStaffAdd].stfID, staffChange.stfID);
+				strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
+				strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
+				fclose(stfopen);
+				stfopen = fopen("staffNameList.bin", "wb");
+				for (int a = 0; a < totstaff; a++)
+				{
+					fwrite(&staffCache[a], sizeof(Staff), 1, stfopen);
+				}
+				fclose(stfopen);
+
+
+				printf("Changes have been made this is the new staff info.\n");
+				printf("(NEW)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n\n"
+					, staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
+
+				system("cls");
+				displayStaffList();
 			}
-			fclose(stfopen);
-			
-
-			printf("Changes have been made this is the new staff info.\n");
-			printf("(NEW)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n\n"
-				, staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
-
-			system("cls");
-			displayStaffList();
-		}
-	} while (choice != '5');
-	
+		} while (choice != '5');
+	}
+	else
+	{
+	printf("No records exist.\n");
+	system("pause");
+	}
 }
 
 void pwRecover()
@@ -391,40 +408,41 @@ void staffMain()
 	{
 		system("cls");
 	
-		printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
+		/*printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
 		printf("%41s|     Staff infomations Console     |\n", "");
 		printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
 		printf("%41s|     1. Staff list                 |\n", "");
 		printf("%41s|     2. Add staff                  |\n", "");
 		printf("%41s|     3. Search staff               |\n", "");
 		printf("%41s|     4. Change staff info          |\n", "");
-		printf("%41s|     5. Exit                       |\n", "");
+		printf("%41s|     5. c                       |\n", "");
 		printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
 		printf("%49sEnter menu choice: ", "");
 		getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-		rewind(stdin);
-		switch (choice[0])
+		rewind(stdin);*/
+		char choiceText[][100] = { "Staff list", "Add staff", "Search staff", "Change staff info", "Exit" };
+		int choice = globalMainMenu("<!> Staff infomations Console <!>", 5, choiceText);
+		switch (choice)
 		{
 
-		case '1':
+		case 1:
 			displayStaffList();
-			printf("Enter anything to continue.");
-			scanf("%d", choice);
+			system("pause");
 			break;
-		case '2':
+		case 2:
 			addStaffList();
 			break;
-		case '3':
+		case 3:
 			staffSearchName();
 			break;
-		case '4':
+		case 4:
 			changeStfList();
 			break;
-		case '5':
+		case 5:
 			return;
 		default:
 			break;
 		}
-	} while (choice != '5');
+	} while (choice != 5);
 }
 
