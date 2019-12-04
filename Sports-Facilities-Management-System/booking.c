@@ -91,16 +91,20 @@ void bookingBook()
 	// find latestBooking ID + count of items in file
 	char latestBookingID[10];
 	latestBookingID[0] = '\0';
-	FILE *f = fopen(bookingFilePath, "r");
-	// if file doesnt exist, open in write mode
-	if (chkFileExist(f))
-	{
-		while (fscanf(f, "%[^,]%*[^\n]\n", &latestBookingID) != EOF);
-		fclose(f); // if file exist, means its pointer is not closed -> refer to chkFileExist()
-	}
+	//FILE *f = fopen(bookingFilePath, "r");
+	//// if file doesnt exist, open in write mode
+	//if (chkFileExist(f))
+	//{
+	//	while (fscanf(f, "%[^,]%*[^\n]\n", &latestBookingID) != EOF);
+	//	fclose(f); // if file exist, means its pointer is not closed -> refer to chkFileExist()
+	//}
 
 	int count = readBookingDataIntoStructArray(&data[0], 100); // read file into struct array + get entries count
-
+	if (count != 0) // if file exist
+	{
+		strcpy(latestBookingID, data[count - 1].bookingID);
+	}
+	printf("%s\n", latestBookingID);
 	incrementBookingID(latestBookingID); // increment bookingID
 	printBookingInfo();
 
@@ -229,16 +233,22 @@ void bookingModifyRecords()
 
 void bookingDisplayAll()
 {
-	FILE *f = fopen(bookingFilePath, "r");
+	/*FILE *f = fopen(bookingFilePath, "r");
 	if (!chkFileExist(f))
 	{
 		printf("\n<!> ERR: No records found. <!>\n");
 		system("pause");
 		return;
 	}
-	fclose(f);
+	fclose(f);*/
 	BookingData data[100];
 	int count = readBookingDataIntoStructArray(&data[0], 100);
+	if (count == 0)
+	{
+		printf("\n<!> ERR: No records found. <!>\n");
+		system("pause");
+		return;
+	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "|                                               Booking Transactions                                                 |");
 	printf("%s\n", "======================================================================================================================");
