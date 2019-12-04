@@ -341,6 +341,29 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			// Apply filters
 			for (int a = 0; a < dataCount; a++)
 			{ // ALOT OF IF_ELSE WILL BE HERE
+				if(isSet[0])
+				{
+					if (compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotFrom.d, dotFrom.m, dotFrom.y) == -1 
+						|| compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotTo.d, dotTo.m, dotTo.y) == 1)
+					{
+						continue;
+					}
+				}
+				if (isSet[1])
+				{
+					if (compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookFrom.d, bookFrom.m, bookFrom.y) == -1
+						|| compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookTo.d, bookTo.m, bookTo.y) == 1)
+					{
+						continue;
+					}
+				}
+				if (isSet[2])
+				{
+					if(!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)])
+					{
+						continue;
+					}
+				}
 				printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
 					data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 					data[a].bookingID,

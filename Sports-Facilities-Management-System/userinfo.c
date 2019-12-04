@@ -12,7 +12,7 @@ int totalNumUser()
 	{
 		printf("No registration has been made yet\n");
 		system("pause");
-		userInfo();
+		userInfo(); // need changing
 	}
 
 	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
@@ -44,7 +44,7 @@ void registerInfo()
 	{
 		printf("File userinfo can't be created\n");
 		system("pause");
-		userInfo();
+		return;
 	}
 	
 	printf("Enter your user ID(4 characters) = ");
@@ -144,14 +144,14 @@ void registerInfo()
 			fclose(userinfo);
 			system("pause");
 			x = 1;
-			userInfo();
+			return;
 		}
 		else if (toupper(confirmation) == 'N')
 		{
 			x = 1;
 			printf("User has not been regis congrats and enjoy your day\n");
 			system("pause");
-			userInfo();
+			return;
 		}
 		else
 		{
@@ -189,7 +189,7 @@ void modifyInfo2()
 	printf("Enter Password = ");
 	scanf("%s", pass);
 
-	for (i = 0; i < x; i++)
+	for (i = 0; i < x; i++) 
 	{
 		if ((strcmp(user2[i].id, s) == 0) && (strcmp(user2[i].password, pass) == 0))
 		{
@@ -217,7 +217,7 @@ void modifyInfo2()
 				}
 				fclose(userinfo1);
 				system("pause");
-				userInfo();
+				return;
 				break;
 			case '2':userinfo1 = fopen(UserInfoFilePath, "wb");
 
@@ -230,7 +230,7 @@ void modifyInfo2()
 				}
 				fclose(userinfo1);
 				system("pause");
-				userInfo();
+				return;
 				break;
 			case '3':
 
@@ -245,9 +245,10 @@ void modifyInfo2()
 				}
 				fclose(userinfo1);
 				system("pause");
-				userInfo();
+				return;
 				break;
-			}
+			} // consider case '4' for return;
+			return;
 		}
 
 	}
@@ -283,7 +284,7 @@ void displayInfo()
 	}
 	fclose(userinfo1);
 	system("pause");
-	userInfo();
+	return;
 }
 
 
@@ -348,7 +349,6 @@ void searchInfo()
 
 
 	}
-	userInfo();
 }
 
 void userInfo()
@@ -365,24 +365,27 @@ void userInfo()
 	printf("\n\t\t\t\t\t\tMenu Choice: ");*/
 
 	char choiceText[][100] = { "Registration For New User", "Changing User Info", "Search Details Of User", "Display All The User In Database", "Exit" };
-	int choice = globalMainMenu("^_^ USERINFO MODULE ^_^", 5, choiceText);
-	switch (choice)
-	{
-	case 1:registerInfo();
-		break;
-	case 2: modifyInfo2();
-		break;
-	case 3:searchInfo();
-		break;
-	case 4:displayInfo();
-		break;
-	case 5:return;
-		break;
-	default:
-		return;
-	}
+	do {
+		int choice = globalMainMenu("^_^ USERINFO MODULE ^_^", 5, choiceText);
+	
+		switch (choice)
+		{
+		case 1:registerInfo();
+			break;
+		case 2: modifyInfo2();
+			break;
+		case 3:searchInfo();
+			break;
+		case 4:displayInfo();
+			break;
+		case 5:
+			return;
 
-	return;
+		default:
+			return;
+		}
+	}
+	while (1);
 }
 
 void userinfoMain() {
