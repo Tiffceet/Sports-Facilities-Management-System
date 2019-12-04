@@ -24,6 +24,7 @@ int bookingMenu();
 void printBookingInfo();
 void bookingBook();
 void bookingSearchRecords();
+void printFilteredSearchResult(BookingData *data, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *dateTo, int *timeslot);
 void bookingModifyRecords();
 void bookingDisplayAll();
 void bookingDisplayFilters(BookingData *data, int dataCount);
