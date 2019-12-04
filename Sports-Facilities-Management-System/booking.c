@@ -106,11 +106,11 @@ void bookingBook()
 
 	// Sub Menu
 	char choice[10];
-	do{
+	do {
 		char facilityStatus[100], bookingDateStatus[100], timeslotStatus[100];
 		if (isSet[0]) strcpy(facilityStatus, userPickedfacilityID); else strcpy(facilityStatus, "<!> Not Set <!>");
 		if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "<!> Not Set <!>");
-		if (isSet[2]) strcpy(timeslotStatus,TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "<!> Not Set <!>");
+		if (isSet[2]) strcpy(timeslotStatus, TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "<!> Not Set <!>");
 		printf(" <----------------------------------------------------->\n");
 		printf(" ->                  Booking Details                  <-\n");
 		printf(" <----------------------------------------------------->\n");
@@ -125,7 +125,7 @@ void bookingBook()
 		printf(" \t[4] Comfirm Booking\n");
 		printf(" \t[5] Cancel Booking\n\n");
 		printf(" Choice ? ");
-		getUserMenuChoice(choice, 9, " Invalid Choice, try again.\n Choice ? ");
+		getUserMenuChoice(choice, 9, " Choice ? ");
 		switch (choice[0])
 		{
 		case '1':
@@ -173,7 +173,7 @@ void bookingBook()
 				break;
 			}
 			// NEED TO FKING ADD COMFIRMATIONA AND WHOLE LOT OF SHIT
-			
+
 			printf("Please read the booking details again for confirmation. (Y=Comfirm) ? ");
 			char bookingComfirmChoice[10];
 			getUserMenuChoice(bookingComfirmChoice, 9, "Please read the booking details again for confirmation. (Y=Comfirm) ? ");
@@ -198,14 +198,16 @@ void bookingBook()
 				data[count].staffID,
 				data[count].usrID,
 				data[count].facilityID,
-				data[count].bookingDate.d, 
+				data[count].bookingDate.d,
 				data[count].bookingDate.m,
 				data[count].bookingDate.y,
 				TIMESLOTS[getTimeslotBooked(data[count].timeSlotsBooked)]
-				);
+			);
 			system("pause");
 			return;
 		case '5':
+			printf("\n<INFO> Booking is canceled <INFO>\n");
+			system("pause");
 			return;
 		default:
 			printf("\n<!> ERR: Please select number between 1 - 5 <!>\n\n");
@@ -267,8 +269,8 @@ void bookingDisplayAll()
 	printf("\n%d record(s) found. \n", count);
 
 	char filterChoice[10];
-	printf("\nDo you wish to add filters ? (Y = yes) ");
-	getUserMenuChoice(filterChoice, 9, "Do you wish to add filters ? (Y = yes, other to return to menu) \n");
+	printf("\nDo you wish to add filters ? (Y = yes, other to return to menu) ");
+	getUserMenuChoice(filterChoice, 9, "Do you wish to add filters ? (Y = yes, other to return to menu) ");
 	if (tolower(filterChoice[0]) == 'y')
 	{
 		bookingDisplayFilters(&data[0], count);
@@ -278,107 +280,119 @@ void bookingDisplayAll()
 
 void bookingDisplayFilters(BookingData *data, int dataCount)
 {
+	char retryChoice[10]; // to ask user if user wants to keep on filtering after printing of data
 	Date dotFrom, dotTo, bookFrom, bookTo;
-	int timeslot[6] = {0,0,0,0,0,0}; // for TimeslotBooked
+	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	char facilityID[100][100], staffID[100][100], userID[100][100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
 	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
 	char filterChoice[10];
-	do{
-		char statusText[6][100] = {"", "", "" , "" , "" , ""};
-		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
-		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
-		if (isSet[2]) 
-		{
-			int firstTime = 1;
-			for (int a = 0; a < 6; a++)
+	int recordsCount = 0; // to keep track of how many records is printed
+	do {
+		recordsCount = 0;
+		do {
+			recordsCount = 0;
+			char statusText[6][100] = { "", "", "" , "" , "" , "" };
+			if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
+			if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
+			if (isSet[2])
 			{
-				if (timeslot[a])
+				int firstTime = 1;
+				for (int a = 0; a < 6; a++)
 				{
-					if(firstTime){
-						sprintf(statusText[2], "%s", TIMESLOTS[a]);
-						firstTime = 0;
-					}
-					else
+					if (timeslot[a])
 					{
-						sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+						if (firstTime) {
+							sprintf(statusText[2], "%s", TIMESLOTS[a]);
+							firstTime = 0;
+						}
+						else
+						{
+							sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+						}
 					}
 				}
 			}
-		}
-		else strcpy(statusText[2], "Not Set");
-		if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
-		if (isSet[4]) break; else strcpy(statusText[4], "Not Set");
-		if (isSet[5]) break; else strcpy(statusText[5], "Not Set");
-		printf("\n[ Filters ]\n");
-		printf("[1] Date of Transactions : %s\n", statusText[0]);
-		printf("[2] Booking Date         : %s\n", statusText[1]);
-		printf("[3] TimeslotBooked       : %s\n", statusText[2]);
-		printf("[4] FacilityBooked       : %s\n", statusText[3]);
-		printf("[5] Staff involved       : %s\n", statusText[4]);
-		printf("[6] User Involved        : %s\n", statusText[5]);
-		printf("\nEnter 'X' to apply filters\n\nAdd/Change Filter (1-6)? ");
-		getUserMenuChoice(filterChoice, 9, "Add/Change Filter (1-6)? ");
-		switch (filterChoice[0])
-		{
-		case '1':
-			isSet[0] = dispfilterDOT(&isSet[0], &dotFrom, &dotTo);
-			break;
-		case '2':
-			isSet[1] = dispfilterBookingDate(&bookFrom, &bookTo);
-			break;
-		case '3':
-			isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
-			break;
-		case '4':
-			break;
-		case '5':
-			break;
-		case '6':
-			break;
-		case 'X':
-		case 'x':
-			// Apply filters
-			for (int a = 0; a < dataCount; a++)
-			{ // ALOT OF IF_ELSE WILL BE HERE
-				if(isSet[0])
-				{
-					if (compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotFrom.d, dotFrom.m, dotFrom.y) == -1 
-						|| compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotTo.d, dotTo.m, dotTo.y) == 1)
+			else strcpy(statusText[2], "Not Set");
+			if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
+			if (isSet[4]) break; else strcpy(statusText[4], "Not Set");
+			if (isSet[5]) break; else strcpy(statusText[5], "Not Set");
+			printf("\n[ Filters ]\n");
+			printf("[1] Date of Transactions : %s\n", statusText[0]);
+			printf("[2] Booking Date         : %s\n", statusText[1]);
+			printf("[3] TimeslotBooked       : %s\n", statusText[2]);
+			printf("[4] FacilityBooked       : %s\n", statusText[3]);
+			printf("[5] Staff involved       : %s\n", statusText[4]);
+			printf("[6] User Involved        : %s\n", statusText[5]);
+			printf("[7] Exit to Menu\n");
+			printf("\nEnter 'X' to apply filters\n\nAdd/Change Filter (1-6)? ");
+			getUserMenuChoice(filterChoice, 9, "Add/Change Filter (1-6)? ");
+			switch (filterChoice[0])
+			{
+			case '1':
+				isSet[0] = dispfilterDOT(&isSet[0], &dotFrom, &dotTo);
+				break;
+			case '2':
+				isSet[1] = dispfilterBookingDate(&bookFrom, &bookTo);
+				break;
+			case '3':
+				isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
+				break;
+			case '4':
+				break;
+			case '5':
+				break;
+			case '6':
+				break;
+			case '7':
+				return;
+			case 'X':
+			case 'x':
+				// Apply filters
+				for (int a = 0; a < dataCount; a++)
+				{ // ALOT OF IF_ELSE WILL BE HERE
+					if (isSet[0])
 					{
-						continue;
+						if (compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotFrom.d, dotFrom.m, dotFrom.y) == -1
+							|| compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotTo.d, dotTo.m, dotTo.y) == 1)
+						{
+							continue;
+						}
 					}
-				}
-				if (isSet[1])
-				{
-					if (compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookFrom.d, bookFrom.m, bookFrom.y) == -1
-						|| compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookTo.d, bookTo.m, bookTo.y) == 1)
+					if (isSet[1])
 					{
-						continue;
+						if (compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookFrom.d, bookFrom.m, bookFrom.y) == -1
+							|| compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookTo.d, bookTo.m, bookTo.y) == 1)
+						{
+							continue;
+						}
 					}
-				}
-				if (isSet[2])
-				{
-					if(!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)])
+					if (isSet[2])
 					{
-						continue;
+						if (!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)])
+						{
+							continue;
+						}
 					}
+					printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
+						data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
+						data[a].bookingID,
+						data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
+						TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
+						data[a].facilityID,
+						data[a].usrID,
+						data[a].staffID);
+					recordsCount++;
 				}
-				printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
-					data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
-					data[a].bookingID,
-					data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
-					TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-					data[a].facilityID,
-					data[a].usrID,
-					data[a].staffID);
+				printf("\nTotal %d record(s) found.\n", recordsCount);
+				break;
+			default:
+				break;
 			}
-			break;
-		default:
-			break;
-		}
-	} while (tolower(filterChoice[0]) != 'x');
-	system("pause");
+		} while (tolower(filterChoice[0]) != 'x');
+		printf("Do you wish to return to menu ? (y=yes) ");
+		getUserMenuChoice(retryChoice, 9, "Invalid input, try again. ");
+	} while (tolower(retryChoice[0]) != 'y');
 }
 
 // return 1 if filter for date of transaction is set successfully
@@ -440,11 +454,11 @@ int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo)
 // return 1 if timeslotBooked filter is updated successfully
 int dispfilterTimeslotBooked(int *timeslot)
 {
-	char rawInput[10];	
+	char rawInput[10];
 	char choice[10];
 	int tsPicked, firstTime = 1; // firstTime to check if its the first iteration in loop, tsPicked to get IDX of timeslot picked by user
-	do{
-		do{
+	do {
+		do {
 			if (firstTime) {
 				printf("Timeslot:\n");
 				for (int a = 0; a < 6; a++) {
@@ -542,7 +556,7 @@ void writeBookingDataIntoFile(BookingData *data, int dataCount)
 			data[a].usrID,
 			data[a].staffID,
 			data[a].facilityID
-			);
+		);
 	}
 	fclose(f);
 }
@@ -613,7 +627,7 @@ int getTimeslotBooked(int *timeslot)
 {
 	for (int a = 0; a < 6; a++)
 	{
-		if (timeslot[a]) 
+		if (timeslot[a])
 		{
 			return a;
 		}
@@ -672,16 +686,16 @@ int bipChangeBookingDate(Date *bookingDate)
 
 // return 1 if timeslot is changed successfully
 int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID)
-{	
+{
 	int timeslotAvailable[6] = { 1,1,1,1,1,1 }; // to check for timeslot availablity
-	if(!checkForTimeslotsAvailablity(timeslotAvailable, data, dataSize, bookingDate, facilityID)){
+	if (!checkForTimeslotsAvailablity(timeslotAvailable, data, dataSize, bookingDate, facilityID)) {
 		printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date\n");
 		return 0;
 	}
 	printf("Timeslots: \n");
 	for (int a = 0; a < 6; a++)
 	{
-		printf("\t%d. %s ",a+1, TIMESLOTS[a]);
+		printf("\t%d. %s ", a + 1, TIMESLOTS[a]);
 		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	}
 
@@ -699,7 +713,7 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 			}
 			err = 1;
 			printf("Please, pick a timeslot(1-6): ");
-			getUserMenuChoice(userPickedtimeslotSTR, 9, "Invalid selection.\nPlease, pick a timeslot(1-6): ");
+			getUserMenuChoice(userPickedtimeslotSTR, 9, "Please, pick a timeslot(1-6): ");
 
 		} while (userPickedtimeslotSTR[0] < '1' || userPickedtimeslotSTR[0] > '6');
 		err = 1;
