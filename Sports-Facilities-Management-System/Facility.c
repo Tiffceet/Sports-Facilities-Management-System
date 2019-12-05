@@ -18,13 +18,13 @@ int facilityMenu()
 	printf("(1) Add New Facility\n");
 	printf("(2) Search Faciity\n");
 	printf("(3) Display All Facility\n");
-	char choice[10];
+	char choice;
 	printf("Enter Your Choice: ");
 	rewind(stdin);
 	scanf("%s", &choice);
 	rewind(stdin);
 
-	switch (choice[0])
+	switch (choice)
 	{
 	case '1':
 		addNewFacility();
@@ -46,13 +46,12 @@ void addNewFacility()
 	int a;
 	Facility facility[10];
 	FILE*facilityFile;
-	facilityFile = fopen("facility.txt", "a");
+	facilityFile = fopen("facility.dat", "a");
 
 	if (facilityFile == NULL)
 	{
 		printf("Cannot open facilityFile.");
-		system("pasue");
-		exit(-1);
+		return;
 	}
 
 	for (a = 0; a < 10; a++)
@@ -81,10 +80,72 @@ void addNewFacility()
 
 void searchFacility()
 {
+	int choice1;
+
+	Facility facility[10];
+	FILE*facilityFile;
+	facilityFile = fopen("facility.dat", "rb");
+
+	while (!chkFileExist(facilityFile))
+	{
+		printf("Cannot find facility file\n");
+		return;
+	}
+
+	printf("(1) Badminton\n");
+	printf("(2) Basketball\n");
+	printf("(3) Tennis\n");
+	printf("(4) Ping Pong\n");
+	printf("What facility are you searching for? :");
+	rewind(stdin);
+	scanf("%d", choice1);
+
+	switch (choice1)
+	{
+	case '1':
+		printf("");
+		break;
+	case '2':
+		printf("");
+		break;
+	case '3':
+		printf("");
+		break;
+	case '4':
+		printf("");
+		break;
+	default:
+		return 1;
+	}
+}
+
+void modifyFacility()
+{
 
 }
 
 void displayAllFacility()
 {
+	Facility facility;
+	FILE*facilityFile;
+	facilityFile = fopen("facility.dat", "rb");
 
+	while (facilityFile == NULL)
+	{
+		printf("Cannot open facility file.\n");
+			system("pause");
+		return;
+	}
+
+	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
+	{
+		printf("Facility ID:%s\n", facility.id);
+		printf("Facility Type:%s\n", facility.type);
+		printf("Facility Venue:%s\n", facility.venue);
+		printf("Facility Description:%s\n", facility.description);
+		printf("Maximum of Facility::%d\n", facility.maxUser);
+	}
+	fclose(facilityFile);
 }
+
+
