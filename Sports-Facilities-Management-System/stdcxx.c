@@ -163,6 +163,59 @@ char *trimwhitespace(char *str)
 	return str;
 }
 
+int collectCensoredInput(char* str, int size)
+{
+	int idx = 0;
+	unsigned char buf;
+	do
+	{
+		buf = _getch();
+
+		// if weird key is being pressed
+		// weird key that give escaped character when its being pressed
+		// e.g. delete key, del key on keypad, f1-f10 keys
+		if (buf == 0)
+		{
+			_getch();
+			continue;
+		}
+
+		if (buf == 13) // if enter key pressed
+		{
+			str[idx] = '\0';
+			return;
+		}
+		
+		if (buf == 8) // backspace is being pressed
+		{
+			if (idx <= 0) { // if user input is empty
+				printf("");
+			}
+			else
+			{          // remove last character input
+				printf("\b \b");
+				idx--;
+			}
+			continue;
+		}
+
+		if (idx == size-1) // if idx already reach end of string
+		{
+			continue;
+		}
+
+		if (isdigit(buf) || isalpha(buf))
+		{
+			str[idx++] = buf;
+			printf("*");
+		}
+		else               // is other non-digit character is being pressed
+		{
+			// do nothing
+		}
+	} while (1);
+}
+
 void s_input(char *str, int size)
 {
 	rewind(stdin);

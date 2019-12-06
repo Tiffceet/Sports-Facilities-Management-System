@@ -54,6 +54,10 @@ int chkFileExist(FILE *f);
 
 char *trimwhitespace(char *str);
 
+// For collecting password
+// Only alphanumberic are allowed
+int collectCensoredInput(char* str, int size);
+
 // Get string input function -> the safe way
 void s_input(char *str, int size);
 
