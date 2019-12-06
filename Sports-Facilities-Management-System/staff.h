@@ -10,6 +10,7 @@ typedef struct
 	char stfConPassW[100];// confirm password
 	char stfID[6];
 	char stfPosi[10];
+	char dateRegis[30];
 }Staff;
 
 

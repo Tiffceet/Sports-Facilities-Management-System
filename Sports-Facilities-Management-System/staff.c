@@ -1,16 +1,7 @@
 #include "stdcxx.h"
 #include "staff.h"
 
-
-//typedef struct// struture for to store staff
-//{
-//	char stfName[30];
-//	char stfPassW[100];
-//	char stfConPassW[100];// confirm password
-//	char stfID[6];
-//	char stfPosi[10];
-//}Staff;
-
+const char BOOKFILEPATH[]="staffNameList.bin"
 Staff staffCache[30];
 
 int readStfList()
@@ -124,6 +115,11 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 		scanf("%[^\n]", addStaff.stfPosi);
 		rewind(stdin);
 
+		Date sysDate;
+		getSystemDate(&sysDate);
+		printf("%d:%d\n", sysDate.d, sysDate.m,sysDate.y);
+		sprintf(addStaff.dateRegis, "%d/%d/%d", sysDate.d, sysDate.m,sysDate.y);
+
 		fwrite(&addStaff, sizeof(Staff), 1, stf);
 	
 	fclose(stf);
@@ -140,7 +136,7 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	}
 	for(i=0;i<count;i++)
 	{
-		printf("Name:%s\nID:%s\nPosition:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
+		printf("Name:%s\nID:%s\nPosition:%s\nDate:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis);
 
 	}
 }
@@ -271,19 +267,19 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 			printf("Name:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
 
 			printf("What do you want to change about this staff?\n");
-			/*printf("1. Name\n");
+			printf("1. Name\n");
 			printf("2. PassWord\n");
 			printf("3. ID\n");
 			printf("4. Position\n");
-			printf("5. exit\n");*/
+			printf("5. exit\n");
 
-			char choiceText[][100] = { "Name", "Password", "ID", "Position", "Exit" };
-			int choice = globalMainMenu("<!> Staff infomation editor <!>", 5, choiceText);
+			printf("Enter a choice :");
+			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
 			rewind(stdin);
-			switch (choice)
+			switch (choice[0])
 			{
 
-			case 1:
+			case '1':
 				printf("Enter new name :");
 				scanf("%[^\n]", staffChange.stfName);
 				rewind(stdin);
@@ -295,7 +291,7 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 					rewind(stdin);
 				}
 				break;
-			case 2:
+			case '2':
 				printf("Enter new password(MINUMUM 8):");
 				scanf("%[^\n]", staffChange.stfPassW);
 				rewind(stdin);
@@ -307,7 +303,7 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 					rewind(stdin);
 				}
 				break;
-			case 3:
+			case '3':
 				printf("Enter new staff ID(4 characters): ");
 				scanf("%[^\n]", staffChange.stfID);
 				rewind(stdin);
@@ -337,12 +333,12 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 					}
 				}
 				break;
-			case 4:
+			case '4':
 				printf("Enter new staff position :");
 				scanf("%[^\n]", staffChange.stfPosi);
 				rewind(stdin);
 				break;
-			case 5:
+			case '5':
 				printf("Exiting");
 				return;
 
@@ -354,9 +350,9 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 			printf("(OLD)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n", staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
 			printf("(NEW)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffChange.stfName, staffChange.stfPassW, staffChange.stfID, staffChange.stfPosi);
 
-			printf("Do you want to commit to the changes?(y=yes)");
+			printf("Do you want to commit to the changes?(y=yes)"); // ADD FEA change code so it does like zi kang
 			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-			if (tolower(choice) == 'y')
+			if (tolower(choice) == "y")
 			{
 				strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
 				strcpy(staffCache[oldStaffAdd].stfID, staffChange.stfID);
