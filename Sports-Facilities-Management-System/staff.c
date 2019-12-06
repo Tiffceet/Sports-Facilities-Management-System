@@ -22,7 +22,7 @@ int readStfList()
 void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
 	int i, ans,totstaff;//for loop
-	char idEntered[6]; //to check if id entered is being used
+	char idEntered[6],choice[3]; //to check if id entered is being used
 	
 	// read file + get count of item in files
 	totstaff = readStfList();
@@ -115,13 +115,27 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 		scanf("%[^\n]", addStaff.stfPosi);
 		rewind(stdin);
 
-		Date sysDate;
-		getSystemDate(&sysDate);
-		printf("%d:%d\n", sysDate.d, sysDate.m,sysDate.y);
-		sprintf(addStaff.dateRegis, "%d/%d/%d", sysDate.d, sysDate.m,sysDate.y);
+		printf("Do you want to add this staff to the system?(y=yes)\n\n");
+		printf("Name:%s\nID:%s\nPosition:%s\n", addStaff.stfName, addStaff.stfID, addStaff.stfPosi);
+		getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
+		if (choice[0] == 'y')
+		{
 
-		fwrite(&addStaff, sizeof(Staff), 1, stf);
-	
+			Date sysDate;
+			getSystemDate(&sysDate);
+			printf("Joined date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+			sprintf(addStaff.dateRegis, "%d/%d/%d", sysDate.d, sysDate.m, sysDate.y);
+			sprintf(addStaff.dateModi, "%d/%d/%d", sysDate.d, sysDate.m, sysDate.y);
+			fwrite(&addStaff, sizeof(Staff), 1, stf);
+			printf("User added.\n");
+			system("pause");
+		}
+		else
+		{
+			printf("Registration have been canceled.\n");
+			printf("Have a nice day.\n");
+			system("Pause");
+		}
 	fclose(stf);
 }
 
@@ -136,7 +150,7 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	}
 	for(i=0;i<count;i++)
 	{
-		printf("Name:%s\nID:%s\nPosition:%s\nDate:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis);
+		printf("Name:%s\nID:%s\nPosition:%s\nDate:%s\nLast modified:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis,staffCache[i].dateModi);
 
 	}
 }
@@ -163,7 +177,7 @@ void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 				stfcount++;
 				if (strcmp(staffNameSearch, staffCache[i].stfName) == 0)
 				{
-					printf("Name:%s\nID:%s\nPosition:%s\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi);
+					printf("Name:%s\nID:%s\nPosition:%s\nDate Joined:%s", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis);
 					totstaff = 0;
 				}
 				else if (stfcount >= totstaff)
@@ -352,12 +366,16 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 
 			printf("Do you want to commit to the changes?(y=yes)"); // ADD FEA change code so it does like zi kang
 			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-			if (tolower(choice) == "y")
+			if (tolower(choice[0]) == 'y')
 			{
 				strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
 				strcpy(staffCache[oldStaffAdd].stfID, staffChange.stfID);
 				strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
 				strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
+				Date sysDate;
+				getSystemDate(&sysDate);
+				printf("%d:%d\n", sysDate.d, sysDate.m, sysDate.y);
+				sprintf(staffCache[oldStaffAdd].dateModi, "%d/%d/%d", sysDate.d, sysDate.m, sysDate.y);
 				fclose(stfopen);
 				stfopen = fopen(staffFilePath, "wb");
 				for (int a = 0; a < totstaff; a++)

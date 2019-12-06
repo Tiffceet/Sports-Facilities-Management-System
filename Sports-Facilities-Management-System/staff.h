@@ -10,7 +10,8 @@ typedef struct
 	char stfConPassW[100];// confirm password
 	char stfID[6];
 	char stfPosi[10];
-	char dateRegis[30];
+	char dateRegis[15];
+	char dateModi[15];
 }Staff;
 
 char staffFilePath[1024];
