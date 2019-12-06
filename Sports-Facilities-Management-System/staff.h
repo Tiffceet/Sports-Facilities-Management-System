@@ -13,6 +13,7 @@ typedef struct
 	char dateRegis[30];
 }Staff;
 
+char staffFilePath[1024];
 
 void addStaffList();
 void displayStaffList();

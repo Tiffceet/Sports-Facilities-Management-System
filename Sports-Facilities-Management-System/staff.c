@@ -1,7 +1,7 @@
 #include "stdcxx.h"
 #include "staff.h"
 
-const char BOOKFILEPATH[]="staffNameList.bin"
+
 Staff staffCache[30];
 
 int readStfList()
@@ -9,7 +9,7 @@ int readStfList()
 	int count = 0;
 	FILE*readstf;
 
-	readstf = fopen("staffNameList.bin", "rb");
+	readstf = fopen(staffFilePath, "rb");
 
 	while (fread(&staffCache[count], sizeof(Staff), 1, readstf) != 0)
 	{
@@ -29,7 +29,7 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 	Staff addStaff;
 	FILE*stf;
 
-	stf = fopen("staffNameList.bin", "ab");
+	stf = fopen(staffFilePath, "ab");
 
 	if (!stf)//For checking exsitent of file.
 	{
@@ -254,7 +254,7 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 
 	if (totstaff != 0)
 	{
-		stfopen = fopen("staffNameList.bin", "ab");
+		stfopen = fopen(staffFilePath, "ab");
 
 		strcpy(staffChange.stfID, staffCache[oldStaffAdd].stfID);
 		strcpy(staffChange.stfName, staffCache[oldStaffAdd].stfName);
@@ -359,7 +359,7 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 				strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
 				strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
 				fclose(stfopen);
-				stfopen = fopen("staffNameList.bin", "wb");
+				stfopen = fopen(staffFilePath, "wb");
 				for (int a = 0; a < totstaff; a++)
 				{
 					fwrite(&staffCache[a], sizeof(Staff), 1, stfopen);
@@ -390,8 +390,9 @@ void pwRecover()
 
 void staffMain()
 {
+	sprintf(staffFilePath, "%s\\%s", APPDATA_PATH, "staffNameList.bin");
 	FILE*stflist;
-	stflist = fopen("staffNameList.bin", "ab");
+	stflist = fopen(staffFilePath, "ab");
 	if (!stflist)
 	{
 		printf("Can't open file");
