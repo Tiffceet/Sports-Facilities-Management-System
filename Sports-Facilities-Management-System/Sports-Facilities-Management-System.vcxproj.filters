@@ -18,9 +18,6 @@
     <ClCompile Include="booking.c">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="fusage.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -34,6 +31,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Facility.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="fusage.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

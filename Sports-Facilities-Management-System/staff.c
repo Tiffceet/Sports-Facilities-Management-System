@@ -363,7 +363,6 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 			printf("These are the changes that you made:\n");
 			printf("(OLD)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n", staffCache[oldStaffAdd].stfName, staffCache[oldStaffAdd].stfPassW, staffCache[oldStaffAdd].stfID, staffCache[oldStaffAdd].stfPosi);
 			printf("(NEW)\nName:%s\nPassword:%s\nID:%s\nPosition:%s\n\n", staffChange.stfName, staffChange.stfPassW, staffChange.stfID, staffChange.stfPosi);
-
 			printf("Do you want to commit to the changes?(y=yes)"); // ADD FEA change code so it does like zi kang
 			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
 			if (tolower(choice[0]) == 'y')
