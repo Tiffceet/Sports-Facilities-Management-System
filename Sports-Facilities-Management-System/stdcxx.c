@@ -16,6 +16,10 @@ void init()
 		sprintf(CACHE_FILE, "%s\\cache.txt", APPDATA_PATH);
 		sprintf(CACHE_FILE_BIN, "%s\\cache.bin", APPDATA_PATH);
 	}
+	// define filepath for all data used by all modules
+	sprintf(bookingFilePath, "%s\\%s", APPDATA_PATH, "booking.txt");
+	sprintf(staffFilePath, "%s\\%s", APPDATA_PATH, "staffNameList.bin");
+	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, "userinfo.dat");
 }
 
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100])

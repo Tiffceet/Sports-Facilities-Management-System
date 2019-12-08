@@ -14,8 +14,6 @@ typedef struct
 	char dateModi[15];
 }Staff;
 
-char staffFilePath[1024];
-
 void addStaffList();
 void displayStaffList();
 void staffMain();

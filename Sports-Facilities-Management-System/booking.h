@@ -1,4 +1,8 @@
 #include "stdcxx.h"
+#include "facility.h"
+#include "fusage.h"
+#include "staff.h"
+#include "userinfo.h"
 #ifndef BOOKING_H
 #define BOOKING_H
 
@@ -15,8 +19,13 @@ typedef struct
 } BookingData;
 
 // Global variable
-char bookingFilePath[1024];
 int err; // to keep track of input errors
+// to store data while in here
+Staff staffData[100];
+int staffDataCount;
+userData usrData[100];
+int usrDataCount;
+int facilityDataCount;
 
 // Main functions
 void bookingMain();

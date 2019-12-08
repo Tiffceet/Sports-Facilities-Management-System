@@ -388,9 +388,7 @@ void userInfo()
 	while (1);
 }
 
-void userinfoMain() {
-	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, "userinfo.dat");
-	
+void userinfoMain() {	
 	userInfo();
 
 }

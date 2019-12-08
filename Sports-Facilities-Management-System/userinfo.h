@@ -10,7 +10,6 @@ void userInfo();
 void registerInfo();
 void modifyInfo2();
 int totalNumUser();
-char UserInfoFilePath[1024];
 typedef struct {
 
 	char name[100];

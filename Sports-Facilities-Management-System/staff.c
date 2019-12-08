@@ -482,7 +482,6 @@ void pwRecover()
 
 void staffMain()// still need to add places to indentify position
 {
-	sprintf(staffFilePath, "%s\\%s", APPDATA_PATH, "staffNameList.bin");
 	FILE*stflist;
 	stflist = fopen(staffFilePath, "ab");
 	if (!stflist)

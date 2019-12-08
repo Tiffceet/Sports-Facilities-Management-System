@@ -10,8 +10,6 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
-	// define filepath
-	sprintf(bookingFilePath, "%s\\%s", APPDATA_PATH, "booking.txt");
 	// initialise error code for input validation use
 	err = 0;
 	// while menu() doesnt return 0 = continue running
@@ -637,6 +635,13 @@ void writeBookingDataIntoFile(BookingData *data, int dataCount)
 		);
 	}
 	fclose(f);
+}
+
+void readDataFromOtherModules()
+{
+	facilityDataCount = 0;
+	staffDataCount = 0;
+	usrDataCount = 0;
 }
 
 // Starts with B000001

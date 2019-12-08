@@ -19,6 +19,9 @@
 char APPDATA_PATH[1024];
 char CACHE_FILE_BIN[1024];
 char CACHE_FILE[1024];
+char staffFilePath[1024];
+char bookingFilePath[1024];
+char UserInfoFilePath[1024];
 typedef struct
 {
 	int y, m, d;
