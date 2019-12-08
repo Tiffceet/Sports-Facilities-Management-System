@@ -33,7 +33,7 @@ int bookingMenu();
 void printBookingInfo();
 void bookingBook();
 void bookingSearchRecords();
-void printFilteredSearchResult(BookingData *data, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *dateTo, int *timeslot);
+int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot);
 void bookingModifyRecords();
 void bookingDisplayAll();
 void bookingDisplayFilters(BookingData *data, int dataCount);

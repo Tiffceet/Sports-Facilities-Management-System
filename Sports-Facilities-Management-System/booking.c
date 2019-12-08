@@ -235,22 +235,43 @@ void bookingBook()
 
 void bookingSearchRecords()
 {
-	Date dotFrom, dotTo, bookFrom, bookTo;
+	Date dotFrom = {0,0,0}, dotTo = { 0,0,0 }, bookFrom = { 0,0,0 }, bookTo = { 0,0,0 };
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	BookingData data[100];
+	BookingData *filteredData[100];
+	int filteredDataCount;
 	int count = readBookingDataIntoStructArray(&data[0], 100);
 	char choice[10];
 	char statusText[6][100];
 	int isSet[6] = { 0,0,0,0,0,0 };
 
-	for (int a = 0; a < 6; a++)
+	if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
+	if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
+	if (isSet[2])
 	{
-		if (!isSet[a]) strcpy(statusText[a], "Not Set");
-		else
+		int firstTime = 1;
+		for (int a = 0; a < 6; a++)
 		{
-			strcpy(statusText[a], "Set");
+			if (timeslot[a])
+			{
+				if (firstTime) {
+					sprintf(statusText[2], "%s", TIMESLOTS[a]);
+					firstTime = 0;
+				}
+				else
+				{
+					sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+				}
+			}
 		}
 	}
+	else strcpy(statusText[2], "Not Set");
+	if (isSet[3]) {}
+	else strcpy(statusText[3], "Not Set");
+	if (isSet[4]) {}
+	else strcpy(statusText[4], "Not Set");
+	if (isSet[5]) {}
+	else strcpy(statusText[5], "Not Set");
 	printf("\n[ Search Criteria ]\n");
 	printf("[1] Date of Transactions : %s\n", statusText[0]);
 	printf("[2] Booking Date         : %s\n", statusText[1]);
@@ -282,15 +303,61 @@ void bookingSearchRecords()
 		break;
 	case 'x':
 	case 'X':
-		printFilteredSearchResult(&data[0], &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
+		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
 		break;
 	}
 }
 
-// print filtered result and ask user to pick specific data to view its details
-void printFilteredSearchResult(BookingData *data, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *dateTo, int *timeslot)
+// generate & print filtered result and ask user to pick specific data to view its details
+// return numbers of filtered result found
+int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount ,int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot)
 {
-
+	int count = 0; // to keep track of how many records were printed
+	printf("%s\n", "======================================================================================================================");
+	printf("%s\n", "|                                               Booking Transactions                                                 |");
+	printf("%s\n", "======================================================================================================================");
+	printf("%s\n", "| No. | DateofTransaction BookingID BookingDate TimeslotBooked FacilityBooked           Booked by    Registered by   |");
+	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
+	for (int a = 0; a < dataCount; a++)
+	{
+		if (isSet[0])
+		{
+			if (compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotFrom->d, dotFrom->m, dotFrom->y) == -1
+				|| compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotTo->d, dotTo->m, dotTo->y) == 1)
+			{
+				continue;
+			}
+		}
+		if (isSet[1])
+		{
+			if (compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookFrom->d, bookFrom->m, bookFrom->y) == -1
+				|| compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookTo->d, bookTo->m, bookTo->y) == 1)
+			{
+				continue;
+			}
+		}
+		if (isSet[2])
+		{
+			if (!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)])
+			{
+				continue;
+			}
+		}
+		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-24.24s %-12.12s %-15.15s |\n",
+			count+1,
+			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
+			data[a].bookingID,
+			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
+			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
+			data[a].facilityID,
+			data[a].usrID,
+			data[a].staffID);
+		count++;
+	}
+	printf("%s\n", "======================================================================================================================");
+	printf("%s\n", "======================================================================================================================");
+	printf("\n%d record(s) found. \n", count);
+	return count;
 }
 
 void bookingModifyRecords()
@@ -357,6 +424,8 @@ void bookingDisplayAll()
 
 void bookingDisplayFilters(BookingData *data, int dataCount)
 {
+	BookingData *filteredData[100];
+	int filteredDataCount;
 	char retryChoice[10]; // to ask user if user wants to keep on filtering after printing of data
 	Date dotFrom, dotTo, bookFrom, bookTo;
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
@@ -425,43 +494,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				return;
 			case 'X':
 			case 'x':
-				// Apply filters
-				for (int a = 0; a < dataCount; a++)
-				{ // ALOT OF IF_ELSE WILL BE HERE
-					if (isSet[0])
-					{
-						if (compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotFrom.d, dotFrom.m, dotFrom.y) == -1
-							|| compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotTo.d, dotTo.m, dotTo.y) == 1)
-						{
-							continue;
-						}
-					}
-					if (isSet[1])
-					{
-						if (compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookFrom.d, bookFrom.m, bookFrom.y) == -1
-							|| compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookTo.d, bookTo.m, bookTo.y) == 1)
-						{
-							continue;
-						}
-					}
-					if (isSet[2])
-					{
-						if (!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)])
-						{
-							continue;
-						}
-					}
-					printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
-						data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
-						data[a].bookingID,
-						data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
-						TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-						data[a].facilityID,
-						data[a].usrID,
-						data[a].staffID);
-					recordsCount++;
-				}
-				printf("\nTotal %d record(s) found.\n", recordsCount);
+				filteredDataCount = generateFilteredSearchResult(filteredData, data, dataCount, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
 				break;
 			default:
 				break;
