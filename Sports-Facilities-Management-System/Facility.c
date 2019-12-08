@@ -11,39 +11,6 @@ typedef struct
 
 }Facility;
 
-int facilityMenu()
-{
-	printf("Facility Menu\n");
-	printf("--------------\n");
-	printf("(1) Add New Facility\n");
-	printf("(2) Search Faciity\n");
-	printf("(3) Modify Faciity\n");
-	printf("(4) Display All Facility\n");
-	char choice;
-	printf("Enter Your Choice: ");
-	rewind(stdin);
-	scanf("%s", &choice);
-	rewind(stdin);
-
-	switch (choice)
-	{
-	case '1':
-		addNewFacility();
-		break;
-	case '2':
-		searchFacility();
-		break;
-	case '3':
-		modifyFacility();
-		break;
-	case '4':
-		displayAllFacility();
-		break;
-	default:
-		return;
-	}
-
-}
 
 void addNewFacility()
 {
@@ -84,9 +51,9 @@ void addNewFacility()
 
 void searchFacility()
 {
-	int choice1;
+	int choice1=0;
 
-	Facility facility[10];
+	Facility facility[10] = {"0"};
 	FILE*facilityFile;
 	facilityFile = fopen("facility.dat", "rb");
 
@@ -125,10 +92,10 @@ void searchFacility()
 
 void modifyFacility()
 {
-	int choice2, maxFac;
+	int choice2, maxFac=0;
 	char facType[15], facDescription[20], facVenue[20];
 
-	Facility facility[10];
+	Facility facility[10] = {"0"};
 	FILE *facilityFile;
 	facilityFile = fopen("facility.dat", "rb");
 	while (!chkFileExist(facilityFile))
@@ -210,4 +177,36 @@ void displayAllFacility()
 	fclose(facilityFile);
 }
 
+int facilityMenu()
+{
+	printf("Facility Menu\n");
+	printf("--------------\n");
+	printf("(1) Add New Facility\n");
+	printf("(2) Search Faciity\n");
+	printf("(3) Modify Faciity\n");
+	printf("(4) Display All Facility\n");
+	char choice;
+	printf("Enter Your Choice: ");
+	rewind(stdin);
+	scanf("%s", &choice);
+	rewind(stdin);
 
+	switch (choice)
+	{
+	case '1':
+		addNewFacility();
+		break;
+	case '2':
+		searchFacility();
+		break;
+	case '3':
+		modifyFacility();
+		break;
+	case '4':
+		displayAllFacility();
+		break;
+	default:
+		return;
+	}
+
+}

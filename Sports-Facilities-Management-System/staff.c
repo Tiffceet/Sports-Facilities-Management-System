@@ -2,7 +2,8 @@
 #include "staff.h"
 
 
-Staff staffCache[30];
+Staff staffCache[30];//Main array to keep staff info from files
+Staff loggedinstf;//To check for globla logged in status
 
 int readStfList()
 {
@@ -110,14 +111,30 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 			}
 		}
 		strcpy(addStaff.stfID, idEntered);
+	
+		do //maybe add more options
+		{
+			printf("Enter staff position(1.Admin\n2.staff):");
+			getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
+			rewind(stdin);
+			switch (choice[0])
+			{
+			case '1':
+				strcpy(addStaff.stfPosi, "ADMIN");
+				break;
+			case '2':
+				strcpy(addStaff.stfPosi, "STAFF");
+				break;
+			default:
+				printf("Invalid entry!\n");
+			}
+		} while (choice[0] != '1' || choice[0] != '2');
 		
-		printf("Enter staff position :");
-		scanf("%[^\n]", addStaff.stfPosi);
-		rewind(stdin);
 
 		printf("Do you want to add this staff to the system?(y=yes)\n\n");
 		printf("Name:%s\nID:%s\nPosition:%s\n", addStaff.stfName, addStaff.stfID, addStaff.stfPosi);
 		getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
+		rewind(stdin);
 		if (choice[0] == 'y')
 		{
 
@@ -177,8 +194,8 @@ void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 				stfcount++;
 				if (strcmp(staffNameSearch, staffCache[i].stfName) == 0)
 				{
-					printf("Name:%s\nID:%s\nPosition:%s\nDate Joined:%s", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis);
-					totstaff = 0;
+					printf("Name:%s\nID:%s\nPosition:%s\nDate Joined:%s\nDate last modified:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis,staffCache[i].dateModi);
+					break;
 				}
 				else if (stfcount >= totstaff)
 				{
@@ -251,10 +268,6 @@ int staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	}
 }
 
-void login()
-{
-	
-}
 
 void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER LOOKING DISPLAY
 {
@@ -400,12 +413,74 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 	}
 }
 
+void login()//log in
+{
+	char nameEntered[30], passwordEntered[30];
+	int i = 0, totstaff, stfcount = 0, stfSuccessfullLogin;
+	totstaff = readStfList();
+	if (totstaff != 0)
+	{
+
+		do
+		{
+			printf("Name :");
+			scanf("%[^\n]", nameEntered);
+			rewind(stdin);
+			printf("Passwords :");
+			scanf("%[^\n]", passwordEntered);
+			rewind(stdin);
+			for (i = 0; i < totstaff; i++)
+			{
+				if (strcmp(nameEntered, staffCache[i].stfName) == 0 && strcmp(passwordEntered, staffCache[i].stfPassW) == 0)
+				{
+					printf("Welcome,%s\n", staffCache[i].stfName);
+					stfSuccessfullLogin = 1;
+					break;
+				}
+				else
+				{
+					printf("Password or log in ID is incorrect.\n");
+				}
+			}
+		} while (stfSuccessfullLogin == 0);
+
+		strcpy(loggedinstf.stfPosi, staffCache[i].stfPosi);
+		strcpy(loggedinstf.stfName, staffCache[i].stfName);
+		strcpy(loggedinstf.stfID, staffCache[i].stfID);
+	}
+	else
+	{
+		printf("No record of staff is found.\n");
+		printf("Proceeding to staff registration.\n");
+		system("pause");
+	}
+}
+
+int checkPosition()
+{
+
+	int position = -1;
+	if (strcmp(loggedinstf.stfPosi, "ADMIN") == 0)//For admin
+	{
+		position = 0;
+	}
+	else if (strcmp(loggedinstf.stfPosi, "STAFF") == 0)//For staffs
+	{
+		position = 1;
+	}
+	else
+	{
+		position = 2;
+	}
+	return position;
+}
+
 void pwRecover()
 {
 
 }
 
-void staffMain()
+void staffMain()// still need to add places to indentify position
 {
 	sprintf(staffFilePath, "%s\\%s", APPDATA_PATH, "staffNameList.bin");
 	FILE*stflist;
@@ -416,24 +491,16 @@ void staffMain()
 		return;
 	}
 	fclose(stflist);
+
+    //login();
+
+	printf("%s\n%s\n%s", loggedinstf.stfName, loggedinstf.stfPosi, loggedinstf.stfID);
+	system("pause");
 	int err = 0;
 	char choice[10];
 	do
 	{
 		system("cls");
-	
-		/*printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
-		printf("%41s|     Staff infomations Console     |\n", "");
-		printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
-		printf("%41s|     1. Staff list                 |\n", "");
-		printf("%41s|     2. Add staff                  |\n", "");
-		printf("%41s|     3. Search staff               |\n", "");
-		printf("%41s|     4. Change staff info          |\n", "");
-		printf("%41s|     5. c                       |\n", "");
-		printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
-		printf("%49sEnter menu choice: ", "");
-		getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
-		rewind(stdin);*/
 		char choiceText[][100] = { "Staff list", "Add staff", "Search staff", "Change staff info", "Exit" };
 		int choice = globalMainMenu("<!> Staff infomations Console <!>", 5, choiceText);
 		switch (choice)
