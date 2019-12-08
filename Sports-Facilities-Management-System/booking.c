@@ -10,6 +10,7 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
+	readDataFromOtherModules();
 	// initialise error code for input validation use
 	err = 0;
 	// while menu() doesnt return 0 = continue running
@@ -115,7 +116,7 @@ void bookingBook()
 			isSet[2] = 0;
 			incrementBookingID(latestBookingID); // increment bookingID
 		}
-		do {	
+		do {
 			char facilityStatus[100], bookingDateStatus[100], timeslotStatus[100];
 			if (isSet[0]) strcpy(facilityStatus, userPickedfacilityID); else strcpy(facilityStatus, "<!> Not Set <!>");
 			if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "<!> Not Set <!>");
@@ -207,13 +208,13 @@ void bookingBook()
 				writeBookingDataIntoFile(&data[0], ++count);
 
 				printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
-					data[count-1].staffID,
-					data[count-1].usrID,
-					data[count-1].facilityID,
-					data[count-1].bookingDate.d,
-					data[count-1].bookingDate.m,
-					data[count-1].bookingDate.y,
-					TIMESLOTS[getTimeslotBooked(data[count-1].timeSlotsBooked)]
+					data[count - 1].staffID,
+					data[count - 1].usrID,
+					data[count - 1].facilityID,
+					data[count - 1].bookingDate.d,
+					data[count - 1].bookingDate.m,
+					data[count - 1].bookingDate.y,
+					TIMESLOTS[getTimeslotBooked(data[count - 1].timeSlotsBooked)]
 				);
 				system("pause");
 				break;
@@ -281,7 +282,7 @@ void bookingSearchRecords()
 		break;
 	case 'x':
 	case 'X':
-		printFilteredSearchResult(&data[0], &isSet[0] ,&dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
+		printFilteredSearchResult(&data[0], &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
 		break;
 	}
 }
@@ -637,13 +638,6 @@ void writeBookingDataIntoFile(BookingData *data, int dataCount)
 	fclose(f);
 }
 
-void readDataFromOtherModules()
-{
-	facilityDataCount = 0;
-	staffDataCount = 0;
-	usrDataCount = 0;
-}
-
 // Starts with B000001
 // To prevent invalid string, please set oldBookID[0] = '\0' before passing it to this function
 void incrementBookingID(char *oldBookID)
@@ -804,4 +798,56 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 	} while (!timeslotAvailable[*userPickedtimeslot]); // while that timeslot is booked
 	err = 0;
 	return 1;
+}
+
+void readDataFromOtherModules()
+{
+	facilityDataCount = 0;
+	staffDataCount = 0;
+	usrDataCount = 0;
+	FILE *f = fopen(UserInfoFilePath, "rb");
+	if (chkFileExist(f))
+	{
+		while (fread(&usrData[usrDataCount++], sizeof(userData), 1, f) != 0);
+		fclose(f);
+	}
+	f = fopen(staffFilePath, "rb");
+	if (chkFileExist(f))
+	{
+		while (fread(&staffData[staffDataCount++], sizeof(Staff), 1, f) != 0);
+		fclose(f);
+	}
+}
+
+// Return pointer to staff data, null if not found or no data
+Staff* getStaffDataByID(char *id)
+{
+	if (staffDataCount == 0)
+	{
+		return NULL;
+	}
+	for (int a = 0; a < staffDataCount; a++)
+	{
+		if (strcmp(staffData[a].stfID, id) == 0)
+		{
+			return &staffData[a];
+		}
+	}
+	return NULL;
+}
+
+userData* getUserDataByID(char *id) 
+{
+	if (usrDataCount == 0)
+	{
+		return NULL;
+	}
+	for (int a = 0; a < usrDataCount; a++)
+	{
+		if (strcmp(usrData[a].id, id) == 0)
+		{
+			return &usrData[a];
+		}
+	}
+	return NULL;
 }

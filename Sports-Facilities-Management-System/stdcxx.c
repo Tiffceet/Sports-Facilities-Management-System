@@ -2,24 +2,12 @@
 
 void init()
 {
-	char *temp = getenv("APPDATA");
-	if (!temp) // If appdata is somehow gone, uses relative folder path "data"
-	{
-		strcpy(APPDATA_PATH, "data");
-		strcpy(CACHE_FILE, "data\\cache.txt");
-		strcpy(CACHE_FILE_BIN, "data\\cache.bin");
-	}
-	else
-	{
-		system("IF NOT EXIST \"%appdata%\\SFMS\" mkdir \"%appdata%\\SFMS\""); // make sure SFMS folder exists
-		sprintf(APPDATA_PATH, "%s\\SFMS", temp); // append SFMS to appdata path
-		sprintf(CACHE_FILE, "%s\\cache.txt", APPDATA_PATH);
-		sprintf(CACHE_FILE_BIN, "%s\\cache.bin", APPDATA_PATH);
-	}
+	// get appdata path
+	const char *APPDATA_PATH = getenv("APPDATA");	
 	// define filepath for all data used by all modules
-	sprintf(bookingFilePath, "%s\\%s", APPDATA_PATH, "booking.txt");
-	sprintf(staffFilePath, "%s\\%s", APPDATA_PATH, "staffNameList.bin");
-	sprintf(UserInfoFilePath, "%s\\%s", APPDATA_PATH, "userinfo.dat");
+	sprintf(bookingFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "booking.txt");
+	sprintf(staffFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "staffNameList.bin");
+	sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
 }
 
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
@@ -29,11 +17,11 @@ int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
 	char titleFormat[300];
 	int curPos = 1;
 	if(strlen(title) % 2 == 0){
-		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (70 - strlen(title))/2, (70 - strlen(title)) / 2);
+		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(title))/2, (int)(70 - strlen(title)) / 2);
 	}
 	else
 	{
-		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (70 - strlen(title)) / 2, (70 - strlen(title)) / 2 + 1);
+		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(title)) / 2, (int)(70 - strlen(title)) / 2 + 1);
 	}
 	do{
 		system("cls");
@@ -167,7 +155,7 @@ char *trimwhitespace(char *str)
 	return str;
 }
 
-int collectCensoredInput(char* str, int size)
+void collectCensoredInput(char* str, int size)
 {
 	int idx = 0;
 	unsigned char buf;

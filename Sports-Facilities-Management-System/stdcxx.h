@@ -16,9 +16,6 @@
 #pragma warning(disable: 4996)
 
 // Env variables declarations
-char APPDATA_PATH[1024];
-char CACHE_FILE_BIN[1024];
-char CACHE_FILE[1024];
 char staffFilePath[1024];
 char bookingFilePath[1024];
 char UserInfoFilePath[1024];
@@ -59,7 +56,7 @@ char *trimwhitespace(char *str);
 
 // For collecting password
 // Only alphanumberic are allowed
-int collectCensoredInput(char* str, int size);
+void collectCensoredInput(char* str, int size);
 
 // Get string input function -> the safe way
 void s_input(char *str, int size);
@@ -87,4 +84,5 @@ int compareTime(int h1, int m1, int s1, int h2, int m2, int s2);
 // return -1 if date2 is later than date1
 // return 0 if both time are the same
 int compareDate(int dd1, int mm1, int yy1, int dd2, int mm2, int yy2);
+
 #endif

@@ -52,4 +52,9 @@ int getTimeslotBooked(int *timeslot);
 int bipChangeFacility(char *userPickedfacilityID);
 int bipChangeBookingDate(Date *bookingDate);
 int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
+
+// Functions for obtaining data from other modules
+void readDataFromOtherModules();
+Staff* getStaffDataByID(char *id);
+userData* getUserDataByID(char *id);
 #endif
