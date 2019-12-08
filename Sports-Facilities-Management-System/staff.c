@@ -114,7 +114,7 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 	
 		do //maybe add more options
 		{
-			printf("Enter staff position(1.Admin\n2.staff):");
+			printf("1.Admin\n2.staff\nEnter staff position : ");
 			getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
 			rewind(stdin);
 			switch (choice[0])
@@ -126,13 +126,14 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 				strcpy(addStaff.stfPosi, "STAFF");
 				break;
 			default:
-				printf("Invalid entry!\n");
+				choice[0] = 0;
+				printf("Invalid entry!\n\n");
 			}
-		} while (choice[0] != '1' || choice[0] != '2');
+		} while (choice[0]==0);
 		
-
-		printf("Do you want to add this staff to the system?(y=yes)\n\n");
+		printf("\n\n");
 		printf("Name:%s\nID:%s\nPosition:%s\n", addStaff.stfName, addStaff.stfID, addStaff.stfPosi);
+		printf("Do you want to add this staff to the system?(y=yes) :");
 		getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
 		rewind(stdin);
 		if (choice[0] == 'y')
@@ -491,10 +492,6 @@ void staffMain()// still need to add places to indentify position
 	}
 	fclose(stflist);
 
-    //login();
-
-	printf("%s\n%s\n%s", loggedinstf.stfName, loggedinstf.stfPosi, loggedinstf.stfID);
-	system("pause");
 	int err = 0;
 	char choice[10];
 	do
