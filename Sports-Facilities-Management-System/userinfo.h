@@ -1,20 +1,24 @@
 #pragma once
 #ifndef USERINFO_H
 #define USERINFO_H
-void userEntry();
 void searchInfo();
-void modifyInfo();
 void displayInfo();
 void userinfoMain();
 void userInfo();
 void registerInfo();
 void modifyInfo2();
 int totalNumUser();
+char UserInfoFilePath[1024];
+int exitProgram(char quit[10]);
+int uniqueId(char id[15]);
 typedef struct {
 
 	char name[100];
 	char id[15];
-	char gender;
+	char date[20];
+	char dateRegis[15];
+	char timeRegis[15];
+	char gender[20];
 	char contact[100];
 	char password[100];
 }userData;
