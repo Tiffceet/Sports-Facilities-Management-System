@@ -707,7 +707,7 @@ void displayInfo()
 	{
 		printf("\t\t*****************************************\n");
 		printf("\t\t*Name              = %-19s*\n", user2[i].name);
-		printf("\t\t*Gender is         = %-19c*\n", user2[i].gender);
+		printf("\t\t*Gender is         = %-19s*\n", user2[i].gender);
 		printf("\t\t*Contact number is = %-19s*\n", user2[i].contact);
 		printf("\t\t*Date Of Register  =%-19s *\n", user2[i].dateRegis);
 		printf("\t\t*Time Of Register  =%-19s *\n", user2[i].timeRegis);
@@ -769,7 +769,7 @@ void searchInfo()
 			printf("Name = %s\n", user1.name);
 			printf("ID   = %s\n", user1.id);
 			printf("Password = %s\n", user1.password);
-			printf("Gender is = %c\n", user1.gender);
+			printf("Gender is = %s\n", user1.gender);
 			printf("Contact number is = %s\n", user1.contact);
 			system("pause");
 			return;
