@@ -11,10 +11,9 @@ typedef struct
 
 }Facility;
 
-
 void addNewFacility()
 {
-	int a;
+	char ans;
 	Facility facility[10];
 	FILE*facilityFile;
 	facilityFile = fopen("facility.dat", "a");
@@ -25,26 +24,40 @@ void addNewFacility()
 		return;
 	}
 
-	for (a = 0; a < 10; a++)
-	{
-		printf("Facility id: ");
+	    printf("Facility id: ");
 		rewind(stdin);
-		scanf("%[^\n]", facility[a].id);
+		scanf("%[^\n]", facility[0].id);
 		rewind(stdin);
 		printf("Facility Type: ");
-		scanf("%[^\n]", facility[a].type);
+		scanf("%[^\n]", facility[0].type);
 		rewind(stdin);
 		printf("Facility Description:");
-		scanf("%[^\n]", facility[a].description);
+		scanf("%[^\n]", facility[0].description);
 		rewind(stdin);
 		printf("Facility Venue:");
-		scanf("%[^\n]", facility[a].venue);
+		scanf("%[^\n]", facility[0].venue);
 		rewind(stdin);
 		printf("Maximum User:");
-		scanf("%d", &facility[a].maxUser);
+		scanf("%d", &facility[0].maxUser);
+		printf("Add new facility?(y/n):");
 		rewind(stdin);
+		scanf("%c", &ans);
+		if (ans == 'y' || ans == 'Y')
+		{
+			addNewFacility();
+		}
+		else if (ans == 'n' || ans == 'N')
+		{
+			system("pause");
+		}
+		else 
+		{
+			printf("Invalid Input!\n");
+			addNewFacility();
+		}
+		system("pause");
 
-	}
+	
 	fclose(facilityFile);
 	return;
 }
