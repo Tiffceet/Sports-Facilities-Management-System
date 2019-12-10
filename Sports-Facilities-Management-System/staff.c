@@ -142,8 +142,8 @@ void addStaffList()//For adding new staff(NEED TO MAKE THE PRINT F MUCH BETTER L
 			Date sysDate;
 			getSystemDate(&sysDate);
 			printf("Joined date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
-			sprintf(addStaff.dateRegis, "%d/%d/%d", sysDate.d, sysDate.m, sysDate.y);
-			sprintf(addStaff.dateModi, "%d/%d/%d", sysDate.d, sysDate.m, sysDate.y);
+			addStaff.dateRegis = sysDate;
+			addStaff.dateModi = sysDate;
 			fwrite(&addStaff, sizeof(Staff), 1, stf);
 			printf("User added.\n");
 			system("pause");
@@ -168,7 +168,7 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	}
 	for(i=0;i<count;i++)
 	{
-		printf("Name:%s\nID:%s\nPosition:%s\nDate:%s\nLast modified:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis,staffCache[i].dateModi);
+		printf("Name:%s\nID:%s\nPosition:%s\nDate:%d/%d/%d\nLast modified:%d/%d/%d\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y,staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 
 	}
 }
@@ -195,7 +195,7 @@ void staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 				stfcount++;
 				if (strcmp(staffNameSearch, staffCache[i].stfName) == 0)
 				{
-					printf("Name:%s\nID:%s\nPosition:%s\nDate Joined:%s\nDate last modified:%s\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis,staffCache[i].dateModi);
+					printf("Name:%s\nID:%s\nPosition:%s\nDate:%d/%d/%d\nLast modified:%d/%d/%d\n\n", staffCache[i].stfName, staffCache[i].stfID, staffCache[i].stfPosi,staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y,staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 					break;
 				}
 				else if (stfcount >= totstaff)
@@ -387,8 +387,8 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 				strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
 				Date sysDate;
 				getSystemDate(&sysDate);
-				printf("%d:%d\n", sysDate.d, sysDate.m, sysDate.y);
-				sprintf(staffCache[oldStaffAdd].dateModi, "%d/%d/%d", sysDate.d, sysDate.m, sysDate.y);
+				printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+				staffCache[oldStaffAdd].dateModi = sysDate;
 				fclose(stfopen);
 				stfopen = fopen(staffFilePath, "wb");
 				for (int a = 0; a < totstaff; a++)
