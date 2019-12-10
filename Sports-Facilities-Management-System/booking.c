@@ -22,17 +22,6 @@ void bookingMain()
 
 int bookingMenu()
 {
-	/*printf("==============\n");
-	printf("Booking Module\n");
-	printf("==============\n");
-	printf("1. Book\n");
-	printf("2. Search records\n");
-	printf("3. Modify records\n");
-	printf("4. Display all bookings\n");
-	printf("5. Return to console\n");
-	printf("\nMenu Choice: ");
-	char choice[10];
-	getUserMenuChoice(choice, 9, "Menu Choice: ");*/
 	char choiceText[][100] = { "Book", "Search Records", "Modify records", "Display all bookings", "Return to console" };
 	int choice = globalMainMenu("Booking Module", 5, choiceText);
 	switch (choice)
@@ -41,6 +30,7 @@ int bookingMenu()
 		bookingBook(); // add do while loop to ask user if want to book mores
 		break;
 	case 2:
+		bookingSearchRecords();
 		break;
 	case 3:
 		break;
@@ -65,8 +55,8 @@ void printBookingInfo()
 	printf(" | 2. Booking for multiple time slots is allowed                                                                     |\n");
 	printf(" | 3. Timeslots as follows:                                                                                          |\n");
 	printf(" |      < 7am-9am, 9am-11am, 1pm-3pm, 3pm-5pm, 5pm-7pm, 7pm-9pm >                                                    |\n");
-	printf(" | 4. Please proceed to payment counter after booking                                                                |\n");
-	printf(" |                                                                                                                   |\n");
+	printf(" | 4. Only registered users are allowed to make booking                                                              |\n");
+	printf(" | 5. Every booking needs to be handled by 1 staff                                                                 |\n");
 	printf(" =====================================================================================================================\n");
 	printf(" =====================================================================================================================\n\n");
 }
@@ -109,6 +99,7 @@ void bookingBook()
 
 	// Sub Menu
 	char choice[10];
+	char bookingComfirmChoice[10];
 	char choiceToContinueNextBooking[10] = "\0";
 	do {
 		if (tolower(choiceToContinueNextBooking[0]) == 'y')
@@ -183,14 +174,29 @@ void bookingBook()
 					break;
 				}
 				// NEED TO FKING ADD COMFIRMATIONA AND WHOLE LOT OF SHIT
+				printf("<INFO> Every booking needs to be handled by 1 staff. <INFO>\n<INFO> Every booking needs 1 registered user <INFO>\n");
+				printf("Press any key to proceed with staff & user login...");
+				system("pause >nul");
+				printf("\n");
+				int loginStat = _staffLogin(data[count].staffID, 5);
+				if (loginStat == 0) // if user wants to return
+				{
+					break;
+				}
+
+				loginStat = _usrLogin(data[count].usrID, 14);
+				if (loginStat == 0)
+				{
+					break;
+				}
 
 				printf("Please read the booking details again for confirmation. (Y=Comfirm) ? ");
-				char bookingComfirmChoice[10];
 				getUserMenuChoice(bookingComfirmChoice, 9, "Please read the booking details again for confirmation. (Y=Comfirm) ? ");
 				if (tolower(bookingComfirmChoice[0]) != 'y')
 				{
 					break;
 				}
+				
 
 				// Gather all info
 				strcpy(data[count].bookingID, latestBookingID);
@@ -200,16 +206,17 @@ void bookingBook()
 				data[count].bookingDate.m = userPickedDate.m;
 				data[count].bookingDate.y = userPickedDate.y;
 				data[count].timeSlotsBooked[userPickedtimeslot] = 1;
-				strcpy(data[count].usrID, "U0001");
-				strcpy(data[count].staffID, "S0001");
+				// strcpy(data[count].usrID, "U0001");
+				// strcpy(data[count].staffID, "S0001");
 				strcpy(data[count].facilityID, userPickedfacilityID);
-
 				// Important line here
 				writeBookingDataIntoFile(&data[0], ++count);
-
+				
 				printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
-					data[count - 1].staffID,
-					data[count - 1].usrID,
+					// data[count - 1].staffID,
+					getStaffDataByID(data[count - 1].staffID)->stfName,
+					// data[count - 1].usrID,
+					getUserDataByID(data[count - 1].usrID)->name,
 					data[count - 1].facilityID,
 					data[count - 1].bookingDate.d,
 					data[count - 1].bookingDate.m,
@@ -226,7 +233,7 @@ void bookingBook()
 				printf("\n<!> ERR: Please select number between 1 - 5 <!>\n\n");
 				system("pause");
 			}
-		} while (choice[0] != '4');
+		} while (choice[0] != '4' || tolower(bookingComfirmChoice[0]) != 'y'); // if user didnt pick 'Comfirm Booking' OR 'y' during final booking comfirmation
 		printf("Would you like to continue a new booking ? (y=yes) ");
 		getUserMenuChoice(choiceToContinueNextBooking, 9, "Would you like to continue a new booking ? (y=yes) ");
 	} while (tolower(choiceToContinueNextBooking[0]) == 'y');
@@ -235,7 +242,7 @@ void bookingBook()
 
 void bookingSearchRecords()
 {
-	Date dotFrom = {0,0,0}, dotTo = { 0,0,0 }, bookFrom = { 0,0,0 }, bookTo = { 0,0,0 };
+	Date dotFrom = { 0,0,0 }, dotTo = { 0,0,0 }, bookFrom = { 0,0,0 }, bookTo = { 0,0,0 };
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	BookingData data[100];
 	BookingData *filteredData[100];
@@ -244,73 +251,75 @@ void bookingSearchRecords()
 	char choice[10];
 	char statusText[6][100];
 	int isSet[6] = { 0,0,0,0,0,0 };
-
-	if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
-	if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
-	if (isSet[2])
-	{
-		int firstTime = 1;
-		for (int a = 0; a < 6; a++)
+	do {
+		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
+		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
+		if (isSet[2])
 		{
-			if (timeslot[a])
+			int firstTime = 1;
+			for (int a = 0; a < 6; a++)
 			{
-				if (firstTime) {
-					sprintf(statusText[2], "%s", TIMESLOTS[a]);
-					firstTime = 0;
-				}
-				else
+				if (timeslot[a])
 				{
-					sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+					if (firstTime) {
+						sprintf(statusText[2], "%s", TIMESLOTS[a]);
+						firstTime = 0;
+					}
+					else
+					{
+						sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+					}
 				}
 			}
 		}
-	}
-	else strcpy(statusText[2], "Not Set");
-	if (isSet[3]) {}
-	else strcpy(statusText[3], "Not Set");
-	if (isSet[4]) {}
-	else strcpy(statusText[4], "Not Set");
-	if (isSet[5]) {}
-	else strcpy(statusText[5], "Not Set");
-	printf("\n[ Search Criteria ]\n");
-	printf("[1] Date of Transactions : %s\n", statusText[0]);
-	printf("[2] Booking Date         : %s\n", statusText[1]);
-	printf("[3] TimeslotBooked       : %s\n", statusText[2]);
-	printf("[4] FacilityBooked       : %s\n", statusText[3]);
-	printf("[5] Staff involved       : %s\n", statusText[4]);
-	printf("[6] User Involved        : %s\n", statusText[5]);
-	printf("[7] Exit to Menu\n");
-	printf("\nEnter 'X' to search based on the criteria given.\n\nSet search criteria (1-6) (7 to exit)? ");
-	getUserMenuChoice(choice, 9, "Set search criteria (1-6) (7 to exit)? ");
-	switch (choice[0])
-	{
-	case '1':
-		isSet[0] = dispfilterDOT(&isSet[0], &dotFrom, &dotTo);
-		break;
-	case '2':
-		isSet[1] = dispfilterBookingDate(&bookFrom, &bookTo);
-		break;
-	case '3':
-		isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
-		break;
-	case '4':
-		break;
-	case '5':
-		break;
-	case '6':
-		break;
-	case '7':
-		break;
-	case 'x':
-	case 'X':
-		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
-		break;
-	}
+		else strcpy(statusText[2], "Not Set");
+		if (isSet[3]) {}
+		else strcpy(statusText[3], "Not Set");
+		if (isSet[4]) {}
+		else strcpy(statusText[4], "Not Set");
+		if (isSet[5]) {}
+		else strcpy(statusText[5], "Not Set");
+		printf("\n[ Search Criteria ]\n");
+		printf("[1] Date of Transactions : %s\n", statusText[0]);
+		printf("[2] Booking Date         : %s\n", statusText[1]);
+		printf("[3] TimeslotBooked       : %s\n", statusText[2]);
+		printf("[4] FacilityBooked       : %s\n", statusText[3]);
+		printf("[5] Staff involved       : %s\n", statusText[4]);
+		printf("[6] User Involved        : %s\n", statusText[5]);
+		printf("[7] Exit to Menu\n");
+		printf("\nEnter 'X' to search based on the criteria given.\n\nSet search criteria (1-6) (7 to exit)? ");
+		getUserMenuChoice(choice, 9, "Set search criteria (1-6) (7 to exit)? ");
+		switch (choice[0])
+		{
+		case '1':
+			isSet[0] = dispfilterDOT(&isSet[0], &dotFrom, &dotTo);
+			break;
+		case '2':
+			isSet[1] = dispfilterBookingDate(&bookFrom, &bookTo);
+			break;
+		case '3':
+			isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
+			break;
+		case '4':
+			break;
+		case '5':
+			break;
+		case '6':
+			break;
+		case '7':
+			return;
+		case 'x':
+		case 'X':
+			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
+			system("pause");
+			break;
+		}
+	} while (tolower(choice[0]) != 'x');
 }
 
 // generate & print filtered result and ask user to pick specific data to view its details
 // return numbers of filtered result found
-int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount ,int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot)
+int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot)
 {
 	int count = 0; // to keep track of how many records were printed
 	printf("%s\n", "======================================================================================================================");
@@ -344,7 +353,7 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			}
 		}
 		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-24.24s %-12.12s %-15.15s |\n",
-			count+1,
+			count + 1,
 			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
@@ -495,6 +504,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			case 'X':
 			case 'x':
 				filteredDataCount = generateFilteredSearchResult(filteredData, data, dataCount, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
+				system("pause");
 				break;
 			default:
 				break;
@@ -599,6 +609,58 @@ int dispfilterTimeslotBooked(int *timeslot)
 	} while (tolower(choice[0]) == 'y');
 	return 1;
 }
+
+// print booking details based on bookingID
+void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
+{
+	BookingData *bData = NULL;
+	for (int a = 0; a < dataSize; a++)
+	{
+		if (strcmp(data[a].bookingID, bookingID) == 0)
+		{
+			bData = &data[a];
+			break;
+		}
+	}
+	if (bData == NULL)
+	{
+		printf("Booking of ID \"%s\" was not found.\n");
+		system("pause");
+		return;
+	}
+	Staff *stf = getStaffDataByID(bData->staffID);
+	if (stf == NULL)
+	{
+		printf("Staff of ID \"%s\" was not found.\n", bData->staffID);
+		system("pause");
+		return;
+	}
+	userData *usr = getUserDataByID(bData->usrID);
+	if (usr == NULL)
+	{
+		printf("User of ID \"%s\" was not found.\n", bData->usrID);
+		system("pause");
+		return;
+	}
+	printf("%40s                Booking\n", "");
+	printf("%40s---------------------------------------\n", "");
+	printf("%40s| Booking ID       : %s          |\n", "", bData->bookingID);
+	printf("%40s| Transaction Date : %02d/%02d/%04d %02d:%02d |\n", "", bData->currentDate.d, bData->currentDate.m, bData->currentDate.y, bData->currentTime.h, bData->currentTime.m);
+	printf("%40s| Booking Date     : %02d/%02d/%04d       |\n", "", bData->bookingDate.d, bData->bookingDate.m, bData->bookingDate.y);
+	printf("%40s| Timeslot Booked  : %s       |\n", "", TIMESLOTS[getTimeslotBooked(&bData->timeSlotsBooked[0])]);
+	printf("%40s---------------------------------------\n", "");
+	printf("                   User                                Faciltity                                Staff                 \n");
+	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
+	printf("  | ID              :                  | |                                    | | ID              :                  |\n");
+	printf("  | Name            :                  | |                                    | | Name            :                  |\n");
+	printf("  | Date registered : xx/xx/xxxx xx:xx | |                                    | | Position        :                  |\n");
+	printf("  | Gender          :                  | |                                    | | Date Registered :                  |\n");
+	printf("  | Contact         :                  | |                                    | |                                    |\n");
+	printf("  |                                    | |                                    | |                                    |\n");
+	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
+	system("pause");
+}
+
 // ============================================================================================
 // Utilities & Sub Functions go below this point
 // ============================================================================================
@@ -852,6 +914,13 @@ void readDataFromOtherModules()
 	}
 }
 
+// ============================================================================================
+// ============================================================================================
+
+// ============================================================================================
+// Functions for obtaining data from other modules
+// ============================================================================================
+
 // Return pointer to staff data, null if not found or no data
 Staff* getStaffDataByID(char *id)
 {
@@ -869,7 +938,7 @@ Staff* getStaffDataByID(char *id)
 	return NULL;
 }
 
-userData* getUserDataByID(char *id) 
+userData* getUserDataByID(char *id)
 {
 	if (usrDataCount == 0)
 	{
@@ -884,3 +953,102 @@ userData* getUserDataByID(char *id)
 	}
 	return NULL;
 }
+
+// ============================================================================================
+// ============================================================================================
+
+// ============================================================================================
+// Login functions
+// ============================================================================================
+
+// login Staff and store ID onto staffID
+// if login was successful, it will return true
+int _staffLogin(char *staffID, int size)
+{
+	char pw[100];
+	Staff *stf;
+
+	if (staffDataCount == 0)
+	{
+		printf("There are currently no staffs in the system.\n");
+		system("pause");
+		return;
+	}
+	do {
+		printf("===============\n");
+		printf("| Staff Login |\n");
+		printf("===============\n");
+		printf("Enter 'XXX' to return to previous screen\n");
+		printf("Staff ID -> ");
+		s_input(staffID, size);
+		if (strcmp(staffID, "XXX") == 0)
+		{
+			return 0;
+		}
+		stf = getStaffDataByID(staffID);
+		if (stf == NULL)
+		{
+			printf("Such staffID do not exist.\n");
+			system("pause");
+			continue;
+		}
+		printf("Password -> ");
+		collectCensoredInput(pw, 99);
+		if (strcmp(pw, stf->stfPassW) == 0)
+		{
+			printf("\nStaff Login Successful.\n");
+			return 1;
+		}
+		else {
+			printf("\nInvalid password.\n");
+		}
+	} while (1);
+
+}
+
+int _usrLogin(char *usrID, int size)
+{
+	char pw[100];
+	userData *usr;
+	if (usrDataCount == 0)
+	{
+		printf("There are currently no users in the system.\n");
+		system("pause");
+		return;
+	}
+
+	do 
+	{
+		printf("===============\n");
+		printf("| User Login |\n");
+		printf("===============\n");
+		printf("Enter 'XXX' to return to previous screen\n");
+		printf("User ID -> ");
+		s_input(usrID, size);
+		if (strcmp(usrID, "XXX") == 0)
+		{
+			return 0;
+		}
+		usr = getStaffDataByID(usrID);
+		if (usr == NULL)
+		{
+			printf("Such usrID do not exist.\n");
+			system("pause");
+			continue;
+		}
+		printf("Password -> ");
+		collectCensoredInput(pw, 99);
+		if (strcmp(pw, usr->password) == 0)
+		{
+			printf("\nUser Login Successful.\n");
+			return 1;
+		}
+		else {
+			printf("\nInvalid password.\n");
+		}
+	} while (1);
+}
+
+
+// ============================================================================================
+// ============================================================================================

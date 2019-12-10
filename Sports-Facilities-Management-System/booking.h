@@ -40,6 +40,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount);
 int dispfilterDOT(int *isSet, Date *dotFrom, Date *dotTo);
 int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo);
 int dispfilterTimeslotBooked(int *timeslot);
+void printBookingDetails(char *bookingID, BookingData *data, int dataSize);
 
 // Util Functions & Sub Functions
 int readBookingDataIntoStructArray(BookingData *data, int size);
@@ -57,4 +58,8 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 void readDataFromOtherModules();
 Staff* getStaffDataByID(char *id);
 userData* getUserDataByID(char *id);
+
+// login functions
+int _staffLogin(char *staffID, int size);
+int _usrLogin(char *usrID, int size);
 #endif
