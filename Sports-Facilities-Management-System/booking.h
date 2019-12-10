@@ -40,6 +40,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount);
 int dispfilterDOT(int *isSet, Date *dotFrom, Date *dotTo);
 int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo);
 int dispfilterTimeslotBooked(int *timeslot);
+int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount);
 void printBookingDetails(char *bookingID, BookingData *data, int dataSize);
 
 // Util Functions & Sub Functions

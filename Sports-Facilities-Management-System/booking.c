@@ -10,6 +10,16 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
+	FILE *f = fopen(UserInfoFilePath, "wb");
+	userData usr = { "User 1", "U001", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	fwrite(&usr, sizeof(userData), 1, f);
+	userData usr2 = { "User 2", "U002", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	fwrite(&usr2, sizeof(userData), 1, f);
+	userData usr3 = { "User 3", "U003", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	fwrite(&usr3, sizeof(userData), 1, f);
+	userData usr4 = { "User 4", "U004", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	fwrite(&usr4, sizeof(userData), 1, f);
+	fclose(f);
 	readDataFromOtherModules();
 	// initialise error code for input validation use
 	err = 0;
@@ -359,8 +369,10 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			data[a].facilityID,
-			data[a].usrID,
-			data[a].staffID);
+			//data[a].usrID,
+			getUserDataByID(data[a].usrID)->name,
+			//data[a].staffID);
+			getStaffDataByID(data[a].staffID)->stfName);
 		count++;
 	}
 	printf("%s\n", "======================================================================================================================");
@@ -414,8 +426,10 @@ void bookingDisplayAll()
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			data[a].facilityID,
-			data[a].usrID,
-			data[a].staffID);
+			//data[a].usrID,
+			getUserDataByID(data[a].usrID)->name,
+			//data[a].staffID);
+			getStaffDataByID(data[a].staffID)->stfName);
 	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "======================================================================================================================");
@@ -436,11 +450,16 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 	BookingData *filteredData[100];
 	int filteredDataCount;
 	char retryChoice[10]; // to ask user if user wants to keep on filtering after printing of data
+
+	// Filters to be used
 	Date dotFrom, dotTo, bookFrom, bookTo;
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
-	char facilityID[100][100], staffID[100][100], userID[100][100];
+	char facilityID[100][100];
+	char staffID[100][100];
+	char userID[100][100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
 	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
+
 	char filterChoice[10];
 	int recordsCount = 0; // to keep track of how many records is printed
 	do {
@@ -452,14 +471,12 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
 			if (isSet[2])
 			{
-				int firstTime = 1;
 				for (int a = 0; a < 6; a++)
 				{
 					if (timeslot[a])
 					{
-						if (firstTime) {
+						if (a == 0) {
 							sprintf(statusText[2], "%s", TIMESLOTS[a]);
-							firstTime = 0;
 						}
 						else
 						{
@@ -471,7 +488,25 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			else strcpy(statusText[2], "Not Set");
 			if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
 			if (isSet[4]) break; else strcpy(statusText[4], "Not Set");
-			if (isSet[5]) break; else strcpy(statusText[5], "Not Set");
+			if (isSet[5]) 
+			{
+				//for ()
+				//{
+				//	// if its not the last idx
+				//	if(a+1 != uCount) sprintf(statusText[5], "%s, %s", getUserDataByID(userID[a])->name); else sprintf(statusText[5], "%s", getUserDataByID(userID[a])->name);
+				//}
+				for (int a = 0; a < uCount; a++)
+				{
+					if (a == 0) {
+						sprintf(statusText[5], "%s", getUserDataByID(userID[a])->name);
+					}
+					else
+					{
+						sprintf(statusText[5], "%s, %s", statusText[5], getUserDataByID(userID[a])->name);
+					}
+				}
+			}
+			else strcpy(statusText[5], "Not Set");
 			printf("\n[ Filters ]\n");
 			printf("[1] Date of Transactions : %s\n", statusText[0]);
 			printf("[2] Booking Date         : %s\n", statusText[1]);
@@ -498,6 +533,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			case '5':
 				break;
 			case '6':
+				isSet[5] = dispFilterUserInvolved(&userID[0], &uCount);
 				break;
 			case '7':
 				return;
@@ -607,7 +643,96 @@ int dispfilterTimeslotBooked(int *timeslot)
 		getUserMenuChoice(choice, 9, "Add more timeslot for filtering (y=yes) ? ");
 		firstTime = 0;
 	} while (tolower(choice[0]) == 'y');
-	return 1;
+	if (getTimeslotBooked(timeslot) == -1) // if none of the timeslots is selected
+	{
+		return 0;
+	}
+	else 
+	{
+		return 1;
+	}
+	
+}
+
+// return 1 if user filter is updated sucessfully
+int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
+{
+	if (usrDataCount == 0)
+	{
+		printf("There was no users in the system.\n");
+		system("pause");
+		return 0;
+	}
+	char usrName[100];
+	char choice[10];
+	int elementRemoved = 0; // keep track if user input wants to remove from filter
+	int usrFound = 0; // keep track of user given username is found
+	do {
+		usrFound = 0;
+		elementRemoved = 0;
+		if (*uCount != 0) {
+			printf("\nUsers in filter:\n");
+			for (int a = 0; a < *uCount; a++)
+			{
+				printf("\t%d. %s\n", a + 1, getUserDataByID(userIDsfilter[a])->name);
+			}
+			printf("\n");
+		}
+		usrFound = 0;
+		elementRemoved = 0;
+		printf("Enter 'X' to unset user filters\nEnter the same username to unset them\n");
+		printf("Enter username to add into filter: ");
+		s_input(usrName, 99);
+		// if user wants to cancel
+		if (strcmp(trimwhitespace(usrName), "X") == 0 || strcmp(trimwhitespace(usrName), "x") == 0)
+		{
+			*uCount = 0;
+			return 0;
+		}
+		for (int a = 0; a < usrDataCount; a++)
+		{
+			if (strcmp(usrData[a].name, usrName) == 0)
+			{
+				// checks if this user was in filter list or not
+				for (int b = 0; b < *uCount; b++)
+				{
+					if (strcmp(usrData[a].id, userIDsfilter[b]) == 0)
+					{
+						// remove an element in array -> bad idea
+						for (int c = b; c < *uCount - 1; c++)
+						{
+							strcpy(userIDsfilter[c], userIDsfilter[c+1]);
+						}
+						elementRemoved = 1;
+						usrFound = 1;
+						*uCount = *uCount - 1;
+						break;
+					}
+				}
+				if(elementRemoved == 0){
+					printf("User found.\n");
+					strcpy(userIDsfilter[*uCount], usrData[a].id);
+					*uCount = *uCount + 1;
+					usrFound = 1;
+				}
+				break;
+			}
+		}
+		if(!usrFound){
+			printf("User of name \"%s\" was not found.\n", usrName);
+		}
+		printf("Continue adding username into filter (y=yes)? ");
+		getUserMenuChoice(choice, 9, "Continue adding username into filter (y=yes)? ");
+	} while (tolower(choice[0]) == 'y');
+	if(*uCount > 0)
+	{
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+	
 }
 
 // print booking details based on bookingID
@@ -624,7 +749,7 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	}
 	if (bData == NULL)
 	{
-		printf("Booking of ID \"%s\" was not found.\n");
+		printf("Booking of ID \"%s\" was not found.\n", bookingID);
 		system("pause");
 		return;
 	}
@@ -903,13 +1028,19 @@ void readDataFromOtherModules()
 	FILE *f = fopen(UserInfoFilePath, "rb");
 	if (chkFileExist(f))
 	{
-		while (fread(&usrData[usrDataCount++], sizeof(userData), 1, f) != 0);
+		while (fread(&usrData[usrDataCount], sizeof(userData), 1, f) != 0) 
+		{
+			usrDataCount++;
+		}
 		fclose(f);
 	}
 	f = fopen(staffFilePath, "rb");
 	if (chkFileExist(f))
 	{
-		while (fread(&staffData[staffDataCount++], sizeof(Staff), 1, f) != 0);
+		while (fread(&staffData[staffDataCount], sizeof(Staff), 1, f) != 0) 
+		{
+			staffDataCount++;
+		}
 		fclose(f);
 	}
 }
@@ -972,7 +1103,7 @@ int _staffLogin(char *staffID, int size)
 	{
 		printf("There are currently no staffs in the system.\n");
 		system("pause");
-		return;
+		return 0;
 	}
 	do {
 		printf("===============\n");
@@ -1014,7 +1145,7 @@ int _usrLogin(char *usrID, int size)
 	{
 		printf("There are currently no users in the system.\n");
 		system("pause");
-		return;
+		return 0;
 	}
 
 	do 
@@ -1029,7 +1160,7 @@ int _usrLogin(char *usrID, int size)
 		{
 			return 0;
 		}
-		usr = getStaffDataByID(usrID);
+		usr = getUserDataByID(usrID);
 		if (usr == NULL)
 		{
 			printf("Such usrID do not exist.\n");
