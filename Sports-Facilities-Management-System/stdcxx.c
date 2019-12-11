@@ -2,6 +2,7 @@
 
 void init()
 {
+	system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS >nul");
 	// get appdata path
 	const char *APPDATA_PATH = getenv("APPDATA");	
 	// define filepath for all data used by all modules

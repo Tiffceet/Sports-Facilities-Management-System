@@ -21,9 +21,8 @@ void bookingMain()
 	fwrite(&usr4, sizeof(userData), 1, f);
 	fclose(f);
 	readDataFromOtherModules();
-	BookingData data[100];
-	readBookingDataIntoStructArray(&data[0], 99);
-	system("pause");
+	/*BookingData data[100];
+	readBookingDataIntoStructArray(&data[0], 99);*/
 	// initialise error code for input validation use
 	err = 0;
 	// while menu() doesnt return 0 = continue running
