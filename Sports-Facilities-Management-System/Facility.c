@@ -1,23 +1,25 @@
 #include "stdcxx.h"
 #include "facility.h"
 
-typedef struct
-{
-	char id[5];
-	char type[20];
-	char description[20];
-	char venue[20];
-	int maxUser;
-
-}Facility;
-
 void addNewFacility()
 {
 	char ans;
-	Facility facility[10];
+	Facility facility[10] = { {"F001", "Indoor", "Badminton Court", "Bayan Lepas", 4},
+	{"F002", "Outdoor", "Socceer field", "Bayan Lepas", 1},
+	{"F003", "Indoor", "Squash Court", "Bayan Lepas", 2},
+	{"F004", "Items", "Ping Pong tables", "Bayan Lepas", 8},
+	{"F005", "Indoor", "Facility 5", "Bayan Lepas", },
+	};
 	FILE*facilityFile;
-	facilityFile = fopen("facility.dat", "a");
-
+	facilityFile = fopen("facility.dat", "wb");
+	fwrite(&facility[0], sizeof(Facility), 1, facilityFile);
+	fwrite(&facility[1], sizeof(Facility), 1, facilityFile);
+	fwrite(&facility[2], sizeof(Facility), 1, facilityFile);
+	fwrite(&facility[3], sizeof(Facility), 1, facilityFile);
+	fwrite(&facility[4], sizeof(Facility), 1, facilityFile);
+	fclose(facilityFile);
+	// return;
+	facilityFile = fopen("facility.dat", "wb");
 	if (facilityFile == NULL)
 	{
 		printf("Cannot open facilityFile.");
@@ -201,7 +203,7 @@ int facilityMenu()
 	char choice;
 	printf("Enter Your Choice: ");
 	rewind(stdin);
-	scanf("%s", &choice);
+	scanf("%c", &choice);
 	rewind(stdin);
 
 	switch (choice)

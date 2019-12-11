@@ -19,6 +19,7 @@
 char staffFilePath[1024];
 char bookingFilePath[1024];
 char UserInfoFilePath[1024];
+char facilityFilePath[1024];
 typedef struct
 {
 	int y, m, d;

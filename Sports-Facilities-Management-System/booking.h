@@ -25,6 +25,7 @@ Staff staffData[100];
 int staffDataCount;
 userData usrData[100];
 int usrDataCount;
+Facility facData[100];
 int facilityDataCount;
 
 // Main functions
@@ -59,6 +60,7 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 void readDataFromOtherModules();
 Staff* getStaffDataByID(char *id);
 userData* getUserDataByID(char *id);
+Facility* getFacilityByID(char *id);
 
 // login functions
 int _staffLogin(char *staffID, int size);

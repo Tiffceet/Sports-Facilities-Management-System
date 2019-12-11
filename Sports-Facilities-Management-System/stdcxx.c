@@ -8,6 +8,8 @@ void init()
 	sprintf(bookingFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "booking.txt");
 	sprintf(staffFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "staffNameList.bin");
 	sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
+	// sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
+	sprintf(facilityFilePath, "facility.dat");
 }
 
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100])

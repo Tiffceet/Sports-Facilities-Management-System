@@ -11,13 +11,13 @@ const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm -
 void bookingMain()
 {
 	FILE *f = fopen(UserInfoFilePath, "wb");
-	userData usr = { "User 1", "U001", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	userData usr = { "Ali", "U001", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
 	fwrite(&usr, sizeof(userData), 1, f);
-	userData usr2 = { "User 2", "U002", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	userData usr2 = { "Ahmad", "U002", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
 	fwrite(&usr2, sizeof(userData), 1, f);
-	userData usr3 = { "User 3", "U003", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	userData usr3 = { "Felix", "U003", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
 	fwrite(&usr3, sizeof(userData), 1, f);
-	userData usr4 = { "User 4", "U004", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "010802" };
+	userData usr4 = { "Gohan", "U004", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
 	fwrite(&usr4, sizeof(userData), 1, f);
 	fclose(f);
 	readDataFromOtherModules();
@@ -90,14 +90,6 @@ void bookingBook()
 	// find latestBooking ID + count of items in file
 	char latestBookingID[10];
 	latestBookingID[0] = '\0';
-	//FILE *f = fopen(bookingFilePath, "r");
-	//// if file doesnt exist, open in write mode
-	//if (chkFileExist(f))
-	//{
-	//	while (fscanf(f, "%[^,]%*[^\n]\n", &latestBookingID) != EOF);
-	//	fclose(f); // if file exist, means its pointer is not closed -> refer to chkFileExist()
-	//}
-
 	int count = readBookingDataIntoStructArray(&data[0], 100); // read file into struct array + get entries count
 	if (count != 0) // if file exist
 	{
@@ -119,7 +111,7 @@ void bookingBook()
 		}
 		do {
 			char facilityStatus[100], bookingDateStatus[100], timeslotStatus[100];
-			if (isSet[0]) strcpy(facilityStatus, userPickedfacilityID); else strcpy(facilityStatus, "<!> Not Set <!>");
+			if (isSet[0]) strcpy(facilityStatus, getFacilityByID(userPickedfacilityID)->description); else strcpy(facilityStatus, "<!> Not Set <!>");
 			if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "<!> Not Set <!>");
 			if (isSet[2]) strcpy(timeslotStatus, TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "<!> Not Set <!>");
 			printf(" <----------------------------------------------------->\n");
@@ -227,7 +219,8 @@ void bookingBook()
 					getStaffDataByID(data[count - 1].staffID)->stfName,
 					// data[count - 1].usrID,
 					getUserDataByID(data[count - 1].usrID)->name,
-					data[count - 1].facilityID,
+					// data[count - 1].facilityID,
+					getFacilityByID(data[count - 1].facilityID)->description,
 					data[count - 1].bookingDate.d,
 					data[count - 1].bookingDate.m,
 					data[count - 1].bookingDate.y,
@@ -368,7 +361,8 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-			data[a].facilityID,
+			// data[a].facilityID,
+			getFacilityByID(data[a].facilityID)->description,
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
@@ -425,7 +419,8 @@ void bookingDisplayAll()
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-			data[a].facilityID,
+			// data[a].facilityID,
+			getFacilityByID(data[a].facilityID)->description,
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
@@ -941,14 +936,45 @@ int getTimeslotBooked(int *timeslot)
 // Return 1 if facility change successfully
 int bipChangeFacility(char *userPickedfacilityID)
 {
+	char rawInput[100];
+	char *trimmedInput;
+	char *endPtr;
+	int userChoice;
 	// Ask user to select facility
-	printf("Select one of the following facilities: \n");
-	/*
-	Insert code to get all facilities
-	Need to count how many facilities are there?
-	*/
-	printf("\nEnter the facility ID you wish to book: ");
-	s_input(userPickedfacilityID, 99);
+	if (facilityDataCount == 0)
+	{
+		printf("There are no facilities registered in the system.\n");
+		system("pause");
+		return 0;
+	}
+	do{
+		printf("Select one of the following facilities: \n");
+		/*
+		Insert code to get all facilities
+		Need to count how many facilities are there?
+		*/
+		for (int a = 0; a < facilityDataCount; a++)
+		{
+			printf("\t%d. %s\n", a+1, facData[a].description);
+		}
+		printf("\nSelect Facility you wish to book: ");
+		s_input(rawInput, 99);
+		trimmedInput = trimwhitespace(rawInput);
+		userChoice = strtol(trimmedInput, &endPtr, 10);
+		if (*endPtr == '\0' && strlen(trimmedInput) != 0)
+		{
+			if (userChoice > 0 && userChoice <= facilityDataCount)
+			{
+				break;
+			}
+		}
+		printf("\n<!> ERR: Invalid Choice. <!>\n");
+		system("pause");
+	} while (1);
+	strcpy(userPickedfacilityID, facData[userChoice - 1].id);
+	return 1;
+
+
 	/*
 	Insert code to check for facilities availablity
 	*/
@@ -996,7 +1022,6 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	}
 
-	// NOTE TO MYSELF: LOL I HAVE THIS WEIRD SHIT CRITERIA WHERE IF ITS WEEKENDS THEN NO BOOKING FOR USER REEEEE
 	char userPickedtimeslotSTR[10]; // for string input
 	do {
 		if (err)
@@ -1043,6 +1068,15 @@ void readDataFromOtherModules()
 		}
 		fclose(f);
 	}
+	f = fopen(facilityFilePath, "rb");
+	if (chkFileExist(f))
+	{
+		while (fread(&facData[facilityDataCount], sizeof(Facility), 1, f) != 0)
+		{
+			facilityDataCount++;
+		}
+		fclose(f);
+	}
 }
 
 // ============================================================================================
@@ -1085,6 +1119,22 @@ userData* getUserDataByID(char *id)
 	return NULL;
 }
 
+Facility* getFacilityByID(char *id)
+{
+	if (facilityDataCount == 0)
+	{
+		return NULL;
+	}
+	for (int a = 0; a < facilityDataCount; a++)
+	{
+		if (strcmp(facData[a].id, id) == 0)
+		{
+			return &facData[a];
+		}
+	}
+	return NULL;
+
+}
 // ============================================================================================
 // ============================================================================================
 
