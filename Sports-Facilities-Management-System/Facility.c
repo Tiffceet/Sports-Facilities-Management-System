@@ -19,7 +19,7 @@ void addNewFacility()
 	fwrite(&facility[4], sizeof(Facility), 1, facilityFile);
 	fclose(facilityFile);
 	// return;
-	facilityFile = fopen("facility.dat", "wb");
+	facilityFile = fopen("facility.dat", "ab");
 	if (facilityFile == NULL)
 	{
 		printf("Cannot open facilityFile.");

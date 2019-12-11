@@ -21,6 +21,9 @@ void bookingMain()
 	fwrite(&usr4, sizeof(userData), 1, f);
 	fclose(f);
 	readDataFromOtherModules();
+	BookingData data[100];
+	readBookingDataIntoStructArray(&data[0], 99);
+	system("pause");
 	// initialise error code for input validation use
 	err = 0;
 	// while menu() doesnt return 0 = continue running
@@ -71,14 +74,182 @@ void printBookingInfo()
 	printf(" =====================================================================================================================\n\n");
 }
 
+//void bookingBook()
+//{
+//	// Variables to be used
+//	BookingData data[100];
+//	char userPickedfacilityID[100];
+//	Date userPickedDate; // Booking Date
+//	int userPickedtimeslot;
+//	int isSet[] = { 0, 0, 0 }; // to keep track of what details have been given and what have not	
+//
+//	// initialise slotsBooked
+//	for (int a = 0; a < 100; a++)
+//	{
+//		for (int b = 0; b < 6; b++) {
+//			data[a].timeSlotsBooked[b] = 0;
+//		}
+//	}
+//	// find latestBooking ID + count of items in file
+//	char latestBookingID[10];
+//	latestBookingID[0] = '\0';
+//	int count = readBookingDataIntoStructArray(&data[0], 100); // read file into struct array + get entries count
+//	if (count != 0) // if file exist
+//	{
+//		strcpy(latestBookingID, data[count - 1].bookingID);
+//	}
+//	printf("%s\n", latestBookingID);
+//	incrementBookingID(latestBookingID); // increment bookingID
+//	printBookingInfo();
+//
+//	// Sub Menu
+//	char choice[10];
+//	char bookingComfirmChoice[10];
+//	char choiceToContinueNextBooking[10] = "\0";
+//	do {
+//		if (tolower(choiceToContinueNextBooking[0]) == 'y')
+//		{
+//			isSet[2] = 0;
+//			incrementBookingID(latestBookingID); // increment bookingID
+//		}
+//		do {
+//			char facilityStatus[100], bookingDateStatus[100], timeslotStatus[100];
+//			if (isSet[0]) strcpy(facilityStatus, getFacilityByID(userPickedfacilityID)->description); else strcpy(facilityStatus, "<!> Not Set <!>");
+//			if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "<!> Not Set <!>");
+//			if (isSet[2]) strcpy(timeslotStatus, TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "<!> Not Set <!>");
+//			printf(" <----------------------------------------------------->\n");
+//			printf(" ->                  Booking Details                  <-\n");
+//			printf(" <----------------------------------------------------->\n");
+//			printf(" | Facility     : %-36.36s |\n", facilityStatus);
+//			printf(" | Booking Date : %-36.36s |\n", bookingDateStatus);
+//			printf(" | Timeslot     : %-36.36s |\n", timeslotStatus);
+//			printf(" <----------------------------------------------------->\n\n");
+//			printf(" Select: \n");
+//			printf(" \t[1] Set Facility\n");
+//			printf(" \t[2] Set Booking Date\n");
+//			printf(" \t[3] Set Timeslot\n");
+//			printf(" \t[4] Comfirm Booking\n");
+//			printf(" \t[5] Cancel Booking\n\n");
+//			printf(" Choice ? ");
+//			getUserMenuChoice(choice, 9, " Choice ? ");
+//			switch (choice[0])
+//			{
+//			case '1':
+//				bipChangeFacility(userPickedfacilityID);
+//				isSet[0] = 1;
+//				isSet[2] = 0;
+//				break;
+//			case '2':\
+//				bipChangeBookingDate(&userPickedDate);
+//				isSet[1] = 1;
+//				isSet[2] = 0;
+//				break;
+//			case '3':
+//				if (!isSet[0])
+//				{
+//					printf("\n<!> ERR: No Facility have been chosen. <!>\n");
+//					system("pause");
+//					break;
+//				}
+//				if (!isSet[1])
+//				{
+//					printf("\n<!> ERR: Booking Date have not been determined. <!>\n");
+//					system("pause");
+//					break;
+//				}
+//				isSet[2] = bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+//				break;
+//			case '4':
+//				if (!isSet[0])
+//				{
+//					printf("\n<!> ERR: No Facility have been chosen. <!>\n");
+//					system("pause");
+//					break;
+//				}
+//				if (!isSet[1])
+//				{
+//					printf("\n<!> ERR: Booking Date have not been determined. <!>\n");
+//					system("pause");
+//					break;
+//				}
+//				if (!isSet[2])
+//				{
+//					printf("\n<!> ERR: Timeslot have not been selected. <!>\n");
+//					system("pause");
+//					break;
+//				}
+//				// NEED TO FKING ADD COMFIRMATIONA AND WHOLE LOT OF SHIT
+//				printf("<INFO> Every booking needs to be handled by 1 staff. <INFO>\n<INFO> Every booking needs 1 registered user <INFO>\n");
+//				printf("Press any key to proceed with staff & user login...");
+//				system("pause >nul");
+//				printf("\n");
+//				int loginStat = _staffLogin(data[count].staffID, 5);
+//				if (loginStat == 0) // if user wants to return
+//				{
+//					break;
+//				}
+//
+//				loginStat = _usrLogin(data[count].usrID, 14);
+//				if (loginStat == 0)
+//				{
+//					break;
+//				}
+//
+//				printf("Please read the booking details again for confirmation. (Y=Comfirm) ? ");
+//				getUserMenuChoice(bookingComfirmChoice, 9, "Please read the booking details again for confirmation. (Y=Comfirm) ? ");
+//				if (tolower(bookingComfirmChoice[0]) != 'y')
+//				{
+//					break;
+//				}
+//				
+//
+//				// Gather all info
+//				strcpy(data[count].bookingID, latestBookingID);
+//				getSystemDate(&data[count].currentDate);
+//				getSystemTime(&data[count].currentTime);
+//				data[count].bookingDate.d = userPickedDate.d;
+//				data[count].bookingDate.m = userPickedDate.m;
+//				data[count].bookingDate.y = userPickedDate.y;
+//				data[count].timeSlotsBooked[userPickedtimeslot] = 1;
+//				// strcpy(data[count].usrID, "U0001");
+//				// strcpy(data[count].staffID, "S0001");
+//				strcpy(data[count].facilityID, userPickedfacilityID);
+//				// Important line here
+//				writeBookingDataIntoFile(&data[0], ++count);
+//				
+//				printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
+//					// data[count - 1].staffID,
+//					getStaffDataByID(data[count - 1].staffID)->stfName,
+//					// data[count - 1].usrID,
+//					getUserDataByID(data[count - 1].usrID)->name,
+//					// data[count - 1].facilityID,
+//					getFacilityByID(data[count - 1].facilityID)->description,
+//					data[count - 1].bookingDate.d,
+//					data[count - 1].bookingDate.m,
+//					data[count - 1].bookingDate.y,
+//					TIMESLOTS[getTimeslotBooked(data[count - 1].timeSlotsBooked)]
+//				);
+//				system("pause");
+//				break;
+//			case '5':
+//				printf("\n<INFO> Booking is canceled <INFO>\n");
+//				system("pause");
+//				return;
+//			default:
+//				printf("\n<!> ERR: Please select number between 1 - 5 <!>\n\n");
+//				system("pause");
+//			}
+//		} while (choice[0] != '4' || tolower(bookingComfirmChoice[0]) != 'y'); // if user didnt pick 'Comfirm Booking' OR 'y' during final booking comfirmation
+//		printf("Would you like to continue a new booking ? (y=yes) ");
+//		getUserMenuChoice(choiceToContinueNextBooking, 9, "Would you like to continue a new booking ? (y=yes) ");
+//	} while (tolower(choiceToContinueNextBooking[0]) == 'y');
+//	// End of Sub Menu	
+//}
+
 void bookingBook()
 {
-	// Variables to be used
+
 	BookingData data[100];
-	char userPickedfacilityID[100];
-	Date userPickedDate; // Booking Date
-	int userPickedtimeslot;
-	int isSet[] = { 0, 0, 0 }; // to keep track of what details have been given and what have not	
 
 	// initialise slotsBooked
 	for (int a = 0; a < 100; a++)
@@ -87,6 +258,15 @@ void bookingBook()
 			data[a].timeSlotsBooked[b] = 0;
 		}
 	}
+
+	char loginUserID[100];
+
+	printf("Only registered user are allowed to make booking.\n");
+	_usrLogin(loginUserID, 99);
+
+	char userPickedfacilityID[100];
+	Date userPickedDate; // Booking Date
+	int userPickedtimeslot;
 	// find latestBooking ID + count of items in file
 	char latestBookingID[10];
 	latestBookingID[0] = '\0';
@@ -95,152 +275,132 @@ void bookingBook()
 	{
 		strcpy(latestBookingID, data[count - 1].bookingID);
 	}
-	printf("%s\n", latestBookingID);
-	incrementBookingID(latestBookingID); // increment bookingID
-	printBookingInfo();
 
-	// Sub Menu
+	incrementBookingID(latestBookingID); // increment bookingID
+
+	// Sub Menu goes here
+	printBookingInfo();
+	char statusText[3][100];
+
 	char choice[10];
 	char bookingComfirmChoice[10];
 	char choiceToContinueNextBooking[10] = "\0";
 	do {
 		if (tolower(choiceToContinueNextBooking[0]) == 'y')
 		{
-			isSet[2] = 0;
 			incrementBookingID(latestBookingID); // increment bookingID
 		}
-		do {
-			char facilityStatus[100], bookingDateStatus[100], timeslotStatus[100];
-			if (isSet[0]) strcpy(facilityStatus, getFacilityByID(userPickedfacilityID)->description); else strcpy(facilityStatus, "<!> Not Set <!>");
-			if (isSet[1]) sprintf(bookingDateStatus, "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y); else strcpy(bookingDateStatus, "<!> Not Set <!>");
-			if (isSet[2]) strcpy(timeslotStatus, TIMESLOTS[userPickedtimeslot]); else strcpy(timeslotStatus, "<!> Not Set <!>");
+		int firstIteration = 1;
+		do{
+			// Main Logic
+			if(firstIteration)
+			{
+				bipChangeFacility(userPickedfacilityID);
+				bipChangeBookingDate(&userPickedDate);
+				bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+				firstIteration = 0;
+			}
+			else 
+			{
+				printf(" Select: \n");
+				printf(" \t[1] Change Facility\n");
+				printf(" \t[2] Change Booking Date + Timeslot\n");
+				printf(" \t[3] Change Timeslot only\n");
+				printf("\n Your Choice ? ");
+				do {
+					getUserMenuChoice(choice, 9, "Your Choice ? ");
+				} while (choice[0] < '1' || choice[0] > '3');
+				switch (choice[0])
+				{
+				case '1':
+					bipChangeFacility(userPickedfacilityID);
+					// temporary variable for checking timeslot availablity
+					int tmpTS[6] = { 0,0,0,0,0,0 }; 
+					int tmpR = checkForTimeslotsAvailablity(&tmpTS[0], &data[0], 100, &userPickedDate, userPickedfacilityID);
+					if (!tmpR) // if no timeslot anymore
+					{
+						printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
+						bipChangeBookingDate(&userPickedDate);
+						bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					}
+					else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
+					{
+						printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
+						bipChangeBookingDate(&userPickedDate);
+						bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					}
+					printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", userPickedDate.d, userPickedDate.m, userPickedDate.y);
+					getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
+					if (tolower(choice[0]) != 'y')
+					{
+						bipChangeBookingDate(&userPickedDate);
+						bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					}
+					break;
+				case '2':
+					bipChangeBookingDate(&userPickedDate);
+					bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					break;
+				case '3':
+					bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					break;
+				}
+				
+			}
+
+			// printing of display
+			strcpy(statusText[0], getFacilityByID(userPickedfacilityID)->description);
+			sprintf(statusText[1], "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y);
+			strcpy(statusText[2], TIMESLOTS[userPickedtimeslot]);
+
 			printf(" <----------------------------------------------------->\n");
 			printf(" ->                  Booking Details                  <-\n");
 			printf(" <----------------------------------------------------->\n");
-			printf(" | Facility     : %-36.36s |\n", facilityStatus);
-			printf(" | Booking Date : %-36.36s |\n", bookingDateStatus);
-			printf(" | Timeslot     : %-36.36s |\n", timeslotStatus);
+			printf(" | Facility     : %-36.36s |\n", statusText[0]);
+			printf(" | Booking Date : %-36.36s |\n", statusText[1]);
+			printf(" | Timeslot     : %-36.36s |\n", statusText[2]);
 			printf(" <----------------------------------------------------->\n\n");
-			printf(" Select: \n");
-			printf(" \t[1] Set Facility\n");
-			printf(" \t[2] Set Booking Date\n");
-			printf(" \t[3] Set Timeslot\n");
-			printf(" \t[4] Comfirm Booking\n");
-			printf(" \t[5] Cancel Booking\n\n");
-			printf(" Choice ? ");
-			getUserMenuChoice(choice, 9, " Choice ? ");
-			switch (choice[0])
-			{
-			case '1':
-				bipChangeFacility(userPickedfacilityID);
-				isSet[0] = 1;
-				isSet[2] = 0;
-				break;
-			case '2':\
-				bipChangeBookingDate(&userPickedDate);
-				isSet[1] = 1;
-				isSet[2] = 0;
-				break;
-			case '3':
-				if (!isSet[0])
-				{
-					printf("\n<!> ERR: No Facility have been chosen. <!>\n");
-					system("pause");
-					break;
-				}
-				if (!isSet[1])
-				{
-					printf("\n<!> ERR: Booking Date have not been determined. <!>\n");
-					system("pause");
-					break;
-				}
-				isSet[2] = bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
-				break;
-			case '4':
-				if (!isSet[0])
-				{
-					printf("\n<!> ERR: No Facility have been chosen. <!>\n");
-					system("pause");
-					break;
-				}
-				if (!isSet[1])
-				{
-					printf("\n<!> ERR: Booking Date have not been determined. <!>\n");
-					system("pause");
-					break;
-				}
-				if (!isSet[2])
-				{
-					printf("\n<!> ERR: Timeslot have not been selected. <!>\n");
-					system("pause");
-					break;
-				}
-				// NEED TO FKING ADD COMFIRMATIONA AND WHOLE LOT OF SHIT
-				printf("<INFO> Every booking needs to be handled by 1 staff. <INFO>\n<INFO> Every booking needs 1 registered user <INFO>\n");
-				printf("Press any key to proceed with staff & user login...");
-				system("pause >nul");
-				printf("\n");
-				int loginStat = _staffLogin(data[count].staffID, 5);
-				if (loginStat == 0) // if user wants to return
-				{
-					break;
-				}
-
-				loginStat = _usrLogin(data[count].usrID, 14);
-				if (loginStat == 0)
-				{
-					break;
-				}
-
-				printf("Please read the booking details again for confirmation. (Y=Comfirm) ? ");
-				getUserMenuChoice(bookingComfirmChoice, 9, "Please read the booking details again for confirmation. (Y=Comfirm) ? ");
-				if (tolower(bookingComfirmChoice[0]) != 'y')
-				{
-					break;
-				}
+		
+			printf(" Do you want to change booking details ? (y=yes) ");
+			getUserMenuChoice(choice, 9, " Do you want to change booking details ? (y=yes) ");
+		} while (tolower(choice[0]) == 'y');
+		printf("Comfirm booking ? (y=yes) ");
+		getUserMenuChoice(choice, 9, "Comfirm booking ? (y=yes) ");
+		if (tolower(choice[0]) == 'y')
+		{
+			// Gather all info
+			strcpy(data[count].bookingID, latestBookingID);
+			getSystemDate(&data[count].currentDate);
+			getSystemTime(&data[count].currentTime);
+			data[count].bookingDate.d = userPickedDate.d;
+			data[count].bookingDate.m = userPickedDate.m;
+			data[count].bookingDate.y = userPickedDate.y;
+			data[count].timeSlotsBooked[userPickedtimeslot] = 1;
+			strcpy(data[count].usrID, loginUserID);
+			// strcpy(data[count].staffID, "S0001");
+			strcpy(data[count].facilityID, userPickedfacilityID);
+			// Important line here
+			writeBookingDataIntoFile(&data[0], ++count);
 				
+			printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
+				// data[count - 1].staffID,
+				getStaffDataByID(data[count - 1].staffID)->stfName,
+				// data[count - 1].usrID,
+				getUserDataByID(data[count - 1].usrID)->name,
+				// data[count - 1].facilityID,
+				getFacilityByID(data[count - 1].facilityID)->description,
+				data[count - 1].bookingDate.d,
+				data[count - 1].bookingDate.m,
+				data[count - 1].bookingDate.y,
+				TIMESLOTS[getTimeslotBooked(data[count - 1].timeSlotsBooked)]
+			);
+			system("pause");
+			break;
+		}
 
-				// Gather all info
-				strcpy(data[count].bookingID, latestBookingID);
-				getSystemDate(&data[count].currentDate);
-				getSystemTime(&data[count].currentTime);
-				data[count].bookingDate.d = userPickedDate.d;
-				data[count].bookingDate.m = userPickedDate.m;
-				data[count].bookingDate.y = userPickedDate.y;
-				data[count].timeSlotsBooked[userPickedtimeslot] = 1;
-				// strcpy(data[count].usrID, "U0001");
-				// strcpy(data[count].staffID, "S0001");
-				strcpy(data[count].facilityID, userPickedfacilityID);
-				// Important line here
-				writeBookingDataIntoFile(&data[0], ++count);
-				
-				printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
-					// data[count - 1].staffID,
-					getStaffDataByID(data[count - 1].staffID)->stfName,
-					// data[count - 1].usrID,
-					getUserDataByID(data[count - 1].usrID)->name,
-					// data[count - 1].facilityID,
-					getFacilityByID(data[count - 1].facilityID)->description,
-					data[count - 1].bookingDate.d,
-					data[count - 1].bookingDate.m,
-					data[count - 1].bookingDate.y,
-					TIMESLOTS[getTimeslotBooked(data[count - 1].timeSlotsBooked)]
-				);
-				system("pause");
-				break;
-			case '5':
-				printf("\n<INFO> Booking is canceled <INFO>\n");
-				system("pause");
-				return;
-			default:
-				printf("\n<!> ERR: Please select number between 1 - 5 <!>\n\n");
-				system("pause");
-			}
-		} while (choice[0] != '4' || tolower(bookingComfirmChoice[0]) != 'y'); // if user didnt pick 'Comfirm Booking' OR 'y' during final booking comfirmation
 		printf("Would you like to continue a new booking ? (y=yes) ");
 		getUserMenuChoice(choiceToContinueNextBooking, 9, "Would you like to continue a new booking ? (y=yes) ");
 	} while (tolower(choiceToContinueNextBooking[0]) == 'y');
-	// End of Sub Menu	
 }
 
 void bookingSearchRecords()
@@ -382,14 +542,6 @@ void bookingModifyRecords()
 
 void bookingDisplayAll()
 {
-	/*FILE *f = fopen(bookingFilePath, "r");
-	if (!chkFileExist(f))
-	{
-		printf("\n<!> ERR: No records found. <!>\n");
-		system("pause");
-		return;
-	}
-	fclose(f);*/
 	BookingData data[100];
 	int count = readBookingDataIntoStructArray(&data[0], 100);
 	if (count == 0)
@@ -403,15 +555,6 @@ void bookingDisplayAll()
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "| DateofTransaction BookingID BookingDate TimeslotBooked FacilityBooked                 Booked by    Registered by   |");
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
-	// Sample
-	/*printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
-		2,2,2014,20,30,
-		"B000001",
-		4,4,2014,
-		TIMESLOTS[1],
-		"Badminton Court",
-		"User",
-		"Staff");*/
 	for (int a = 0; a < count; a++)
 	{
 		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
@@ -759,6 +902,13 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	if (usr == NULL)
 	{
 		printf("User of ID \"%s\" was not found.\n", bData->usrID);
+		system("pause");
+		return;
+	}
+	Facility *fac = getFacilityByID(bData->facilityID);
+	if (fac == NULL)
+	{
+		printf("Facility of ID \"%s\" was not found.\n");
 		system("pause");
 		return;
 	}
@@ -1187,6 +1337,8 @@ int _staffLogin(char *staffID, int size)
 
 }
 
+// login User and store ID onto staffID
+// if login was successful, it will return true
 int _usrLogin(char *usrID, int size)
 {
 	char pw[100];
