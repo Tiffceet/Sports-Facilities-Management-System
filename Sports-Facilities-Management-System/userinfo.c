@@ -23,7 +23,7 @@ int uniqueId(char id[15])
 	int c = 0;
 	for (i = 0; i < x; i++) {
 
-		strcpy(s, user2[i].name);
+		strcpy(s, user2[i].id);
 
 
 		if (strcmp(id, s) == 0)
@@ -42,7 +42,7 @@ int uniqueId(char id[15])
 
 
 
-
+	
 
 }
 
@@ -107,8 +107,8 @@ void registerInfo()
 		system("pause");
 		return;
 	}
-	printf("Type exit  if you wanna cancle registration process\n");
-	printf("Enter your user ID(4 characters) = ");
+
+	printf("Enter your user ID only 4 characters(exit to cancle registration)= ");
 	rewind(stdin);
 	scanf("%s", userData1.id);
 	strcpy(exitProg, userData1.id);
@@ -129,13 +129,7 @@ void registerInfo()
 	{
 		printf("The user id has been taken pls kindly choose another id :) = ");
 		scanf("%s", userData1.id);
-		strcpy(exitProg, userData1.id);
-		programExit = exitProgram(exitProg);
-		if (programExit == 1)
-		{
-			fclose(userinfo);
-			return;
-		}
+
 		unique = uniqueId(userData1.id);
 		while (strlen(userData1.id) != 4)
 		{
@@ -168,13 +162,7 @@ void registerInfo()
 			printf("Enter a id that has 4 characters  = ");
 			rewind(stdin);
 			scanf("%s", userData1.id);
-			strcpy(exitProg, userData1.id);
-			programExit = exitProgram(exitProg);
-			if (programExit == 1)
-			{
-				fclose(userinfo);
-				return;
-			}
+
 
 		}
 
@@ -185,13 +173,8 @@ void registerInfo()
 	printf("Enter your name = ");
 	rewind(stdin);
 	scanf("%[^\n]", userData1.name);
-	strcpy(exitProg, userData1.name);
-	programExit = exitProgram(exitProg);
-	if (programExit == 1)
-	{
-		fclose(userinfo);
-		return;
-	}
+
+
 	strcpy(nameChck, userData1.name);
 	for (i = 0; i < strlen(nameChck); i++)
 	{
@@ -219,17 +202,11 @@ void registerInfo()
 	printf("Enter your password(minimum 6) = ");
 	rewind(stdin);
 	scanf("%s", userData1.password);
-	strcpy(exitProg, userData1.password);
-	programExit = exitProgram(exitProg);
-	if (programExit == 1)
-	{
-		fclose(userinfo);
-		return;
-	}
-	while (strlen(userData1.password) < 6 )
+
+	while (strlen(userData1.password) < 6)
 	{
 
-		if (strlen(userData1.password) < 6 )
+		if (strlen(userData1.password) < 6)
 		{
 			printf("Enter the password with at least minimum 6 words = ");
 			rewind(stdin);
@@ -280,25 +257,17 @@ void registerInfo()
 
 	}
 
-	printf("Enter your gender (M = male,F = Female,O = other = ");
+	printf("Enter your gender (M = male,F = Female) ");
 	rewind(stdin);
 	scanf("%s", &userData1.gender);
-
-
 	
-
+	
 
 	printf("Enter your contact number : ");
 	rewind(stdin);
 	scanf("%s", &userData1.contact);
-	strcpy(exitProg, userData1.contact);
-	programExit = exitProgram(exitProg);
-	if (programExit == 1)
-	{
-		fclose(userinfo);
-		return;
-	}
-	
+
+
 	printf("Confirm info to register?(Y = yes,N = No) =");
 	while (x == 0)
 	{
@@ -306,13 +275,13 @@ void registerInfo()
 		scanf("%c", &confirmation);
 		if (toupper(confirmation) == 'Y')
 		{
-			Date date;
-			Time time;
-			getSystemDate(&date);
-			getSystemTime(&time);
-			printf("User registration date is %d/%d/%d and time of registration is %d:%d\n", date.d, date.m, date.y,time.h,time.m);
-			sprintf(userData1.dateRegis, " %d/%d/%d", date.d, date.m, date.y);
-			sprintf(userData1.timeRegis, " %d:%d", time.h, time.m);
+			Date enterDate;
+			Time enterTime;
+			getSystemDate(&enterDate);
+			getSystemTime(&enterTime);
+			printf("User registration date is %d/%d/%d and time of registration is %d:%d\n", enterDate.d, enterDate.m, enterDate.y, enterTime.h, enterTime.m);
+			userData1.dateEnter = enterDate;
+			userData1.timeEnter = enterTime;
 
 
 			printf("User has been regis congrats and enjoy your day\n");
@@ -368,9 +337,9 @@ void modifyInfo2()
 
 	while (1)
 	{
-		printf("Type exit if you wanna return to main module\n");
 
-		printf("Enter Id = ");
+
+		printf("Enter Id(type exit if you wanna return to main module) = ");
 		rewind(stdin);
 		scanf("%s", s);
 		strcpy(exitProg, s);
@@ -380,11 +349,11 @@ void modifyInfo2()
 			fclose(userinfo1);
 			return;
 		}
-		
+
 		printf("Is the current ID enter is ok?(Y = Yes/N = No)");
 		rewind(stdin);
 		scanf("%c", &confirmation);
-		while (toupper(confirmation) == 'N') 
+		while (toupper(confirmation) == 'N')
 		{
 			if (toupper(confirmation) == 'N')
 			{
@@ -392,13 +361,7 @@ void modifyInfo2()
 				printf("Enter Id again = ");
 				rewind(stdin);
 				scanf("%s", s);
-				strcpy(exitProg, s);
-				programExit = exitProgram(exitProg);
-				if (programExit == 1)
-				{
-					fclose(userinfo1);
-					return;
-				}
+
 				printf("Is the current ID enter is ok?(Y = Yes/N = No)");
 				rewind(stdin);
 				scanf("%c", &confirmation);
@@ -409,13 +372,7 @@ void modifyInfo2()
 		printf("Enter Password = ");
 		rewind(stdin);
 		scanf("%s", pass);
-		strcpy(exitProg, pass);
-		programExit = exitProgram(exitProg);
-		if (programExit == 1)
-		{
-			fclose(userinfo1);
-			return;
-		}
+
 		while (strlen(pass) < 6)
 		{
 
@@ -424,13 +381,7 @@ void modifyInfo2()
 				printf("Enter the password with at least minimum 6 words = ");
 				rewind(stdin);
 				scanf("%s", pass);
-				strcpy(exitProg, pass);
-				programExit = exitProgram(exitProg);
-				if (programExit == 1)
-				{
-					fclose(userinfo1);
-					return;
-				}
+
 			}
 
 
@@ -446,13 +397,7 @@ void modifyInfo2()
 				printf("Enter your password again = ");
 				rewind(stdin);
 				scanf("%s", pass);
-				strcpy(exitProg, pass);
-				programExit = exitProgram(exitProg);
-				if (programExit == 1)
-				{
-					fclose(userinfo1);
-					return;
-				}
+
 
 				while (strlen(pass) < 6)
 				{
@@ -462,13 +407,7 @@ void modifyInfo2()
 						printf("Enter the password with at least minimum 6 words = ");
 						rewind(stdin);
 						scanf("%s", pass);
-						strcpy(exitProg, pass);
-						programExit = exitProgram(exitProg);
-						if (programExit == 1)
-						{
-							fclose(userinfo1);
-							return;
-						}
+
 					}
 
 
@@ -706,11 +645,11 @@ void displayInfo()
 	for (i = 0; i < x; i++)
 	{
 		printf("\t\t*****************************************\n");
-		printf("\t\t*Name              = %-19s*\n", user2[i].name);
-		printf("\t\t*Gender is         = %-19s*\n", user2[i].gender);
-		printf("\t\t*Contact number is = %-19s*\n", user2[i].contact);
-		printf("\t\t*Date Of Register  =%-19s *\n", user2[i].dateRegis);
-		printf("\t\t*Time Of Register  =%-19s *\n", user2[i].timeRegis);
+		printf("\t\t*Name               = %-12s      *\n", user2[i].name);
+		printf("\t\t*Gender is          = %-12s      *\n", user2[i].gender);
+		printf("\t\t*Contact number  is = %-12s      *\n", user2[i].contact);
+		printf("\t\t*Date Registered is = %d/%d/%-12d*\n", user2[i].dateEnter.d, user2[i].dateEnter.m, user2[i].dateEnter.y);
+		printf("\t\t*Time registered is = %d:%-12d   *\n", user2[i].timeEnter.h, user2[i].timeEnter.m);
 		printf("\t\t*****************************************\n");
 		printf("\n");
 	}
@@ -820,7 +759,7 @@ void userInfo()
 }
 
 void userinfoMain() {
-	
+
 
 	userInfo();
 

@@ -1,4 +1,5 @@
 #pragma once
+#include "stdcxx.h"
 #ifndef USERINFO_H
 #define USERINFO_H
 void searchInfo();
@@ -15,9 +16,8 @@ typedef struct {
 
 	char name[100];
 	char id[15];
-	char date[20];
-	char dateRegis[15];
-	char timeRegis[15];
+	Date dateEnter;
+	Time timeEnter;
 	char gender[20];
 	char contact[100];
 	char password[100];
