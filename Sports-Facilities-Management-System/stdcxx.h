@@ -67,6 +67,10 @@ void collectCensoredInput(char* str, int size);
 // Get string input function -> the safe way
 void s_input(char *str, int size);
 
+// Get integer input function -> the safe way
+// return true if user entered an integer
+int i_input(int *num);
+
 // ===================================================================================================
 // functions related to date and time verification
 // ===================================================================================================

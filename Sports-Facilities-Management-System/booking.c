@@ -26,9 +26,12 @@ void bookingMain()
 	// initialise error code for input validation use
 	err = 0;
 	
-	// prompt staff login
-	_staffLogin(sessionStaffID, 99);
-
+	//// prompt staff login
+	//if (!_staffLogin(sessionStaffID, 99))
+	//{
+	//	return;
+	//}
+	strcpy(sessionStaffID , "S001");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
@@ -38,7 +41,7 @@ void bookingMain()
 
 int bookingMenu()
 {
-	char choiceText[][100] = { "Book", "Search Records", "Modify records", "Display all bookings", "Return to console" };
+	char choiceText[][100] = { "Book", "Search Records", "Modify records", "Display all bookings", "Log Out (Return to console)" };
 	int choice = globalMainMenu("Booking Module", 5, choiceText);
 	switch (choice)
 	{
@@ -54,6 +57,7 @@ int bookingMenu()
 		bookingDisplayAll();
 		break;
 	case 5:
+		sessionStaffID[0] = '\0';
 		return 0;
 	default:
 		return 1;
@@ -251,7 +255,6 @@ void printBookingInfo()
 
 void bookingBook()
 {
-
 	BookingData data[100];
 
 	// initialise slotsBooked
@@ -412,16 +415,24 @@ void bookingBook()
 
 void bookingSearchRecords()
 {
+	// Variables
 	Date dotFrom = { 0,0,0 }, dotTo = { 0,0,0 }, bookFrom = { 0,0,0 }, bookTo = { 0,0,0 };
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	BookingData data[100];
 	BookingData *filteredData[100];
 	int filteredDataCount;
 	int count = readBookingDataIntoStructArray(&data[0], 100);
+
+	// inputs variable
 	char choice[10];
+	int userPickedDataToViewIDX = -1;
+
+	// Variables for sub menu
 	char statusText[6][100];
 	int isSet[6] = { 0,0,0,0,0,0 };
+
 	do {
+		userPickedDataToViewIDX = -1;
 		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
 		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
 		if (isSet[2])
@@ -481,10 +492,22 @@ void bookingSearchRecords()
 		case 'x':
 		case 'X':
 			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
-			system("pause");
+			if(filteredDataCount != 0){
+				do{
+					printf("\nEnter '0' to return to search criteria selections.\nSelect (%d-%d) to view more details. ", 1, filteredDataCount);
+				} while (!i_input(&userPickedDataToViewIDX) || (userPickedDataToViewIDX < 0 || userPickedDataToViewIDX > filteredDataCount));
+				if (userPickedDataToViewIDX == 0)
+				{
+					break;
+				}
+				else
+				{
+					printBookingDetails(filteredData[userPickedDataToViewIDX-1]->bookingID, &data[0], 100);
+				}
+			}
 			break;
 		}
-	} while (tolower(choice[0]) != 'x');
+	} while (tolower(choice[0]) != '7'); // while(1) works too because case'7': return;
 }
 
 // generate & print filtered result and ask user to pick specific data to view its details
@@ -534,6 +557,7 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
 			getStaffDataByID(data[a].staffID)->stfName);
+		filteredData[count] = &data[a];
 		count++;
 	}
 	printf("%s\n", "======================================================================================================================");
@@ -692,7 +716,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			}
 		} while (tolower(filterChoice[0]) != 'x');
 		printf("Do you wish to return to menu ? (y=yes) ");
-		getUserMenuChoice(retryChoice, 9, "Invalid input, try again. ");
+		getUserMenuChoice(retryChoice, 9, "Do you wish to return to menu ? (y=yes) ");
 	} while (tolower(retryChoice[0]) != 'y');
 }
 
@@ -928,11 +952,11 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("%40s---------------------------------------\n", "");
 	printf("                   User                                Faciltity                                Staff                 \n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
-	printf("  | ID              :                  | |                                    | | ID              :                  |\n");
-	printf("  | Name            :                  | |                                    | | Name            :                  |\n");
-	printf("  | Date registered : xx/xx/xxxx xx:xx | |                                    | | Position        :                  |\n");
-	printf("  | Gender          :                  | |                                    | | Date Registered :                  |\n");
-	printf("  | Contact         :                  | |                                    | |                                    |\n");
+	printf("  | ID              : %-16.16s | | ID          : %-20.20s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
+	printf("  | Name            : %-16.16s | | Type        : %-20.20s | | Name            : %-16.16s |\n", usr->name, fac->type, stf->stfName);
+	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Description : %-20.20s | | Position        : %-16/16s |\n");
+	printf("  | Gender          :                  | | Venue       :                      | | Date Registered :                  |\n");
+	printf("  | Contact         :                  | | Max User    :                      | |                                    |\n");
 	printf("  |                                    | |                                    | |                                    |\n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	system("pause");
@@ -1093,9 +1117,9 @@ int getTimeslotBooked(int *timeslot)
 // Return 1 if facility change successfully
 int bipChangeFacility(char *userPickedfacilityID)
 {
-	char rawInput[100];
+	/*char rawInput[100];
 	char *trimmedInput;
-	char *endPtr;
+	char *endPtr;*/
 	int userChoice;
 	// Ask user to select facility
 	if (facilityDataCount == 0)
@@ -1115,7 +1139,7 @@ int bipChangeFacility(char *userPickedfacilityID)
 			printf("\t%d. %s\n", a+1, facData[a].description);
 		}
 		printf("\nSelect Facility you wish to book: ");
-		s_input(rawInput, 99);
+		/*s_input(rawInput, 99);
 		trimmedInput = trimwhitespace(rawInput);
 		userChoice = strtol(trimmedInput, &endPtr, 10);
 		if (*endPtr == '\0' && strlen(trimmedInput) != 0)
@@ -1124,6 +1148,11 @@ int bipChangeFacility(char *userPickedfacilityID)
 			{
 				break;
 			}
+		}*/
+		if (i_input(&userChoice)) // if user entered integer
+		{
+			if (userChoice > 0 && userChoice <= facilityDataCount) // if user input is within range
+				break;
 		}
 		printf("\n<!> ERR: Invalid Choice. <!>\n");
 		system("pause");
