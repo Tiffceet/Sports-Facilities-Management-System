@@ -1,5 +1,5 @@
 #include "stdcxx.h"
-
+#include "booking.h"
 void init()
 {
 	system("IF NOT EXIST %appdata%\\SFMS mkdir %appdata%\\SFMS >nul");
@@ -11,13 +11,102 @@ void init()
 	sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
 	// sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
 	sprintf(facilityFilePath, "facility.dat");
+	sessionStaffID[0] = '\0'; // initialise sessionStaffID
+}
+
+/*
+// Print splash screen
+	printf("%37sWelcome to Sports Facility Management System\n", "");
+	if (!_staffLogin(sessionStaffID, 99)) // if staff login is not possible
+	{
+		printf("exit(0) in future\n");
+	}
+	printf("%41sPress any key to enter the system...", "");
+	system("pause >nul");
+*/
+
+int _staffLogin(char *staffID, int size)
+{
+	system("cls");
+	printf("%37sWelcome to Sports Facility Management System\n", "");
+	char pw[100];
+	Staff stfData[100];
+	Staff *stf = NULL;
+	int count = 0;
+	FILE *f = fopen(staffFilePath, "rb");
+	if (chkFileExist(f))
+	{
+		while (fread(&stfData[count], sizeof(Staff), 1, f) != 0)
+		{
+			count++;
+		}
+		fclose(f);
+	}
+
+	if (count == 0)
+	{
+		printf("There are currently no staffs in the system.\n");
+		system("pause");
+		return 0;
+	}
+	do {
+		stf = NULL;
+		printf("%52s===============\n", "");
+		printf("%52s| Staff Login |\n", "");
+		printf("%52s===============\n", "");
+		// printf("Enter 'XXX' to return to previous screen\n");
+		printf("%47sStaff ID -> ", "");
+		s_input(staffID, size);
+		/*if (strcmp(staffID, "XXX") == 0)
+		{
+			return 0;
+		}*/
+
+		// get staff data by ID
+		for (int a = 0; a < count; a++)
+		{
+			if (strcmp(stfData[a].stfID, staffID) == 0)
+			{
+				stf = &stfData[a];
+			}
+		}
+
+		if (stf == NULL)
+		{
+			printf("%52sSuch staffID do not exist.\n", "");
+			printf("%41sPress any key to continue...", "");
+			system("pause >nul");
+			printf("\n");
+			continue;
+		}
+		printf("%47sPassword -> ", "");
+		collectCensoredInput(pw, 99);
+		if (strcmp(pw, stf->stfPassW) == 0)
+		{
+			printf("\n%52sStaff Login Successful.\n", "");
+			printf("%41sPress any key to enter the system...", "");
+			system("pause >nul");
+			printf("\n");
+			return 1;
+		}
+		else {
+			printf("\n%52sInvalid password.\n", "");
+		}
+	} while (1);
+
 }
 
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
 {
+	Date sysDate;
+	Time sysTime;
+	getSystemDate(&sysDate);
+	getSystemTime(&sysTime);
 	rewind(stdin);
 	unsigned char input1, input2;
 	char titleFormat[300];
+	char staffLogOnText[300];
+	char staffLogOnTextFormat[300];
 	int curPos = 1;
 	if(strlen(title) % 2 == 0){
 		sprintf(titleFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(title))/2, (int)(70 - strlen(title)) / 2);
@@ -35,6 +124,32 @@ int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
 		printf("%14s   /_/                                                             /___/                  \n\n", "");
 		printf("%22s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
 		// printf("%s;\n", titleFormat);
+		printf("%22s| %22sDate: %02d/%02d/%02d %02d:%02d:%02d%22s  |\n", "", "", sysDate.y, sysDate.m, sysDate.d, sysTime.h, sysTime.m, sysTime.s, "");
+		if (strlen(sessionStaffID) != 0)
+		{
+			// Printing of staff name on screen whenever possible
+			Staff s;
+			FILE *f = fopen(staffFilePath, "rb");
+			while (fread(&s, sizeof(Staff), 1, f) != 0)
+			{
+				if (strcmp(s.stfID, sessionStaffID) == 0) 
+				{
+					sprintf(staffLogOnText, "Staff Logon: %-57.57s", s.stfName);
+					trimwhitespace(staffLogOnText);
+					if (strlen(staffLogOnText) % 2 == 0) {
+						sprintf(staffLogOnTextFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(staffLogOnText)) / 2, (int)(70 - strlen(staffLogOnText)) / 2);
+					}
+					else
+					{
+						sprintf(staffLogOnTextFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(staffLogOnText)) / 2, (int)(70 - strlen(staffLogOnText)) / 2 + 1);
+					}
+					printf(staffLogOnTextFormat, "", "", staffLogOnText, "");
+				}
+				break;
+			}
+			fclose(f);
+			
+		}
 		printf(titleFormat, "", "",title, "");
 		printf("%22s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
 		printf("%22s|                                                                        |\n", "");

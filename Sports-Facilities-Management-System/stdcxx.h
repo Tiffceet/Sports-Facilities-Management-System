@@ -20,6 +20,7 @@ char staffFilePath[1024];
 char bookingFilePath[1024];
 char UserInfoFilePath[1024];
 char facilityFilePath[1024];
+char sessionStaffID[100]; // to keep track of what staff is being log on
 typedef struct
 {
 	int y, m, d;
@@ -36,6 +37,10 @@ typedef struct
 
 // Function to define all env variables
 void init();
+
+// login Staff and store ID onto staffID
+// if login was successful, it will return true
+int _staffLogin(char *staffID, int size);
 
 // Function for every module's main menu
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100]);

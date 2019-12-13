@@ -25,6 +25,10 @@ void bookingMain()
 	readBookingDataIntoStructArray(&data[0], 99);*/
 	// initialise error code for input validation use
 	err = 0;
+	
+	// prompt staff login
+	_staffLogin(sessionStaffID, 99);
+
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
@@ -261,7 +265,10 @@ void bookingBook()
 	char loginUserID[100];
 
 	printf("Only registered user are allowed to make booking.\n");
-	_usrLogin(loginUserID, 99);
+	if (!_usrLogin(loginUserID, 99))
+	{
+		return;
+	}
 
 	char userPickedfacilityID[100];
 	Date userPickedDate; // Booking Date
@@ -377,6 +384,7 @@ void bookingBook()
 			data[count].timeSlotsBooked[userPickedtimeslot] = 1;
 			strcpy(data[count].usrID, loginUserID);
 			// strcpy(data[count].staffID, "S0001");
+			strcpy(data[count].staffID, sessionStaffID);
 			strcpy(data[count].facilityID, userPickedfacilityID);
 			// Important line here
 			writeBookingDataIntoFile(&data[0], ++count);
@@ -1290,51 +1298,6 @@ Facility* getFacilityByID(char *id)
 // ============================================================================================
 // Login functions
 // ============================================================================================
-
-// login Staff and store ID onto staffID
-// if login was successful, it will return true
-int _staffLogin(char *staffID, int size)
-{
-	char pw[100];
-	Staff *stf;
-
-	if (staffDataCount == 0)
-	{
-		printf("There are currently no staffs in the system.\n");
-		system("pause");
-		return 0;
-	}
-	do {
-		printf("===============\n");
-		printf("| Staff Login |\n");
-		printf("===============\n");
-		printf("Enter 'XXX' to return to previous screen\n");
-		printf("Staff ID -> ");
-		s_input(staffID, size);
-		if (strcmp(staffID, "XXX") == 0)
-		{
-			return 0;
-		}
-		stf = getStaffDataByID(staffID);
-		if (stf == NULL)
-		{
-			printf("Such staffID do not exist.\n");
-			system("pause");
-			continue;
-		}
-		printf("Password -> ");
-		collectCensoredInput(pw, 99);
-		if (strcmp(pw, stf->stfPassW) == 0)
-		{
-			printf("\nStaff Login Successful.\n");
-			return 1;
-		}
-		else {
-			printf("\nInvalid password.\n");
-		}
-	} while (1);
-
-}
 
 // login User and store ID onto staffID
 // if login was successful, it will return true
