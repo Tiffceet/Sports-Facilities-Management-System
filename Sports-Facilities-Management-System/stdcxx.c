@@ -54,14 +54,14 @@ int _staffLogin(char *staffID, int size)
 		printf("%52s===============\n", "");
 		printf("%52s| Staff Login |\n", "");
 		printf("%52s===============\n", "");
-		// printf("Enter 'XXX' to return to previous screen\n");
+		printf("%40sEnter 'XXX' to return to previous screen\n", "");
 		printf("%47sStaff ID -> ", "");
 		s_input(staffID, size);
-		/*if (strcmp(staffID, "XXX") == 0)
+		if (strcmp(staffID, "XXX") == 0)
 		{
 			return 0;
-		}*/
-
+		}
+		
 		// get staff data by ID
 		for (int a = 0; a < count; a++)
 		{
@@ -73,7 +73,7 @@ int _staffLogin(char *staffID, int size)
 
 		if (stf == NULL)
 		{
-			printf("%52sSuch staffID do not exist.\n", "");
+			printf("%47sSuch staffID do not exist.\n", "");
 			printf("%41sPress any key to continue...", "");
 			system("pause >nul");
 			printf("\n");
@@ -90,7 +90,7 @@ int _staffLogin(char *staffID, int size)
 			return 1;
 		}
 		else {
-			printf("\n%52sInvalid password.\n", "");
+			printf("\n%53sWrong password.\n", "");
 		}
 	} while (1);
 
@@ -337,6 +337,24 @@ void s_input(char *str, int size)
 		*loc = '\0';
 	}
 	rewind(stdin);
+}
+
+int i_input(int *num)
+{
+	char cache[100];
+	char *trimmedCache;
+	int tmp;
+	char *endPtr;
+	rewind(stdin);
+	s_input(cache, 99);
+	trimmedCache = trimwhitespace(cache);
+	tmp = strtol(trimmedCache, &endPtr, 10);
+	if (*endPtr != '\0' || strlen(trimmedCache) == 0)
+	{
+		return 0;
+	}
+	*num = tmp;
+	return 1;
 }
 
 int validateDate(int dd, int mm, int yy)
