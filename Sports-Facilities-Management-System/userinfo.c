@@ -262,7 +262,6 @@ void registerInfo()
 	scanf("%s", &userData1.gender);
 	
 	
-
 	printf("Enter your contact number : ");
 	rewind(stdin);
 	scanf("%s", &userData1.contact);
