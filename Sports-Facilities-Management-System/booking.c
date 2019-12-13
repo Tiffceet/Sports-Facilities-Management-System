@@ -11,13 +11,13 @@ const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm -
 void bookingMain()
 {
 	FILE *f = fopen(UserInfoFilePath, "wb");
-	userData usr = { "Ali", "U001", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
+	userData usr = { "Ali", "U001", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
 	fwrite(&usr, sizeof(userData), 1, f);
-	userData usr2 = { "Ahmad", "U002", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
+	userData usr2 = { "Ahmad", "U002", 2019,12,10,9,46,0, "L", "010389552", "123456" };
 	fwrite(&usr2, sizeof(userData), 1, f);
-	userData usr3 = { "Felix", "U003", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
+	userData usr3 = { "Felix", "U003", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
 	fwrite(&usr3, sizeof(userData), 1, f);
-	userData usr4 = { "Gohan", "U004", "10/12/2019", "12/12/2019", "9:46PM", "L", "010389552", "123456" };
+	userData usr4 = { "Gohan", "U004", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
 	fwrite(&usr4, sizeof(userData), 1, f);
 	fclose(f);
 	readDataFromOtherModules();
@@ -292,7 +292,6 @@ void bookingBook()
 	char statusText[3][100];
 
 	char choice[10];
-	char bookingComfirmChoice[10];
 	char choiceToContinueNextBooking[10] = "\0";
 	do {
 		if (tolower(choiceToContinueNextBooking[0]) == 'y')
@@ -833,31 +832,35 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 		return 0;
 	}
 	char usrName[100];
-	char choice[10];
 	int elementRemoved = 0; // keep track if user input wants to remove from filter
 	int usrFound = 0; // keep track of user given username is found
-	do {
-		usrFound = 0;
+
+	do{
 		elementRemoved = 0;
-		if (*uCount != 0) {
-			printf("\nUsers in filter:\n");
-			for (int a = 0; a < *uCount; a++)
-			{
-				printf("\t%d. %s\n", a + 1, getUserDataByID(userIDsfilter[a])->name);
-			}
-			printf("\n");
+		usrFound = 0;
+
+		printf("\nUsers in filter:\n");
+		for (int a = 0; a < *uCount; a++)
+		{
+			printf("\t%d. %s\n", a + 1, getUserDataByID(userIDsfilter[a])->name);
 		}
-		usrFound = 0;
-		elementRemoved = 0;
-		printf("Enter 'X' to unset user filters\nEnter the same username to unset them\n");
-		printf("Enter username to add into filter: ");
+		printf("\n");
+		
+		printf("--> Enter 'X' to comfirm user filters\n");
+		printf("--> Enter 'XXX' to unset user filters\n---> Enter the same username to unset them\n");
+		printf("--> Enter username to add into filter\n>>> ");
 		s_input(usrName, 99);
 		// if user wants to cancel
 		if (strcmp(trimwhitespace(usrName), "X") == 0 || strcmp(trimwhitespace(usrName), "x") == 0)
 		{
+			return 1;
+		}
+		if (strcmp(trimwhitespace(usrName), "XXX") == 0)
+		{
 			*uCount = 0;
 			return 0;
 		}
+
 		for (int a = 0; a < usrDataCount; a++)
 		{
 			if (strcmp(usrData[a].name, usrName) == 0)
@@ -870,7 +873,7 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 						// remove an element in array -> bad idea
 						for (int c = b; c < *uCount - 1; c++)
 						{
-							strcpy(userIDsfilter[c], userIDsfilter[c+1]);
+							strcpy(userIDsfilter[c], userIDsfilter[c + 1]);
 						}
 						elementRemoved = 1;
 						usrFound = 1;
@@ -878,7 +881,7 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 						break;
 					}
 				}
-				if(elementRemoved == 0){
+				if (elementRemoved == 0) { // if no element is being removed
 					printf("User found.\n");
 					strcpy(userIDsfilter[*uCount], usrData[a].id);
 					*uCount = *uCount + 1;
@@ -887,21 +890,22 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 				break;
 			}
 		}
-		if(!usrFound){
+		if (!usrFound) {
 			printf("User of name \"%s\" was not found.\n", usrName);
+			system("pause");
 		}
-		printf("Continue adding username into filter (y=yes)? ");
-		getUserMenuChoice(choice, 9, "Continue adding username into filter (y=yes)? ");
-	} while (tolower(choice[0]) == 'y');
-	if(*uCount > 0)
+	} while (1);
+}
+
+// return 1 if filter is updated successfully
+int dispFilterStaffInvovled(char staffIDFilter[][100], int *sCount)
+{
+	if (staffDataCount == 0)
 	{
-		return 1;
-	}
-	else
-	{
+		printf("There are no staffs in the system...\n");
+		system("pause");
 		return 0;
 	}
-	
 }
 
 // print booking details based on bookingID
@@ -939,7 +943,7 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	Facility *fac = getFacilityByID(bData->facilityID);
 	if (fac == NULL)
 	{
-		printf("Facility of ID \"%s\" was not found.\n");
+		printf("Facility of ID \"%s\" was not found.\n", bData->facilityID);
 		system("pause");
 		return;
 	}
@@ -954,9 +958,9 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	printf("  | ID              : %-16.16s | | ID          : %-20.20s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
 	printf("  | Name            : %-16.16s | | Type        : %-20.20s | | Name            : %-16.16s |\n", usr->name, fac->type, stf->stfName);
-	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Description : %-20.20s | | Position        : %-16/16s |\n");
-	printf("  | Gender          :                  | | Venue       :                      | | Date Registered :                  |\n");
-	printf("  | Contact         :                  | | Max User    :                      | |                                    |\n");
+	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Description : %-20.20s | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m,fac->description, stf->stfPosi);
+	printf("  | Gender          : %-16.16s | | Venue       : %-20.20s | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, fac->venue, stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
+	printf("  | Contact         : %-16.16s | | Max User    : %-20d | |                                    |\n", usr->contact, fac->maxUser);
 	printf("  |                                    | |                                    | |                                    |\n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	system("pause");
