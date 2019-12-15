@@ -22,6 +22,6 @@ void staffMain();
 void pwRecover();
 void changeStfList();
 void login();
-int staffSearchID();
-void staffSearchName();
+void staffSearchID();
+int staffSearchName();
 #endif
