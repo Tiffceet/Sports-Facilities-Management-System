@@ -623,8 +623,8 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 	Date dotFrom, dotTo, bookFrom, bookTo;
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	char facilityID[100][100];
-	char staffID[100][100];
-	char userID[100][100];
+	char *staffID[100];
+	char *userID[100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
 	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
 
@@ -655,7 +655,19 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			}
 			else strcpy(statusText[2], "Not Set");
 			if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
-			if (isSet[4]) break; else strcpy(statusText[4], "Not Set");
+			if (isSet[4]) {
+				for (int a = 0; a < sCount; a++)
+				{
+					if (a == 0) {
+						sprintf(statusText[4], "%s", getStaffDataByID(staffID[a])->stfName);
+					}
+					else
+					{
+						sprintf(statusText[4], "%s, %s", statusText[4], getStaffDataByID(staffID[a])->stfName);
+					}
+				}
+			}
+			else strcpy(statusText[4], "Not Set");
 			if (isSet[5]) 
 			{
 				//for ()
@@ -699,9 +711,10 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			case '4':
 				break;
 			case '5':
+				isSet[4] = dispFilterStaffInvovled(staffID, &sCount);
 				break;
 			case '6':
-				isSet[5] = dispFilterUserInvolved(&userID[0], &uCount);
+				isSet[5] = dispFilterUserInvolved(userID, &uCount);
 				break;
 			case '7':
 				return;
@@ -823,7 +836,7 @@ int dispfilterTimeslotBooked(int *timeslot)
 }
 
 // return 1 if user filter is updated sucessfully
-int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
+int dispFilterUserInvolved(char **userIDsfilter, int *uCount)
 {
 	if (usrDataCount == 0)
 	{
@@ -853,7 +866,14 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 		// if user wants to cancel
 		if (strcmp(trimwhitespace(usrName), "X") == 0 || strcmp(trimwhitespace(usrName), "x") == 0)
 		{
-			return 1;
+			if (*uCount < 1)
+			{
+				return 0;
+			}
+			else
+			{
+				return 1;
+			}
 		}
 		if (strcmp(trimwhitespace(usrName), "XXX") == 0)
 		{
@@ -873,8 +893,9 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 						// remove an element in array -> bad idea
 						for (int c = b; c < *uCount - 1; c++)
 						{
-							strcpy(userIDsfilter[c], userIDsfilter[c + 1]);
+							userIDsfilter[c] = userIDsfilter[c+1];
 						}
+
 						elementRemoved = 1;
 						usrFound = 1;
 						*uCount = *uCount - 1;
@@ -882,8 +903,8 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 					}
 				}
 				if (elementRemoved == 0) { // if no element is being removed
-					printf("User found.\n");
-					strcpy(userIDsfilter[*uCount], usrData[a].id);
+					// printf("User found.\n");
+					userIDsfilter[*uCount] = &usrData[a].id;
 					*uCount = *uCount + 1;
 					usrFound = 1;
 				}
@@ -898,7 +919,7 @@ int dispFilterUserInvolved(char userIDsfilter[][100], int *uCount)
 }
 
 // return 1 if filter is updated successfully
-int dispFilterStaffInvovled(char staffIDFilter[][100], int *sCount)
+int dispFilterStaffInvovled(char **staffIDFilter, int *sCount)
 {
 	if (staffDataCount == 0)
 	{
@@ -906,6 +927,62 @@ int dispFilterStaffInvovled(char staffIDFilter[][100], int *sCount)
 		system("pause");
 		return 0;
 	}
+	char staffName[100];
+	int elementRemoved = 0;
+	int staffFound = 0;
+	do {
+		elementRemoved = 0;
+		staffFound = 0;
+
+		printf("Staffs in filter: \n");
+		for (int a = 0; a < *sCount; a++)
+		{
+			printf("\t%d. %s\n", a+1, getStaffDataByID(staffIDFilter[a]));
+		}
+
+		printf("<!> Enter XXX to unset all staff filters <!>\n");
+		printf("<!> Enter X to apply selected filters <!>\n");
+		printf("Enter staff name to include in the filter: \n>>> ");
+		s_input(staffName, 99);
+		if (strcmp(trimwhitespace(staffName), "XXX") == 0)
+		{
+			*sCount = 0;
+			return 0;
+		}
+		if (strcmp(trimwhitespace(staffName), "X") == 0)
+		{
+			if(*sCount > 0)
+				return 1;
+			else
+				return 0;
+		}
+		for (int a = 0; a < staffDataCount; a++)
+		{
+			if (strcmp(staffData[a].stfName, staffName) == 0)
+			{
+				staffFound = 1;
+				for (int b = 0; b < *sCount; b++) // check if it exist in filter
+				{
+					if (strcmp(staffData[a].stfID, staffIDFilter[b]) == 0)
+					{
+						for (int c = b; c < *sCount - 1; c++)
+						{
+							staffIDFilter[c] = staffIDFilter[c + 1];
+						}
+						elementRemoved = 1;
+						*sCount = *sCount - 1;
+						break;
+					}
+				}
+				if (!elementRemoved)
+				{
+					staffIDFilter[*sCount] = &staffData[a].stfID;
+					*sCount = *sCount + 1;
+				}
+				break;
+			}
+		}
+	} while (1);
 }
 
 // print booking details based on bookingID
