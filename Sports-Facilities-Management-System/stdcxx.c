@@ -10,7 +10,7 @@ void init()
 	sprintf(staffFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "staffNameList.bin");
 	sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
 	// sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
-	sprintf(facilityFilePath, "facility.dat");
+	sprintf(facilityFilePath, "%s\\SFMS\\facility.dat", APPDATA_PATH);
 	sessionStaffID[0] = '\0'; // initialise sessionStaffID
 }
 

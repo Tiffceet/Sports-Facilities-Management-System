@@ -9,7 +9,6 @@ int main(void)
 {
 	// initalise env variables
 	init();
-
 	while (mainMenu()) // if user input is invalid, menu() returns 0
 	{
 		system("cls"); // clear current console screen
@@ -46,7 +45,8 @@ int mainMenu()
 		staffMain();
 		break;
 	case 2:
-		facilityMenu();
+		// facilityMenu();
+		facInfoMain();
 		break;
 	case 3:
 		userinfoMain();

@@ -1,67 +1,68 @@
 #include "stdcxx.h"
 #include "facility.h"
 
+void facInfoMain()
+{
+	_staffLogin(staffLogon.stfID, 99);
+	while (facilityMenu() != 5) // if user didnt choose logout
+	{
+
+	}
+}
+
 void addNewFacility()
 {
 	char ans;
-	Facility facility[10] = { {"F001", "Indoor", "Badminton Court", "Bayan Lepas", 4},
-	{"F002", "Outdoor", "Socceer field", "Bayan Lepas", 1},
-	{"F003", "Indoor", "Squash Court", "Bayan Lepas", 2},
-	{"F004", "Items", "Ping Pong tables", "Bayan Lepas", 8},
-	{"F005", "Indoor", "Facility 5", "Bayan Lepas", },
-	};
+	
 	FILE*facilityFile;
-	facilityFile = fopen("facility.dat", "wb");
-	fwrite(&facility[0], sizeof(Facility), 1, facilityFile);
-	fwrite(&facility[1], sizeof(Facility), 1, facilityFile);
-	fwrite(&facility[2], sizeof(Facility), 1, facilityFile);
-	fwrite(&facility[3], sizeof(Facility), 1, facilityFile);
-	fwrite(&facility[4], sizeof(Facility), 1, facilityFile);
-	fclose(facilityFile);
-	// return;
-	facilityFile = fopen("facility.dat", "ab");
+	// Facility facility[100];
+	Facility fac;
+	facilityFile = fopen(facilityFilePath, "ab");
 	if (facilityFile == NULL)
 	{
 		printf("Cannot open facilityFile.");
 		return;
 	}
 
-	    printf("Facility id: ");
-		rewind(stdin);
-		scanf("%[^\n]", facility[0].id);
-		rewind(stdin);
-		printf("Facility Type: ");
-		scanf("%[^\n]", facility[0].type);
-		rewind(stdin);
-		printf("Facility Description:");
-		scanf("%[^\n]", facility[0].description);
-		rewind(stdin);
-		printf("Facility Venue:");
-		scanf("%[^\n]", facility[0].venue);
-		rewind(stdin);
-		printf("Maximum User:");
-		scanf("%d", &facility[0].maxUser);
-		printf("Add new facility?(y/n):");
-		rewind(stdin);
-		scanf("%c", &ans);
-		if (ans == 'y' || ans == 'Y')
-		{
-			addNewFacility();
-		}
-		else if (ans == 'n' || ans == 'N')
-		{
-			system("pause");
-		}
-		else 
-		{
-			printf("Invalid Input!\n");
-			addNewFacility();
-		}
-		system("pause");
+	//    printf("Facility id: ");
+	//	rewind(stdin);
+	//	scanf("%[^\n]", facility[0].id);
+	//	rewind(stdin);
+	//	printf("Facility Name: ");
+	//	scanf("%[^\n]", facility[0].name);
+	//	rewind(stdin);
+	//	printf("Facility Description:");
+	//	scanf("%[^\n]", facility[0].remarks);
+	//	rewind(stdin);
+	//	/*printf("Facility Venue:");
+	//	scanf("%[^\n]", facility[0].venue);
+	//	rewind(stdin);*/
+	//	/*printf("Maximum User:");
+	//	scanf("%d", &facility[0].maxUser);*/
+	//	printf("Add new facility?(y/n):");
+	//	rewind(stdin);
+	//	scanf("%c", &ans);
+	//	if (ans == 'y' || ans == 'Y')
+	//	{
+	//		addNewFacility();
+	//	}
+	//	else if (ans == 'n' || ans == 'N')
+	//	{
+	//		system("pause");
+	//	}
+	//	else 
+	//	{
+	//		printf("Invalid Input!\n");
+	//		addNewFacility();
+	//	}
+	//	system("pause");
 
+	//
+	//fclose(facilityFile);
+	//return;
+	printf("Facility ID: ");
+	// nput(fac.id,);
 	
-	fclose(facilityFile);
-	return;
 }
 
 void searchFacility()
@@ -107,7 +108,7 @@ void searchFacility()
 
 void modifyFacility()
 {
-	int choice2, maxFac=0;
+	/*int choice2, maxFac=0;
 	char facType[15], facDescription[20], facVenue[20];
 
 	Facility facility[10] = {"0"};
@@ -165,12 +166,12 @@ void modifyFacility()
 	}
 
 	fclose(facilityFile);
-	system("pause");
+	system("pause");*/
 }
 
 void displayAllFacility()
 {
-	Facility facility;
+	/*Facility facility;
 	FILE*facilityFile;
 	facilityFile = fopen("facility.dat", "rb");
 
@@ -190,11 +191,12 @@ void displayAllFacility()
 		printf("Maximum of Facility::%d\n", facility.maxUser);
 	}
 	fclose(facilityFile);
+	system("pause");*/
 }
 
 int facilityMenu()
 {
-	printf("Facility Menu\n");
+	/*printf("Facility Menu\n");
 	printf("--------------\n");
 	printf("(1) Add New Facility\n");
 	printf("(2) Search Faciity\n");
@@ -204,24 +206,27 @@ int facilityMenu()
 	printf("Enter Your Choice: ");
 	rewind(stdin);
 	scanf("%c", &choice);
-	rewind(stdin);
+	rewind(stdin);*/
+	char choiceText[][100] = {"Add New Facility", "Search Facility", "Modify Facility", "Display All Facility", "Return to console(Log Out)"};
+	int choice = globalMainMenu("Facility Info Module", 5, choiceText);
 
 	switch (choice)
 	{
-	case '1':
+	case 1:
 		addNewFacility();
 		break;
-	case '2':
+	case 2:
 		searchFacility();
 		break;
-	case '3':
+	case 3:
 		modifyFacility();
 		break;
-	case '4':
+	case 4:
 		displayAllFacility();
-		break;
+		break;		
 	default:
 		return;
 	}
+	return choice;
 
 }

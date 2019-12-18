@@ -357,7 +357,7 @@ void bookingBook()
 			}
 
 			// printing of display
-			strcpy(statusText[0], getFacilityByID(userPickedfacilityID)->description);
+			//strcpy(statusText[0], getFacilityByID(userPickedfacilityID)->description);
 			sprintf(statusText[1], "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 			strcpy(statusText[2], TIMESLOTS[userPickedtimeslot]);
 
@@ -397,7 +397,7 @@ void bookingBook()
 				// data[count - 1].usrID,
 				getUserDataByID(data[count - 1].usrID)->name,
 				// data[count - 1].facilityID,
-				getFacilityByID(data[count - 1].facilityID)->description,
+				getFacilityByID(data[count - 1].facilityID)->id,
 				data[count - 1].bookingDate.d,
 				data[count - 1].bookingDate.m,
 				data[count - 1].bookingDate.y,
@@ -551,7 +551,7 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			// data[a].facilityID,
-			getFacilityByID(data[a].facilityID)->description,
+			/*getFacilityByID(data[a].facilityID)->description,*/
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
@@ -593,7 +593,7 @@ void bookingDisplayAll()
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			// data[a].facilityID,
-			getFacilityByID(data[a].facilityID)->description,
+			//getFacilityByID(data[a].facilityID)->description,
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
@@ -623,8 +623,10 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 	Date dotFrom, dotTo, bookFrom, bookTo;
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	char facilityID[100][100];
-	char *staffID[100];
-	char *userID[100];
+	// char *staffID[100];
+	Staff *staffFilter[100];
+	// char *userID[100];
+	userData *userFilter[100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
 	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
 
@@ -659,11 +661,11 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				for (int a = 0; a < sCount; a++)
 				{
 					if (a == 0) {
-						sprintf(statusText[4], "%s", getStaffDataByID(staffID[a])->stfName);
+						sprintf(statusText[4], "%s", staffFilter[a]->stfName);
 					}
 					else
 					{
-						sprintf(statusText[4], "%s, %s", statusText[4], getStaffDataByID(staffID[a])->stfName);
+						sprintf(statusText[4], "%s, %s", statusText[4], staffFilter[a]->stfName);
 					}
 				}
 			}
@@ -678,11 +680,11 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				for (int a = 0; a < uCount; a++)
 				{
 					if (a == 0) {
-						sprintf(statusText[5], "%s", getUserDataByID(userID[a])->name);
+						sprintf(statusText[5], "%s", userFilter[a]->name);
 					}
 					else
 					{
-						sprintf(statusText[5], "%s, %s", statusText[5], getUserDataByID(userID[a])->name);
+						sprintf(statusText[5], "%s, %s", statusText[5], userFilter[a]->name);
 					}
 				}
 			}
@@ -711,10 +713,10 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 			case '4':
 				break;
 			case '5':
-				isSet[4] = dispFilterStaffInvovled(staffID, &sCount);
+				isSet[4] = dispFilterStaffInvovled(staffFilter, &sCount);
 				break;
 			case '6':
-				isSet[5] = dispFilterUserInvolved(userID, &uCount);
+				isSet[5] = dispFilterUserInvolved(userFilter, &uCount);
 				break;
 			case '7':
 				return;
@@ -836,7 +838,7 @@ int dispfilterTimeslotBooked(int *timeslot)
 }
 
 // return 1 if user filter is updated sucessfully
-int dispFilterUserInvolved(char **userIDsfilter, int *uCount)
+int dispFilterUserInvolved(userData **userIDsfilter, int *uCount)
 {
 	if (usrDataCount == 0)
 	{
@@ -855,7 +857,7 @@ int dispFilterUserInvolved(char **userIDsfilter, int *uCount)
 		printf("\nUsers in filter:\n");
 		for (int a = 0; a < *uCount; a++)
 		{
-			printf("\t%d. %s\n", a + 1, getUserDataByID(userIDsfilter[a])->name);
+			printf("\t%d. %s\n", a + 1, userIDsfilter[a]->name);
 		}
 		printf("\n");
 		
@@ -888,7 +890,7 @@ int dispFilterUserInvolved(char **userIDsfilter, int *uCount)
 				// checks if this user was in filter list or not
 				for (int b = 0; b < *uCount; b++)
 				{
-					if (strcmp(usrData[a].id, userIDsfilter[b]) == 0)
+					if (strcmp(usrData[a].id, userIDsfilter[b]->id) == 0)
 					{
 						// remove an element in array -> bad idea
 						for (int c = b; c < *uCount - 1; c++)
@@ -904,7 +906,7 @@ int dispFilterUserInvolved(char **userIDsfilter, int *uCount)
 				}
 				if (elementRemoved == 0) { // if no element is being removed
 					// printf("User found.\n");
-					userIDsfilter[*uCount] = &usrData[a].id;
+					userIDsfilter[*uCount] = &usrData[a];
 					*uCount = *uCount + 1;
 					usrFound = 1;
 				}
@@ -919,7 +921,7 @@ int dispFilterUserInvolved(char **userIDsfilter, int *uCount)
 }
 
 // return 1 if filter is updated successfully
-int dispFilterStaffInvovled(char **staffIDFilter, int *sCount)
+int dispFilterStaffInvovled(Staff **staffIDFilter, int *sCount)
 {
 	if (staffDataCount == 0)
 	{
@@ -937,7 +939,7 @@ int dispFilterStaffInvovled(char **staffIDFilter, int *sCount)
 		printf("Staffs in filter: \n");
 		for (int a = 0; a < *sCount; a++)
 		{
-			printf("\t%d. %s\n", a+1, getStaffDataByID(staffIDFilter[a]));
+			printf("\t%d. %s\n", a+1, staffIDFilter[a]->stfName);
 		}
 
 		printf("<!> Enter XXX to unset all staff filters <!>\n");
@@ -963,7 +965,7 @@ int dispFilterStaffInvovled(char **staffIDFilter, int *sCount)
 				staffFound = 1;
 				for (int b = 0; b < *sCount; b++) // check if it exist in filter
 				{
-					if (strcmp(staffData[a].stfID, staffIDFilter[b]) == 0)
+					if (strcmp(staffData[a].stfID, staffIDFilter[b]->stfID) == 0)
 					{
 						for (int c = b; c < *sCount - 1; c++)
 						{
@@ -976,7 +978,7 @@ int dispFilterStaffInvovled(char **staffIDFilter, int *sCount)
 				}
 				if (!elementRemoved)
 				{
-					staffIDFilter[*sCount] = &staffData[a].stfID;
+					staffIDFilter[*sCount] = &staffData[a];
 					*sCount = *sCount + 1;
 				}
 				break;
@@ -1031,7 +1033,7 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("%40s| Booking Date     : %02d/%02d/%04d       |\n", "", bData->bookingDate.d, bData->bookingDate.m, bData->bookingDate.y);
 	printf("%40s| Timeslot Booked  : %s       |\n", "", TIMESLOTS[getTimeslotBooked(&bData->timeSlotsBooked[0])]);
 	printf("%40s---------------------------------------\n", "");
-	printf("                   User                                Faciltity                                Staff                 \n");
+	/*printf("                   User                                Faciltity                                Staff                 \n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	printf("  | ID              : %-16.16s | | ID          : %-20.20s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
 	printf("  | Name            : %-16.16s | | Type        : %-20.20s | | Name            : %-16.16s |\n", usr->name, fac->type, stf->stfName);
@@ -1039,7 +1041,7 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("  | Gender          : %-16.16s | | Venue       : %-20.20s | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, fac->venue, stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
 	printf("  | Contact         : %-16.16s | | Max User    : %-20d | |                                    |\n", usr->contact, fac->maxUser);
 	printf("  |                                    | |                                    | |                                    |\n");
-	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
+	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");*/
 	system("pause");
 }
 
@@ -1217,7 +1219,7 @@ int bipChangeFacility(char *userPickedfacilityID)
 		*/
 		for (int a = 0; a < facilityDataCount; a++)
 		{
-			printf("\t%d. %s\n", a+1, facData[a].description);
+			//printf("\t%d. %s\n", a+1, facData[a].description);
 		}
 		printf("\nSelect Facility you wish to book: ");
 		/*s_input(rawInput, 99);
