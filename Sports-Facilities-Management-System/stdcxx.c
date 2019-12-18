@@ -130,25 +130,26 @@ int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
 			// Printing of staff name on screen whenever possible
 			Staff s;
 			FILE *f = fopen(staffFilePath, "rb");
-			while (fread(&s, sizeof(Staff), 1, f) != 0)
-			{
-				if (strcmp(s.stfID, sessionStaffID) == 0) 
+			if(chkFileExist(f)){
+				while (fread(&s, sizeof(Staff), 1, f) != 0)
 				{
-					sprintf(staffLogOnText, "Staff Logon: %-57.57s", s.stfName);
-					trimwhitespace(staffLogOnText);
-					if (strlen(staffLogOnText) % 2 == 0) {
-						sprintf(staffLogOnTextFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(staffLogOnText)) / 2, (int)(70 - strlen(staffLogOnText)) / 2);
-					}
-					else
+					if (strcmp(s.stfID, sessionStaffID) == 0) 
 					{
-						sprintf(staffLogOnTextFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(staffLogOnText)) / 2, (int)(70 - strlen(staffLogOnText)) / 2 + 1);
+						sprintf(staffLogOnText, "Staff Logon: %-57.57s", s.stfName);
+						trimwhitespace(staffLogOnText);
+						if (strlen(staffLogOnText) % 2 == 0) {
+							sprintf(staffLogOnTextFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(staffLogOnText)) / 2, (int)(70 - strlen(staffLogOnText)) / 2);
+						}
+						else
+						{
+							sprintf(staffLogOnTextFormat, "%%22s| %%%ds%%s%%%ds |\n", (int)(70 - strlen(staffLogOnText)) / 2, (int)(70 - strlen(staffLogOnText)) / 2 + 1);
+						}
+						printf(staffLogOnTextFormat, "", "", staffLogOnText, "");
+						break;
 					}
-					printf(staffLogOnTextFormat, "", "", staffLogOnText, "");
 				}
-				break;
+				fclose(f);
 			}
-			fclose(f);
-			
 		}
 		printf(titleFormat, "", "",title, "");
 		printf("%22s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+--+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");

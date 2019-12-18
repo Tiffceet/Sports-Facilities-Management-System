@@ -15,7 +15,7 @@ typedef struct
 {
 	char id[10];
 	char name[200];
-	Date maintainanceDate;
+	Date maintenanceDate;
 	char remarks[500];
 	char staffHandledID[100];
 	Date lastModified;

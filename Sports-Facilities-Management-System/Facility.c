@@ -3,19 +3,30 @@
 
 void facInfoMain()
 {
-	_staffLogin(staffLogon.stfID, 99);
+	_staffLogin(sessionStaffID, 99);
+	FILE *f = fopen(staffFilePath, "rb");
+	// find staffData of the staff log on
+	while (fread(&staffLogon, sizeof(Staff), 1, f) != 0) 
+	{
+		if (strcmp(sessionStaffID, staffLogon.stfID) == 0)
+		{
+			break;
+		}
+	}
+	fclose(f);
 	while (facilityMenu() != 5) // if user didnt choose logout
 	{
 
 	}
+	// if user finally wants to log out
+	sessionStaffID[0] = '\0';
 }
 
 void addNewFacility()
 {
-	char ans;
-	
+	char choice[10];
+
 	FILE*facilityFile;
-	// Facility facility[100];
 	Facility fac;
 	facilityFile = fopen(facilityFilePath, "ab");
 	if (facilityFile == NULL)
@@ -23,55 +34,76 @@ void addNewFacility()
 		printf("Cannot open facilityFile.");
 		return;
 	}
+	do{
+		fac.id[0] = '\0';
+		do {
+			if (strlen(fac.id) > 5)
+			{
+				printf("Maximum of 5 character");
+			}
+			printf("New Facility ID (max 5): ");
+			s_input(fac.id, 7);
+		} while (strlen(fac.id) > 5);
 
-	//    printf("Facility id: ");
-	//	rewind(stdin);
-	//	scanf("%[^\n]", facility[0].id);
-	//	rewind(stdin);
-	//	printf("Facility Name: ");
-	//	scanf("%[^\n]", facility[0].name);
-	//	rewind(stdin);
-	//	printf("Facility Description:");
-	//	scanf("%[^\n]", facility[0].remarks);
-	//	rewind(stdin);
-	//	/*printf("Facility Venue:");
-	//	scanf("%[^\n]", facility[0].venue);
-	//	rewind(stdin);*/
-	//	/*printf("Maximum User:");
-	//	scanf("%d", &facility[0].maxUser);*/
-	//	printf("Add new facility?(y/n):");
-	//	rewind(stdin);
-	//	scanf("%c", &ans);
-	//	if (ans == 'y' || ans == 'Y')
-	//	{
-	//		addNewFacility();
-	//	}
-	//	else if (ans == 'n' || ans == 'N')
-	//	{
-	//		system("pause");
-	//	}
-	//	else 
-	//	{
-	//		printf("Invalid Input!\n");
-	//		addNewFacility();
-	//	}
-	//	system("pause");
+		printf("New Facility Name: ");
+		s_input(fac.name, 199);
 
-	//
-	//fclose(facilityFile);
-	//return;
-	printf("Facility ID: ");
-	// nput(fac.id,);
-	
+		int r = -999; // to store scanf output
+		fac.maintenanceDate.y = 2020; // for the validation to work
+		do {
+			if (r != -999) {
+				if (r != 2)
+				{
+					printf("Wrong Date format.\n");
+				}
+				else if (!validateDate(fac.maintenanceDate.d, fac.maintenanceDate.m, fac.maintenanceDate.y))
+				{
+					printf("Invalid date\n");
+				}
+			}
+			printf("Facility Yearly Maintenance Date Date (dd/mm): ");
+			rewind(stdin);
+			r = scanf("%d/%d", &fac.maintenanceDate.d, &fac.maintenanceDate.m);
+			rewind(stdin);
+		} while (r != 2 || !validateDate(fac.maintenanceDate.d, fac.maintenanceDate.m, fac.maintenanceDate.y));
+
+
+		printf("Facility Remarks <Press ENTER if none> : ");
+		s_input(fac.remarks, 499);
+
+		strcpy(fac.staffHandledID, sessionStaffID);
+		getSystemDate(&fac.lastModified);
+
+		printf("\nFacility ID              : %s\n", fac.id);
+		printf("Facility Name            : %s\n", fac.name);
+		printf("Facility Maintenance Date: %02d/%02d\n", fac.maintenanceDate.d, fac.maintenanceDate.m);
+		printf("Facility Remarks         : %s\n", fac.remarks);
+		printf("\nComfirm Adding facility ? (y = yes) ");
+
+		getUserMenuChoice(choice, 9, "Comfirm Adding facility ? (y = yes, n = no) ");
+		if (tolower(choice[0]) == 'y')
+		{
+			fwrite(&fac, sizeof(Facility), 1, facilityFile);
+			printf("%s was added into the system.\n", fac.name);
+			system("pause");
+		}
+		else
+		{
+			printf("Facility was not added.\n");
+		}
+		printf("Continue adding facility ? (y=yes) ");
+		getUserMenuChoice(choice, 9, "Continue adding facility ? (y=yes) ");
+	} while (tolower(choice[0] == 'y'));
+	fclose(facilityFile);
 }
 
 void searchFacility()
 {
-	int choice1=0;
+	/*int choice1=0;
 
 	Facility facility[10] = {"0"};
 	FILE*facilityFile;
-	facilityFile = fopen("facility.dat", "rb");
+	facilityFile = fopen(facilityFilePath, "rb");
 
 	while (!chkFileExist(facilityFile))
 	{
@@ -103,110 +135,207 @@ void searchFacility()
 		break;
 	default:
 		return;
-	}
+	}*/
 }
 
 void modifyFacility()
 {
-	/*int choice2, maxFac=0;
-	char facType[15], facDescription[20], facVenue[20];
-
-	Facility facility[10] = {"0"};
-	FILE *facilityFile;
-	facilityFile = fopen("facility.dat", "rb");
-	while (!chkFileExist(facilityFile))
+	Facility facData[100];
+	int dataCount = 0;
+	FILE *f = fopen(facilityFilePath, "rb");
+	if (!chkFileExist(f))
 	{
-		printf("Cannot find facility file\n");
+		printf("There are no facility data to modify in the system.\n");
 		system("pause");
 		return;
 	}
-
-	printf("1. Facility Type\n");
-	printf("2. Facility Description\n");
-	printf("3. Facility Venue");
-	printf("4. Maximum User");;
-	printf("Which one do you want to modify: ");
-	rewind(stdin);
-	scanf("%d", &choice2);
-
-	while (strcmp(choice2, 1) != 0 && strcmp(choice2, 2) != 0 &&
-		strcmp(choice2, 3) != 0 && strcmp(choice2, 4) != 0)
+	while (fread(&facData[dataCount], sizeof(Facility), 1, f) != 0)
 	{
-		printf("Invalid Input. Please Re-enter:");
-		rewind(stdin);
-		scanf("%d", choice2);
+		dataCount++;
 	}
+	fclose(f);
 
-	if (strcmp(choice2, 1) == 0)
+	// Main Logic
+	char facilityNameSearch[200];
+	char choice[10];
+	Facility *facNameSearchResult[100];
+	Facility *facToModify;
+	Facility newData;
+	int facNameSearchResultIDX;
+	do{
+		facNameSearchResultIDX = 0;
+		printf("Enter facility Name to modify: ");
+		s_input(facilityNameSearch, 199);
+		for (int a = 0; a < dataCount; a++)
+		{
+			if (strcmp(facilityNameSearch, facData[a].name) == 0)
+			{
+				facNameSearchResult[facNameSearchResultIDX] = &facData[a];
+				facNameSearchResultIDX++;
+			}
+		}
+		if (facNameSearchResultIDX == 0)
+		{
+			printf("There are no facility of name \"%s\"\n", facilityNameSearch);
+			system("pause");
+			choice[0] = 'y'; // to break the loop
+			continue;
+		}
+		if (facNameSearchResultIDX != 1) // if there are multiple facility of same name
+		{
+			for (int a = 0; a < facNameSearchResultIDX; a++)
+			{
+				printf("\t%d. %s - %s\n", a + 1, facNameSearchResult[a]->id, facNameSearchResult[a]->name);
+			}
+			int userPickedFromSearchR;
+			do {
+				printf("\nWhich facility you wish to modify ? (%d - %d) ", 1, facNameSearchResultIDX);
+				i_input(&userPickedFromSearchR);
+			} while (userPickedFromSearchR < 1 || userPickedFromSearchR > facNameSearchResultIDX);
+			facToModify = facNameSearchResult[userPickedFromSearchR - 1]; // -1 to match idx on facNameSearchResult
+		}
+		else
+		{
+			facToModify = facNameSearchResult[0];
+		}
+
+		strcpy(newData.id, facToModify->id);
+		strcpy(newData.name, facToModify->name);
+		strcpy(newData.remarks, facToModify->remarks);
+		strcpy(newData.staffHandledID, facToModify->staffHandledID);
+		newData.maintenanceDate.d = facToModify->maintenanceDate.d;
+		newData.maintenanceDate.m = facToModify->maintenanceDate.m;
+		newData.maintenanceDate.y = facToModify->maintenanceDate.y;
+		newData.lastModified.d = facToModify->lastModified.d;
+		newData.lastModified.m = facToModify->lastModified.m;
+		newData.lastModified.y = facToModify->lastModified.y;
+		do {
+			printf("\tID               : %s\n", newData.id);
+			printf("\tName             : %s\n", newData.name);
+			printf("\tMaintenance Date : %02d/%02d\n", newData.maintenanceDate.d, newData.maintenanceDate.m);
+			printf("\tRemarks          : %s\n", newData.remarks);
+			printf("\n\t1. Change facility name\n"
+				"\t2. Add/Modify Facilty Remarks\n"
+				"\t3. Change Yearly Maintenance Date\n");
+			printf("Choice ? ");
+			getUserMenuChoice(choice, 9, "Choice ? ");
+			switch (choice[0])
+			{
+			case '1':
+				printf("Previous name: %s\n", facToModify->name);
+				printf("New name     : ");
+				s_input(newData.name, 199);
+				break;
+			case '2':
+				printf("Previous Remarks: %s\n", facToModify->remarks);
+				printf("New Remarks     : ");
+				s_input(newData.remarks, 499);
+				break;
+			case '3':
+				printf("Previous Maintenance Date    : %02d/%02d\n", facToModify->maintenanceDate.d, facToModify->maintenanceDate.m);
+
+				// Get Date input
+				int r = -999; // to store scanf output
+				newData.maintenanceDate.y = 2020; // for the validation to work
+				do {
+					if (r != -999) {
+						if (r != 2)
+						{
+							printf("Wrong Date format.\n");
+						}
+						else if (!validateDate(newData.maintenanceDate.d, newData.maintenanceDate.m, newData.maintenanceDate.y))
+						{
+							printf("Invalid date\n");
+						}
+					}
+					printf("New Maintenance Date (dd/mm) : ");
+					rewind(stdin);
+					r = scanf("%d/%d", &newData.maintenanceDate.d, &newData.maintenanceDate.m);
+					rewind(stdin);
+				} while (r != 2 || !validateDate(newData.maintenanceDate.d, newData.maintenanceDate.m, newData.maintenanceDate.y));
+
+				break;
+			}
+			printf("Old Facility Info:\n");
+			printf("\tID               : %s\n", facToModify->id);
+			printf("\tName             : %s\n", facToModify->name);
+			printf("\tMaintenance Date : %02d/%02d\n", facToModify->maintenanceDate.d, facToModify->maintenanceDate.m);
+			printf("\tRemarks          : %s\n", facToModify->remarks);
+
+			printf("\nNew Facility Info:\n");
+			printf("\tID               : %s\n", facToModify->id);
+			printf("\tName             : %s\n", newData.name);
+			printf("\tMaintenance Date : %02d/%02d\n", newData.maintenanceDate.d, newData.maintenanceDate.m);
+			printf("\tRemarks          : %s\n", newData.remarks);
+
+			printf("\nApply Changes ? (y = apply, r = back) ");
+			getUserMenuChoice(choice, 9, "Apply Changes ? (y = apply, r = back) ");
+			if (tolower(choice[0]) == 'y') {
+				strcpy(facToModify->name, newData.name);
+				strcpy(facToModify->remarks, newData.remarks);
+				strcpy(facToModify->staffHandledID, sessionStaffID);
+				facToModify->maintenanceDate.d = newData.maintenanceDate.d;
+				facToModify->maintenanceDate.m = newData.maintenanceDate.m;
+				facToModify->maintenanceDate.y = newData.maintenanceDate.y;
+				getSystemDate(&facToModify->maintenanceDate);
+				system("pause");
+				break;
+			}
+		} while (tolower(choice[0]) == 'r');
+		printf("Modify more facility ? (y=yes) ");
+		getUserMenuChoice(choice, 9, "Modify more facility ? (y=yes) ");
+	} while (tolower(choice[0]) == 'y');
+
+	// End of Main Logic
+
+	// End of Function
+	f = fopen(facilityFilePath, "wb");
+	for (int a = 0; a < dataCount; a++)
 	{
-		printf("Facility Type:");
-		scanf("%s", facType);
-		fprintf(facilityFile, "%s %s %s %s %d", facility->id, facType, facility->venue, facility->description, facility->maxUser);
+		fwrite(&facData[a], sizeof(Facility), 1, f);
 	}
-
-	if (strcmp(choice2, 2) == 0)
-	{
-		printf("Facility Description:");
-		scanf("%s", facDescription);
-		fprintf(facilityFile, "%s %s %s %s %d", facility->id, facility->type, facility->venue, facDescription, facility->maxUser);
-	}
-
-	if (strcmp(choice2, 3) == 0)
-	{
-		printf("Facility Venue:");
-		scanf("%s", facVenue);
-		fprintf(facilityFile, "%s %s %s %s %d", facility->id, facility->type, facVenue, facility->description, facility->maxUser);
-	}
-
-	if (strcmp(choice2, 4) == 0)
-	{
-		printf("Maximum User of Facility:");
-		scanf("%s", maxFac);
-		fprintf(facilityFile, "%s %s %s %s %d ", facility->id, facility->type, facility->venue, facility->description, maxFac);
-	}
-
-	fclose(facilityFile);
-	system("pause");*/
+	fclose(f);
 }
 
 void displayAllFacility()
 {
-	/*Facility facility;
-	FILE*facilityFile;
-	facilityFile = fopen("facility.dat", "rb");
-
-	while (facilityFile == NULL)
+	Facility facData[100];
+	int dataCount = 0;
+	FILE *f = fopen(facilityFilePath, "rb");
+	if (!chkFileExist(f))
 	{
-		printf("Cannot open facility file.\n");
+		printf("There are no facility in the system.\n");
 		system("pause");
 		return;
 	}
-
-	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
+	while (fread(&facData[dataCount], sizeof(Facility),1,f) != 0)
 	{
-		printf("Facility ID:%s\n", facility.id);
-		printf("Facility Type:%s\n", facility.type);
-		printf("Facility Venue:%s\n", facility.venue);
-		printf("Facility Description:%s\n", facility.description);
-		printf("Maximum of Facility::%d\n", facility.maxUser);
+		printf("ID: %s\n", facData[dataCount].id);
+		printf("Name: %s\n", facData[dataCount].name);
+		printf("Yearly Maintenance Date: %02d/%02d\n", facData[dataCount].maintenanceDate.d, facData[dataCount].maintenanceDate.m);
+		printf("Date Last Modified: %02d/%02d/%04d\n", facData[dataCount].lastModified.d, facData[dataCount].lastModified.m, facData[dataCount].lastModified.y);
+		printf("Modified/Created by: ");
+		// print staff name from ID
+		Staff tmp;
+		FILE *f2 = fopen(staffFilePath, "rb");
+		while (fread(&tmp, sizeof(Staff), 1, f2) != 0)
+		{
+			if (strcmp(tmp.stfID, facData[dataCount].staffHandledID) == 0)
+			{
+				printf("%s\n", tmp.stfName);
+				break;
+			}
+		}
+		fclose(f2);
+		// End of print staff name from ID
+		printf("Remarks: %s\n", facData[dataCount].remarks);
 	}
-	fclose(facilityFile);
-	system("pause");*/
+	fclose(f);
+	system("pause");
 }
 
 int facilityMenu()
 {
-	/*printf("Facility Menu\n");
-	printf("--------------\n");
-	printf("(1) Add New Facility\n");
-	printf("(2) Search Faciity\n");
-	printf("(3) Modify Faciity\n");
-	printf("(4) Display All Facility\n");
-	char choice;
-	printf("Enter Your Choice: ");
-	rewind(stdin);
-	scanf("%c", &choice);
-	rewind(stdin);*/
 	char choiceText[][100] = {"Add New Facility", "Search Facility", "Modify Facility", "Display All Facility", "Return to console(Log Out)"};
 	int choice = globalMainMenu("Facility Info Module", 5, choiceText);
 
