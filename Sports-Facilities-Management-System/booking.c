@@ -31,7 +31,7 @@ void bookingMain()
 	//{
 	//	return;
 	//}
-	strcpy(sessionStaffID , "S001");
+	strcpy(sessionStaffID , "Looz");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
@@ -357,7 +357,7 @@ void bookingBook()
 			}
 
 			// printing of display
-			//strcpy(statusText[0], getFacilityByID(userPickedfacilityID)->description);
+			strcpy(statusText[0], getFacilityByID(userPickedfacilityID)->name);
 			sprintf(statusText[1], "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 			strcpy(statusText[2], TIMESLOTS[userPickedtimeslot]);
 
@@ -593,7 +593,7 @@ void bookingDisplayAll()
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			// data[a].facilityID,
-			//getFacilityByID(data[a].facilityID)->description,
+			getFacilityByID(data[a].facilityID)->name,
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
@@ -1033,15 +1033,15 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("%40s| Booking Date     : %02d/%02d/%04d       |\n", "", bData->bookingDate.d, bData->bookingDate.m, bData->bookingDate.y);
 	printf("%40s| Timeslot Booked  : %s       |\n", "", TIMESLOTS[getTimeslotBooked(&bData->timeSlotsBooked[0])]);
 	printf("%40s---------------------------------------\n", "");
-	/*printf("                   User                                Faciltity                                Staff                 \n");
+	printf("                   User                                Faciltity                                Staff                 \n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
-	printf("  | ID              : %-16.16s | | ID          : %-20.20s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
-	printf("  | Name            : %-16.16s | | Type        : %-20.20s | | Name            : %-16.16s |\n", usr->name, fac->type, stf->stfName);
-	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Description : %-20.20s | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m,fac->description, stf->stfPosi);
-	printf("  | Gender          : %-16.16s | | Venue       : %-20.20s | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, fac->venue, stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
-	printf("  | Contact         : %-16.16s | | Max User    : %-20d | |                                    |\n", usr->contact, fac->maxUser);
+	printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
+	printf("  | Name            : %-16.16s | | Name             : %-15.15s | | Name            : %-16.16s |\n", usr->name, fac->name, stf->stfName);
+	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Remarks     : %-15.15s | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m,fac->remarks, stf->stfPosi);
+	printf("  | Gender          : %-16.16s | | Maintenance Date : %02d/%02d           | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, fac->maintenanceDate.d, fac->maintenanceDate.m, stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
+	printf("  | Contact         : %-16.16s | |                          | |                                    |\n", usr->contact);
 	printf("  |                                    | |                                    | |                                    |\n");
-	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");*/
+	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	system("pause");
 }
 
@@ -1219,19 +1219,9 @@ int bipChangeFacility(char *userPickedfacilityID)
 		*/
 		for (int a = 0; a < facilityDataCount; a++)
 		{
-			//printf("\t%d. %s\n", a+1, facData[a].description);
+			printf("\t%d. %s\n", a+1, facData[a].name);
 		}
 		printf("\nSelect Facility you wish to book: ");
-		/*s_input(rawInput, 99);
-		trimmedInput = trimwhitespace(rawInput);
-		userChoice = strtol(trimmedInput, &endPtr, 10);
-		if (*endPtr == '\0' && strlen(trimmedInput) != 0)
-		{
-			if (userChoice > 0 && userChoice <= facilityDataCount)
-			{
-				break;
-			}
-		}*/
 		if (i_input(&userChoice)) // if user entered integer
 		{
 			if (userChoice > 0 && userChoice <= facilityDataCount) // if user input is within range
@@ -1241,12 +1231,6 @@ int bipChangeFacility(char *userPickedfacilityID)
 		system("pause");
 	} while (1);
 	strcpy(userPickedfacilityID, facData[userChoice - 1].id);
-	return 1;
-
-
-	/*
-	Insert code to check for facilities availablity
-	*/
 	return 1;
 }
 

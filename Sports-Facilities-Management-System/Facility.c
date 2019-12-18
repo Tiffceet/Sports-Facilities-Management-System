@@ -3,7 +3,10 @@
 
 void facInfoMain()
 {
-	_staffLogin(sessionStaffID, 99);
+	if (!_staffLogin(sessionStaffID, 99))
+	{
+		return;
+	}
 	FILE *f = fopen(staffFilePath, "rb");
 	// find staffData of the staff log on
 	while (fread(&staffLogon, sizeof(Staff), 1, f) != 0) 
@@ -61,7 +64,7 @@ void addNewFacility()
 					printf("Invalid date\n");
 				}
 			}
-			printf("Facility Yearly Maintenance Date Date (dd/mm): ");
+			printf("Facility Yearly Maintenance Date (dd/mm): ");
 			rewind(stdin);
 			r = scanf("%d/%d", &fac.maintenanceDate.d, &fac.maintenanceDate.m);
 			rewind(stdin);
@@ -132,7 +135,7 @@ void searchFacility()
 		break;
 	case '4':
 		printf("");
-		break;
+		break;010802
 	default:
 		return;
 	}*/
