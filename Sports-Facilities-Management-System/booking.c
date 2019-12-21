@@ -553,7 +553,7 @@ void bookingSearchRecords()
 			return;
 		case 'x':
 		case 'X':
-			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
+			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount);
 			if(filteredDataCount != 0){
 				do{
 					printf("\nEnter '0' to return to search criteria selections.\nSelect (%d-%d) to view more details. ", 1, filteredDataCount);
@@ -574,7 +574,7 @@ void bookingSearchRecords()
 
 // generate & print filtered result and ask user to pick specific data to view its details
 // return numbers of filtered result found
-int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot)
+int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot, Staff **staffFilter, int sCount, userData **userFilter, int uCount)
 {
 	int count = 0; // to keep track of how many records were printed
 	printf("%s\n", "======================================================================================================================");
@@ -607,6 +607,38 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 				continue;
 			}
 		}
+		if (isSet[4])
+		{
+			int found = 0;
+			for (int b=0;b<sCount;b++){
+				if (strcmp(data[a].staffID, staffFilter[b]->stfID) == 0)
+				{
+					found = 1;
+					break;
+				}
+			}
+			if (!found)
+			{
+				continue;
+			}
+		}
+		if (isSet[5])
+		{
+			int found = 0;
+			for (int b = 0;b < uCount; b++)
+			{
+				if (strcmp(data[a].usrID, userFilter[b]->id) == 0)
+				{
+					found = 1;
+					break;
+				}
+			}
+			if (!found)
+			{
+				continue;
+			}
+		}
+
 		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-24.24s %-12.12s %-15.15s |\n",
 			count + 1,
 			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
@@ -614,7 +646,7 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			// data[a].facilityID,
-			/*getFacilityByID(data[a].facilityID)->description,*/
+			getFacilityByID(data[a].facilityID)->name,
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
 			//data[a].staffID);
@@ -782,7 +814,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				return;
 			case 'X':
 			case 'x':
-				filteredDataCount = generateFilteredSearchResult(filteredData, data, dataCount, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0]);
+				filteredDataCount = generateFilteredSearchResult(filteredData, data, dataCount, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount);
 				system("pause");
 				break;
 			default:
