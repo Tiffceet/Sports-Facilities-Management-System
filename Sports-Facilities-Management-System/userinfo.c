@@ -14,7 +14,7 @@ int uniqueId(char id[15])
 		printf("File userinfo doesnt exist\n");
 
 	}
-
+	
 	x = totalNumUser();
 	for (i = 0; i < x; i++) {
 		fread(&user2[i], sizeof(userData), 1, userinfo1);
@@ -42,7 +42,7 @@ int uniqueId(char id[15])
 
 
 
-	
+
 
 }
 
@@ -206,20 +206,10 @@ void registerInfo()
 	while (strlen(userData1.password) < 6)
 	{
 
-		if (strlen(userData1.password) < 6)
-		{
-			printf("Enter the password with at least minimum 6 words = ");
-			rewind(stdin);
-			scanf("%s", userData1.password);
-			strcpy(exitProg, userData1.password);
-			programExit = exitProgram(exitProg);
-			if (programExit == 1)
-			{
-				fclose(userinfo);
-				return;
-			}
-		}
 
+		printf("Enter the password with at least minimum 6 words = ");
+		rewind(stdin);
+		scanf("%s", userData1.password);
 
 	}
 
@@ -257,15 +247,52 @@ void registerInfo()
 
 	}
 
-	printf("Enter your gender (M = male,F = Female) ");
+	printf("Enter your gender (M = male,F = Female) = ");
 	rewind(stdin);
 	scanf("%s", &userData1.gender);
-	
-	
+	while (1)
+	{
+		while (toupper(userData1.gender[0]) != 'M' || toupper(userData1.gender[0]) != 'F')
+		{
+			if (toupper(userData1.gender[0]) == 'M' || toupper(userData1.gender[0]) == 'F')
+			{
+				break;
+			}
+			printf("Either type M or F only\n");
+			printf("Enter your gender (M = male,F = Female) = ");
+			rewind(stdin);
+			scanf("%s", &userData1.gender);
+
+		}
+
+		while (strlen(userData1.gender) > 1)
+		{
+			printf("Either type M or F only\n");
+			printf("Enter your gender (M = male,F = Female) = ");
+			rewind(stdin);
+			scanf("%s", &userData1.gender);
+
+
+		}
+		if ((toupper(userData1.gender[0]) == 'M' && strlen(userData1.gender) == 1) || (toupper(userData1.gender[0]) == 'F' && strlen(userData1.gender) == 1))
+		{
+			break;
+		}
+
+	}
 	printf("Enter your contact number : ");
 	rewind(stdin);
 	scanf("%s", &userData1.contact);
-
+	for (i = 0; i < strlen(userData1.contact); i++)
+	{
+		while (isdigit(userData1.contact[i]) == 0)
+		{
+			printf("Enter your contact number in integer and without dash  : ");
+			rewind(stdin);
+			scanf("%s", &userData1.contact);
+			i = 0;
+		}
+	}
 
 	printf("Confirm info to register?(Y = yes,N = No) =");
 	while (x == 0)
@@ -278,7 +305,7 @@ void registerInfo()
 			Time enterTime;
 			getSystemDate(&enterDate);
 			getSystemTime(&enterTime);
-			printf("User registration date is %d/%d/%d and time of registration is %d:%d\n", enterDate.d, enterDate.m, enterDate.y, enterTime.h, enterTime.m);
+			printf("User registration date is %d/%d/%d and time of registration is %d:%.2d\n", enterDate.d, enterDate.m, enterDate.y, enterTime.h, enterTime.m);
 			userData1.dateEnter = enterDate;
 			userData1.timeEnter = enterTime;
 
@@ -310,7 +337,7 @@ void registerInfo()
 }
 void modifyInfo2()
 {
-	char confirmation;
+	char confirmation[20];
 	char check;
 	char choice[6];
 	char exit;
@@ -319,6 +346,7 @@ void modifyInfo2()
 	int v = 0;
 	int i = 0;
 	int x = 0;
+	int z = 0;
 	char exitProg[20];
 	int programExit;
 	FILE *userinfo1;
@@ -348,29 +376,69 @@ void modifyInfo2()
 			fclose(userinfo1);
 			return;
 		}
-
-		printf("Is the current ID enter is ok?(Y = Yes/N = No)");
-		rewind(stdin);
-		scanf("%c", &confirmation);
-		while (toupper(confirmation) == 'N')
+		while (strlen(s) != 4)
 		{
-			if (toupper(confirmation) == 'N')
-			{
 
-				printf("Enter Id again = ");
+			if (strlen(s) != 4)
+			{
+				printf("Id enter should be only 4 digit  = ");
 				rewind(stdin);
 				scanf("%s", s);
 
-				printf("Is the current ID enter is ok?(Y = Yes/N = No)");
-				rewind(stdin);
-				scanf("%c", &confirmation);
+
 			}
+
+		}
+
+
+		printf("Do you want to change the current id that have entered?(Y = Yes/N = No) = ");
+		rewind(stdin);
+		scanf("%s", &confirmation);
+
+		while ((toupper(confirmation[0]) != 'N' || toupper(confirmation[0]) != 'Y') && strlen(confirmation) > 1)
+		{
+			if ((toupper(confirmation[0]) == 'N' || toupper(confirmation[0]) == 'Y') && strlen(confirmation) == 1)
+			{
+				break;
+			}
+
+			printf("Pease enter either Y or N only(Y = Yes/N = No) = ");
+			rewind(stdin);
+			scanf("%s", &confirmation);
+
+		}
+
+		while (toupper(confirmation[0]) == 'Y' || strlen(confirmation) > 4)
+		{
+
+			printf("Enter Id again(Only 4 character) = ");
+			rewind(stdin);
+			scanf("%s", s);
+
+			printf("Is the current ID enter is ok?(Y = Yes/N = No) = ");
+			rewind(stdin);
+			scanf("%s", &confirmation);
+
+			while ((toupper(confirmation[0]) != 'N' || toupper(confirmation[0]) != 'Y') && strlen(confirmation) > 1)
+			{
+				if ((toupper(confirmation[0]) == 'N' || toupper(confirmation[0]) == 'Y') && strlen(confirmation) == 1)
+				{
+					break;
+				}
+
+				printf("Pease enter either Y or N only(Y = Yes/N = No) = ");
+				rewind(stdin);
+				scanf("%s", &confirmation);
+
+			}
+
 		}
 
 
 		printf("Enter Password = ");
 		rewind(stdin);
 		scanf("%s", pass);
+
 
 		while (strlen(pass) < 6)
 		{
@@ -385,36 +453,66 @@ void modifyInfo2()
 
 
 		}
-		printf("Is the current password is ok?(Y = Yes/N = No)");
+		printf("Is the current password is ok?(Y = Yes/N = No) = ");
 		rewind(stdin);
 		scanf("%c", &confirmation);
-		while (toupper(confirmation) == 'N')
+
+		while ((toupper(confirmation[0]) != 'N' || toupper(confirmation[0]) != 'Y') && strlen(confirmation) > 1)
 		{
-			if (toupper(confirmation) == 'N')
+			if ((toupper(confirmation[0]) == 'N' || toupper(confirmation[0]) == 'Y') && strlen(confirmation) == 1)
+			{
+				break;
+			}
+
+			printf("Pease enter either Y or N only(Y = Yes/N = No) = ");
+			rewind(stdin);
+			scanf("%s", &confirmation);
+
+		}
+		while (toupper(confirmation[0]) == 'N' || strlen(confirmation) > 4)
+		{
+
+
+			printf("Enter your password again = ");
+			rewind(stdin);
+			scanf("%s", pass);
+
+
+			while (strlen(pass) < 6)
 			{
 
-				printf("Enter your password again = ");
-				rewind(stdin);
-				scanf("%s", pass);
-
-
-				while (strlen(pass) < 6)
+				if (strlen(pass) < 6)
 				{
-
-					if (strlen(pass) < 6)
-					{
-						printf("Enter the password with at least minimum 6 words = ");
-						rewind(stdin);
-						scanf("%s", pass);
-
-					}
-
+					printf("Enter the password with at least minimum 6 words = ");
+					rewind(stdin);
+					scanf("%s", pass);
 
 				}
-				printf("Is the current password is ok?(Y = Yes/N = No)");
-				rewind(stdin);
-				scanf("%c", &confirmation);
+
+
 			}
+
+			printf("Is the current password is ok?(Y = Yes/N = No) = ");
+			rewind(stdin);
+			scanf("%c", &confirmation);
+
+
+			while ((toupper(confirmation[0]) != 'N' || toupper(confirmation[0]) != 'Y') && strlen(confirmation) > 1)
+			{
+				if ((toupper(confirmation[0]) == 'N' || toupper(confirmation[0]) == 'Y') && strlen(confirmation) == 1)
+				{
+					break;
+				}
+
+				printf("Pease enter either Y or N only(Y = Yes/N = No) = ");
+				rewind(stdin);
+				scanf("%s", &confirmation);
+
+			}
+
+
+
+
 		}
 
 
@@ -442,6 +540,19 @@ void modifyInfo2()
 
 						printf("Enter new ID = ");
 						scanf("%s", s);
+						while (strlen(s) != 4)
+						{
+
+							if (strlen(s) != 4)
+							{
+								printf("Enter a id that has 4 characters  = ");
+								rewind(stdin);
+								scanf("%s", s);
+
+
+							}
+
+						}
 						strcpy(user2[i].id, s);
 
 						for (i = 0; i < x; i++) {
@@ -449,11 +560,26 @@ void modifyInfo2()
 						}
 						fclose(userinfo1);
 						v = 1;
+						if (v == 1)
+						{
+							printf("User Id has been change\n");
+						}
+
 						break;
 					case '2':userinfo1 = fopen(UserInfoFilePath, "wb");
 
 						printf("Enter new password = ");
 						scanf("%s", s);
+						while (strlen(s) < 6)
+						{
+
+
+							printf("Enter the password with at least minimum 6 words = ");
+							rewind(stdin);
+							scanf("%s", s);
+
+						}
+
 						strcpy(user2[i].password, s);
 
 						for (i = 0; i < x; i++) {
@@ -461,21 +587,41 @@ void modifyInfo2()
 						}
 						fclose(userinfo1);
 						v = 1;
+						if (v == 1)
+						{
+							printf("Password has been change\n");
+						}
 
 						break;
 					case '3':
-
+						fclose(userinfo1);
 						userinfo1 = fopen(UserInfoFilePath, "wb");
 
 						printf("Enter new contact = ");
 						scanf("%s", s);
+
+						for (z = 0; z < strlen(s); z++)
+						{
+							while (isdigit(s[z]) == 0)
+							{
+								printf("Enter your contact number in integer and without dash  : ");
+								rewind(stdin);
+								scanf("%s", s);
+								z = 0;
+							}
+						}
 						strcpy(user2[i].contact, s);
+
 
 						for (i = 0; i < x; i++) {
 							fwrite(&user2[i], sizeof(userData), 1, userinfo1);
 						}
 						fclose(userinfo1);
 						v = 1;
+						if (v == 1)
+						{
+							printf("Contact Number has been change\n");
+						}
 
 						break;
 
