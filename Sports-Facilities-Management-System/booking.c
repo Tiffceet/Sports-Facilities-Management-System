@@ -10,7 +10,7 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
-	FILE *f = fopen(UserInfoFilePath, "wb");
+	/*FILE *f = fopen(UserInfoFilePath, "wb");
 	userData usr = { "Ali", "U001", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
 	fwrite(&usr, sizeof(userData), 1, f);
 	userData usr2 = { "Ahmad", "U002", 2019,12,10,9,46,0, "L", "010389552", "123456" };
@@ -20,7 +20,25 @@ void bookingMain()
 	userData usr4 = { "Gohan", "U004", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
 	fwrite(&usr4, sizeof(userData), 1, f);
 	fclose(f);
+	f = fopen(staffFilePath, "wb");
+	Staff stf = {"Looz", "010802", "010802", "Looz", "ADMIN", 1,1,2020,1,1,2020,12,12,12,12};
+	fwrite(&stf, sizeof(Staff), 1, f);
+	fclose(f);
+	f = fopen(facilityFilePath, "wb");
+	Facility fac1 = {"F001", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18};
+	fwrite(&fac1, sizeof(Facility), 1, f);
+	Facility fac2 = { "F002", "Squash Court", 2019,12,12 , "", "Looz", 2019,12,18 };
+	fwrite(&fac2, sizeof(Facility), 1, f);
+	Facility fac3 = { "F003", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18 };
+	fwrite(&fac3, sizeof(Facility), 1, f);
+	Facility fac4 = { "F004", "Basketball Court",  2019,12,12 , "", "Looz",2019,12,18 };
+	fwrite(&fac4, sizeof(Facility), 1, f);
+	Facility fac5 = { "F005", "Swimming pool",  2019,12,12 , "", "Looz", 2019,12,18 };
+	fwrite(&fac5, sizeof(Facility), 1, f);
+	fclose(f);*/
+
 	readDataFromOtherModules();
+
 	/*BookingData data[100];
 	readBookingDataIntoStructArray(&data[0], 99);*/
 	// initialise error code for input validation use
@@ -419,6 +437,9 @@ void bookingSearchRecords()
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	BookingData data[100];
 	BookingData *filteredData[100];
+	Staff *staffFilter[100];
+	userData *userFilter[100];
+	int sCount = 0, uCount = 0;
 	int filteredDataCount;
 	int count = readBookingDataIntoStructArray(&data[0], 100);
 
@@ -427,13 +448,13 @@ void bookingSearchRecords()
 	int userPickedDataToViewIDX = -1;
 
 	// Variables for sub menu
-	char statusText[6][100];
 	int isSet[6] = { 0,0,0,0,0,0 };
 
 	do {
+		char statusText[6][100] = {"","","" ,"" ,"" ,"" };
 		userPickedDataToViewIDX = -1;
-		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
-		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
+		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y);
+		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y);
 		if (isSet[2])
 		{
 			int firstTime = 1;
@@ -452,13 +473,53 @@ void bookingSearchRecords()
 				}
 			}
 		}
-		else strcpy(statusText[2], "Not Set");
+		if (isSet[2])
+		{
+			for (int a = 0; a < 6; a++)
+			{
+				if (timeslot[a])
+				{
+					if (a == 0) {
+						sprintf(statusText[2], "%s", TIMESLOTS[a]);
+					}
+					else
+					{
+						sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
+					}
+				}
+			}
+		}
 		if (isSet[3]) {}
-		else strcpy(statusText[3], "Not Set");
-		if (isSet[4]) {}
-		else strcpy(statusText[4], "Not Set");
-		if (isSet[5]) {}
-		else strcpy(statusText[5], "Not Set");
+		if (isSet[4]) {
+			for (int a = 0; a < sCount; a++)
+			{
+				if (a == 0) {
+					sprintf(statusText[4], "%s", staffFilter[a]->stfName);
+				}
+				else
+				{
+					sprintf(statusText[4], "%s, %s", statusText[4], staffFilter[a]->stfName);
+				}
+			}
+		}
+		if (isSet[5])
+		{
+			//for ()
+			//{
+			//	// if its not the last idx
+			//	if(a+1 != uCount) sprintf(statusText[5], "%s, %s", getUserDataByID(userID[a])->name); else sprintf(statusText[5], "%s", getUserDataByID(userID[a])->name);
+			//}
+			for (int a = 0; a < uCount; a++)
+			{
+				if (a == 0) {
+					sprintf(statusText[5], "%s", userFilter[a]->name);
+				}
+				else
+				{
+					sprintf(statusText[5], "%s, %s", statusText[5], userFilter[a]->name);
+				}
+			}
+		}
 		printf("\n[ Search Criteria ]\n");
 		printf("[1] Date of Transactions : %s\n", statusText[0]);
 		printf("[2] Booking Date         : %s\n", statusText[1]);
@@ -483,8 +544,10 @@ void bookingSearchRecords()
 		case '4':
 			break;
 		case '5':
+			isSet[4] = dispFilterStaffInvovled(staffFilter, &sCount);
 			break;
 		case '6':
+			isSet[5] = dispFilterUserInvolved(userFilter, &uCount);
 			break;
 		case '7':
 			return;
@@ -637,8 +700,8 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 		do {
 			recordsCount = 0;
 			char statusText[6][100] = { "", "", "" , "" , "" , "" };
-			if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y); else strcpy(statusText[0], "Not Set");
-			if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y); else strcpy(statusText[1], "Not Set");
+			if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y);
+			if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y);
 			if (isSet[2])
 			{
 				for (int a = 0; a < 6; a++)
@@ -655,8 +718,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 					}
 				}
 			}
-			else strcpy(statusText[2], "Not Set");
-			if (isSet[3]) break; else strcpy(statusText[3], "Not Set");
+			if (isSet[3]) break;
 			if (isSet[4]) {
 				for (int a = 0; a < sCount; a++)
 				{
@@ -669,7 +731,6 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 					}
 				}
 			}
-			else strcpy(statusText[4], "Not Set");
 			if (isSet[5]) 
 			{
 				//for ()
@@ -688,7 +749,6 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 					}
 				}
 			}
-			else strcpy(statusText[5], "Not Set");
 			printf("\n[ Filters ]\n");
 			printf("[1] Date of Transactions : %s\n", statusText[0]);
 			printf("[2] Booking Date         : %s\n", statusText[1]);
@@ -987,6 +1047,18 @@ int dispFilterStaffInvovled(Staff **staffIDFilter, int *sCount)
 	} while (1);
 }
 
+// return 1 if filter is updated successfully
+int dispFilterFacInvolved(Facility **facFilter, int *fCount)
+{
+	if (facilityDataCount == 0)
+	{
+		printf("There are no facility in the system...\n");
+		system("pause");
+		return 0;
+	}
+
+}
+
 // print booking details based on bookingID
 void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 {
@@ -1026,6 +1098,34 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 		system("pause");
 		return;
 	}
+
+	// Split facility remarks into 3 lines
+	char remarkLine[3][36] = { "","","" };
+	for (int a = 0; a < 15; a++)
+	{
+		if (a == strlen(fac->remarks))
+		{
+			break;
+		}
+		remarkLine[0][a] = fac->remarks[a];
+	}
+	for (int a = 0; a < 34; a++)
+	{
+		if (a + 15 == strlen(fac->remarks))
+		{
+			break;
+		}
+		remarkLine[1][a] = fac->remarks[a + 15];
+	}
+	for (int a = 0; a < 34; a++)
+	{
+		if (a + 48 == strlen(fac->remarks))
+		{
+			break;
+		}
+		remarkLine[2][a] = fac->remarks[a + 48];
+	}
+
 	printf("%40s                Booking\n", "");
 	printf("%40s---------------------------------------\n", "");
 	printf("%40s| Booking ID       : %s          |\n", "", bData->bookingID);
@@ -1037,10 +1137,10 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
 	printf("  | Name            : %-16.16s | | Name             : %-15.15s | | Name            : %-16.16s |\n", usr->name, fac->name, stf->stfName);
-	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Remarks     : %-15.15s | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m,fac->remarks, stf->stfPosi);
-	printf("  | Gender          : %-16.16s | | Maintenance Date : %02d/%02d           | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, fac->maintenanceDate.d, fac->maintenanceDate.m, stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
-	printf("  | Contact         : %-16.16s | |                          | |                                    |\n", usr->contact);
-	printf("  |                                    | |                                    | |                                    |\n");
+	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Maintenance Date : %02d/%02d           | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m, fac->maintenanceDate.d, fac->maintenanceDate.m, stf->stfPosi);
+	printf("  | Gender          : %-16.16s | | Remarks          : %-15.15s | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, remarkLine[0], stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
+	printf("  | Contact         : %-16.16s | | %-34.34s | |                                    |\n", usr->contact, remarkLine[1]);
+	printf("  |                                    | | %-34.34s | |                                    |\n", remarkLine[2]);
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
 	system("pause");
 }
