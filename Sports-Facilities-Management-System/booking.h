@@ -50,6 +50,7 @@ int readBookingDataIntoStructArray(BookingData *data, int size);
 void writeBookingDataIntoFile(BookingData *data, int dataCount);
 void incrementBookingID(char *oldStaffID);
 int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
+int checkOverallTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityName);
 int getTimeslotBooked(int *timeslot);
 
 // Functions for BIP (Book-In-Progress)
@@ -66,4 +67,8 @@ Facility* getFacilityByID(char *id);
 // login functions
 int _staffLogin(char *staffID, int size);
 int _usrLogin(char *usrID, int size);
+
+// functions to deal with facility module
+int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX);
+
 #endif
