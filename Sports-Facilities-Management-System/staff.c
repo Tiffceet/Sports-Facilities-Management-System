@@ -592,7 +592,7 @@ void login()//log in
 	totstaff = readStfList();
 
 	printf("NOTE:Only staffs are allowed to login to staff module.\n");
-	printf("Normal account will not be allowed to login here.\n");
+	printf("Normal account will not be allowed to login here.\n\n");
 	if (totstaff != 0)
 	{
 
@@ -616,7 +616,7 @@ void login()//log in
 				else
 				{
 					incorrectlogins++;
-					if(incorrectlogins == totstaff)
+					if(incorrectlogins >= totstaff)
 					printf("Password or log in ID is incorrect.\n");
 				}
 			}
@@ -659,6 +659,19 @@ int checkPosition()
 
 void pwRecover()
 {
+	char staffIDEntered[30];
+	int totstaff = 0;
+	totstaff = readStfList();
+	printf("%25s====================================================================\n", "");
+	printf("%25s|%24sPASSWORD RECOVERER%24s|\n", "", "", "");
+	printf("%25s|%4s**YOU NEED TO ENTER YOUR STAFF ID TO CHANGE YOUR PASSWORD**%3s|\n", "", "", "");
+	printf("%25s|%9sASK AN ADMIN FOR HELP IF YOU FORGOT YOUR STAFFID%9s|\n", "", "", "");
+	printf("%25s====================================================================\n", "");
+
+	printf("Enter staff ID\n");
+	scanf("%[^\n]", staffIDEntered);
+	rewind(stdin);
+	
 	
 }
 
