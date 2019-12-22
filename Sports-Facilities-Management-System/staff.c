@@ -132,35 +132,44 @@ void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY EN
 			rewind(stdin);
 		}
 
-		printf("Enter staff ID(4 characters): ");
-		scanf("%[^\n]", idEntered);
-		rewind(stdin);
-		while (strlen(idEntered) != 4)
-		{
-			printf("Needs to be 4 characters please reenter!\n");
-			printf("Enter staff ID(4 characters) : ");
-			scanf("%[^\n]", idEntered);
+		do {
+			strLength = 0;
+			ifUsed = 1;
+			totalCondition = 3;
+			printf("Enter staff ID(4 characters): ");
+			scanf("%[^\n]", toupper(addStaff.stfID));
 			rewind(stdin);
-		}
-		for (i = 0; i < totstaff; i++)
-		{
-			while (strcmp(idEntered, staffCache[i].stfID) == 0)
+			if (strlen(addStaff.stfID) == 4)
 			{
-				printf("ID used!\n");
-				printf("Reenter ID :");
-				scanf("%[^\n]", idEntered);
-				rewind(stdin);
-				while (strlen(idEntered) != 4)
-				{
-					printf("Needs to be 4 characters please reenter : \n");
-					printf("Enter staff ID(4 characters) : ");
-					scanf("%[^\n]", idEntered);
-					rewind(stdin);
-				}
-
+				strLength = 1;
 			}
-		}
-		strcpy(addStaff.stfID, idEntered);
+			valid = isAlNum(addStaff.stfID);
+			for (i = 0; i < totstaff; i++)
+			{
+				while (strcmp(addStaff.stfID, staffCache[i].stfID) == 0)
+				{
+					ifUsed = 0;
+				}
+			}
+			if (totalCondition != ifUsed + strLength + valid)
+			{
+				printf("ID fails to meet the following condition \n");
+				if (valid != 1)
+				{
+					printf("Only numbers and alphabet are allowed in entry.\n");
+				}
+				if (ifUsed != 1)
+				{
+					printf("ID exist in our system.\n");
+				}
+				if (strLength != 1)
+				{
+					printf("Length of entry is not 4\n");
+				}
+				rewind(stdin);
+			}
+		} while (totalCondition != strLength + ifUsed + valid);
+
 	
 		do //maybe add more options
 		{
@@ -286,10 +295,11 @@ int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	{
 		printf("No record exist.\n");
 		system("pause");
+		return 0;
 	}
 }
 
-void staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
+void staffSearchID()
 {
 	char stfID[6],ans;
 	int i = 0, totstaff, stfcount = 0,staffAdd,stafffound=0;
@@ -347,11 +357,11 @@ void staffSearchID()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 }
 
 
-void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER LOOKING DISPLAY
+void changeStfList()
 {
 	char choice[10];
 	
-	int oldStaffAdd = 0, totstaff, i;
+	int oldStaffAdd = 0, totstaff, i, totalCondition=0, strLength=0, ifUsed=0,valid=0;
 	totstaff = readStfList();
 	Staff staffChange;
 	oldStaffAdd=staffSearchName();
@@ -389,17 +399,44 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 			{
 
 			case '1':
-				printf("Enter new name :");
-				scanf("%[^\n]", staffChange.stfName);
-				rewind(stdin);
-				while (strlen(staffChange.stfName) > 29)
+				do
 				{
-					printf("Reenter name it's too long.\n");
-					printf("Enter staff name : ");
-					scanf("%[\n]", staffChange.stfName);
+					strLength = 0;
+					ifUsed = 1;
+					totalCondition = 3;
+					printf("Enter new name : ");
+					scanf("%[^\n]", staffChange.stfName);
+					if ((strlen(staffChange.stfName)) < 30)
+					{
+						strLength = 1;
+					}
 					rewind(stdin);
-				}
-				break;
+					valid = isAlNum(staffChange.stfName);
+					for (i = 0; i < totstaff; i++)
+					{
+						if (strcmp(staffChange.stfName, staffCache[i].stfName) == 0)
+						{
+							ifUsed = 0;
+						}
+					}
+					if (totalCondition != ifUsed + strLength + valid)
+					{
+						printf("Name fails to meet the following condition \n");
+						if (valid != 1)
+						{
+							printf("Only numbers and alphabet are allowed in entry.\n");
+						}
+						if (ifUsed != 1)
+						{
+							printf("Name exist in our system.\n");
+						}
+						if (strLength != 1)
+						{
+							printf("Length of entry is too long.(limit = 29)\n");
+						}
+						rewind(stdin);
+					}
+				} while (totalCondition != valid + ifUsed + strLength);
 			case '2':
 				printf("Enter new password(MINUMUM 8):");
 				scanf("%[^\n]", staffChange.stfPassW);
@@ -434,34 +471,43 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 				}
 				break;
 			case '3':
-				printf("Enter new staff ID(4 characters): ");
-				scanf("%[^\n]", staffChange.stfID);
-				rewind(stdin);
-				while (strlen(staffChange.stfID) != 4)
-				{
-					printf("Needs to be 4 characters please reenter : \n");
-					printf("Enter staff ID(4 characters): ");
-					scanf("%[^\n]", staffChange.stfID);
+				do {
+					strLength = 0;
+					ifUsed = 1;
+					totalCondition = 3;
+					printf("Enter new staff ID(4 characters): ");
+					scanf("%[^\n]", toupper(staffChange.stfID));
 					rewind(stdin);
-				}
-				for (i = 0; i < totstaff; i++)
-				{
-					while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
+					if (strlen(staffChange.stfID) == 4)
 					{
-						printf("ID used!\n");
-						printf("Reenter ID :");
-						scanf("%[^\n]", staffChange.stfID);
-						rewind(stdin);
-						while (strlen(staffChange.stfID) != 4)
-						{
-							printf("Needs to be 4 characters please reenter : \n");
-							printf("Enter staff ID(4 characters): ");
-							scanf("%[^\n]", staffChange.stfID);
-							rewind(stdin);
-						}
-
+						strLength = 1;
 					}
-				}
+					valid = isAlNum(staffChange.stfID);
+					for (i = 0; i < totstaff; i++)
+					{
+						while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
+						{
+							ifUsed = 0;
+						}
+					}
+					if (totalCondition != ifUsed + strLength + valid)
+					{
+						printf("ID fails to meet the following condition \n");
+						if (valid != 1)
+						{
+							printf("Only numbers and alphabet are allowed in entry.\n");
+						}
+						if (ifUsed != 1)
+						{
+							printf("ID exist in our system.\n");
+						}
+						if (strLength != 1)
+						{
+							printf("Length of entry is not 4\n");
+						}
+						rewind(stdin);
+					}
+				} while (totalCondition != strLength + ifUsed + valid);
 				break;
 			case '4':
 				do //maybe add more options
@@ -542,8 +588,11 @@ void changeStfList()//NEED TO ADD A DISPLAY FOR OLD AND NEW AND NEED MAKE BETTER
 void login()//log in
 {
 	char nameEntered[30], passwordEntered[30];
-	int i = 0, totstaff, stfcount = 0, stfSuccessfullLogin;
+	int i = 0, totstaff, stfcount = 0, stfSuccessfullLogin=0,incorrectlogins=0;
 	totstaff = readStfList();
+
+	printf("NOTE:Only staffs are allowed to login to staff module.\n");
+	printf("Normal account will not be allowed to login here.\n");
 	if (totstaff != 0)
 	{
 
@@ -560,11 +609,14 @@ void login()//log in
 				if (strcmp(nameEntered, staffCache[i].stfName) == 0 && strcmp(passwordEntered, staffCache[i].stfPassW) == 0)
 				{
 					printf("Welcome,%s\n", staffCache[i].stfName);
+					system("pause");
 					stfSuccessfullLogin = 1;
 					break;
 				}
 				else
 				{
+					incorrectlogins++;
+					if(incorrectlogins == totstaff)
 					printf("Password or log in ID is incorrect.\n");
 				}
 			}
@@ -584,21 +636,24 @@ void login()//log in
 
 int checkPosition()
 {
-
+	int totstaff = readStfList();
 	int position = -1;
-	if (strcmp(loggedinstf.stfPosi, "ADMIN") == 0)//For admin
+
+	if (totstaff != 0)
 	{
-		position = 0;
+		if (strcmp(loggedinstf.stfPosi, "ADMIN") == 0)//For admin
+		{
+			position = 0;
+		}
+		else
+		{
+			position = 1;
+		}
+		return position;
 	}
-	else if (strcmp(loggedinstf.stfPosi, "STAFF") == 0)//For staffs
-	{
-		position = 1;
+	else {
+		return 0;
 	}
-	else
-	{
-		position = 2;
-	}
-	return position;
 }
 
 
@@ -617,9 +672,10 @@ void staffMain()// still need to add places to indentify position
 		return;
 	}
 	fclose(stflist);
-
 	int err = 0;
 	char choice[10];
+	login();
+	int position = checkPosition();
 	do
 	{
 		system("cls");
@@ -633,13 +689,31 @@ void staffMain()// still need to add places to indentify position
 			system("pause");
 			break;
 		case 2:
-			addStaffList();
+			if (position == 0)
+			{
+				addStaffList();
+			}
+			else
+			{
+				printf("Only admins are allowed this feature.\n");
+				system("pause");
+				break;
+			}
 			break;
 		case 3:
-			staffSearchID();
+			staffSearchName();
 			break;
 		case 4:
-			changeStfList();
+			if (position == 0)
+			{
+				changeStfList();
+			}
+			else
+			{
+				printf("Only admins are allowed this feature.\n");
+				system("pause");
+				break;
+			}
 			break;
 		case 5:
 			return;

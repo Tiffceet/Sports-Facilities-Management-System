@@ -24,4 +24,5 @@ void changeStfList();
 void login();
 void staffSearchID();
 int staffSearchName();
+int checkPosition();
 #endif
