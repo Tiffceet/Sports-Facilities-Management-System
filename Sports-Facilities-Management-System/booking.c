@@ -67,9 +67,10 @@ int bookingMenu()
 		bookingBook(); // add do while loop to ask user if want to book mores
 		break;
 	case 2:
-		bookingSearchRecords();
+		bookingSearchRecords(0, NULL); // null because i dont want raw records only
 		break;
 	case 3:
+		bookingModifyRecords();
 		break;
 	case 4:
 		bookingDisplayAll();
@@ -258,7 +259,10 @@ void bookingBook()
 	} while (tolower(choiceToContinueNextBooking[0]) == 'y');
 }
 
-void bookingSearchRecords()
+// NOTE: showRawRecordsOnly is a flag if want to allow user to pick record to show more details
+// If showRawRecordsOnly is 1, then it will not ask user to pick record to show more details
+// Will write filteredRecords into pointer array if showRawRecordsOnly is true (just in case someday the filteredRecords can be further used)
+void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords)
 {
 	// Variables
 	Date dotFrom = { 0,0,0 }, dotTo = { 0,0,0 }, bookFrom = { 0,0,0 }, bookTo = { 0,0,0 };
@@ -395,8 +399,21 @@ void bookingSearchRecords()
 			return;
 		case 'x':
 		case 'X':
-			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount);
-			if (filteredDataCount != 0) {
+			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount, facFilter, fCount);
+			
+			// check if caller function wants to showRawDataOnly
+			if (showRawRecordsOnly)
+			{
+				// write it to filteredRecords as output parameter just incase the result is used somewhere
+				for (int a = 0; a < filteredDataCount; a++)
+				{
+					filteredRecords[a] = filteredData[a];
+				}
+				return;
+			}
+
+			// extra check to make sure there are data to let user select
+			if (filteredDataCount != 0) { 
 				do {
 					printf("\nEnter '0' to return to search criteria selections.\nSelect (%d-%d) to view more details. ", 1, filteredDataCount);
 				} while (!i_input(&userPickedDataToViewIDX) || (userPickedDataToViewIDX < 0 || userPickedDataToViewIDX > filteredDataCount));
@@ -416,7 +433,7 @@ void bookingSearchRecords()
 
 // generate & print filtered result and ask user to pick specific data to view its details
 // return numbers of filtered result found
-int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot, Staff **staffFilter, int sCount, userData **userFilter, int uCount)
+int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot, Staff **staffFilter, int sCount, userData **userFilter, int uCount, Facility **facFilter, int fCount)
 {
 	int count = 0; // to keep track of how many records were printed
 	printf("%s\n", "======================================================================================================================");
@@ -453,9 +470,20 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 		}
 		if (isSet[3]) // if facility filter is set
 		{
-
+			int found = 0;
+			for (int b = 0; b < fCount; b++) {
+				if (strcmp(data[a].facilityID, facFilter[b]->id) == 0)
+				{
+					found = 1;
+					break;
+				}
+			}
+			if (!found)
+			{
+				continue;
+			}
 		}
-		if (isSet[4])
+		if (isSet[4]) // if staff filter is set
 		{
 			int found = 0;
 			for (int b = 0; b < sCount; b++) {
@@ -470,7 +498,7 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 				continue;
 			}
 		}
-		if (isSet[5])
+		if (isSet[5]) // if user filter is set
 		{
 			int found = 0;
 			for (int b = 0; b < uCount; b++)
@@ -510,7 +538,23 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 
 void bookingModifyRecords()
 {
+	BookingData data[100];
+	BookingData *filteredData[100];
+	int dataCount = readBookingDataIntoStructArray(data, 100);
+	char choice[10];
+	printf("Would you like to filter the bookings before selecting records to modify (y=yes)? ");
+	getUserMenuChoice(choice, 9, "Would you like to search the bookings before selecting records to modify ? ");
+	if (tolower(choice[0]) == 'y')
+	{
+		bookingSearchRecords(1, filteredData);
 
+	}
+	else
+	{
+		int isSet[6] = { 0,0,0,0,0,0 };
+		generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		system("pause");
+	}
 }
 
 void bookingDisplayAll()
@@ -674,7 +718,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				return;
 			case 'X':
 			case 'x':
-				filteredDataCount = generateFilteredSearchResult(filteredData, data, dataCount, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount);
+				filteredDataCount = generateFilteredSearchResult(filteredData, data, dataCount, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount, facFilter, fCount);
 				system("pause");
 				break;
 			default:
