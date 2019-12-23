@@ -67,7 +67,7 @@ int bookingMenu()
 		bookingBook(); // add do while loop to ask user if want to book mores
 		break;
 	case 2:
-		bookingSearchRecords(0, NULL); // null because i dont want raw records only
+		bookingSearchRecords(0, NULL, NULL); // null because i dont want raw records only
 		break;
 	case 3:
 		bookingModifyRecords();
@@ -262,7 +262,8 @@ void bookingBook()
 // NOTE: showRawRecordsOnly is a flag if want to allow user to pick record to show more details
 // If showRawRecordsOnly is 1, then it will not ask user to pick record to show more details
 // Will write filteredRecords into pointer array if showRawRecordsOnly is true (just in case someday the filteredRecords can be further used)
-void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords)
+// filteredDataCount as well
+void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords, int *filteredRecordsCount)
 {
 	// Variables
 	Date dotFrom = { 0,0,0 }, dotTo = { 0,0,0 }, bookFrom = { 0,0,0 }, bookTo = { 0,0,0 };
@@ -409,6 +410,7 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords)
 				{
 					filteredRecords[a] = filteredData[a];
 				}
+				*filteredRecordsCount = filteredDataCount;
 				return;
 			}
 
@@ -541,21 +543,114 @@ void bookingModifyRecords()
 	BookingData data[100];
 	BookingData *filteredData[100];
 	int dataCount = readBookingDataIntoStructArray(data, 100);
+	int filteredDataCount;
 	char choice[10];
+	int userPickedIDX;
 	printf("Would you like to filter the bookings before selecting records to modify (y=yes)? ");
 	getUserMenuChoice(choice, 9, "Would you like to search the bookings before selecting records to modify ? ");
 	if (tolower(choice[0]) == 'y')
 	{
-		bookingSearchRecords(1, filteredData);
-
+		// This function have generateFilteredSearchResult() call in it
+		bookingSearchRecords(1, filteredData, &filteredDataCount);
 	}
 	else
 	{
+		// just print all data without filters
+		// i didnt use displayAll because i need the numbering infront so user can choose
 		int isSet[6] = { 0,0,0,0,0,0 };
-		generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 		system("pause");
 	}
+
+	if(filteredDataCount>0)
+	{
+		do{
+			printf("Select records to modify (%d-%d) ", 1, filteredDataCount);
+			i_input(&userPickedIDX);
+		} while (userPickedIDX >= 1 && userPickedIDX <= filteredDataCount);
+		modifySpecificBooking(filteredData[userPickedIDX-1]);
+	}
+
 }
+
+// Modify specific booking
+// return 1 if it modified successfully
+int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int dataCount)
+{
+	char choice[10];
+	// caching data for changes
+	BookingData cache;
+	strcpy(cache.bookingID, bookingToModify->bookingID);
+	cache.bookingDate.d = bookingToModify->bookingDate.d;
+	cache.bookingDate.m = bookingToModify->bookingDate.m;
+	cache.bookingDate.y = bookingToModify->bookingDate.y;
+	cache.currentDate.d = bookingToModify->currentDate.d;
+	cache.currentDate.m = bookingToModify->currentDate.m;
+	cache.currentDate.y = bookingToModify->currentDate.y;
+	cache.currentTime.h = bookingToModify->currentTime.h;
+	cache.currentTime.m = bookingToModify->currentTime.m;
+	cache.currentTime.s = bookingToModify->currentTime.s;
+	strcpy(cache.facilityID, bookingToModify->facilityID);
+	strcpy(cache.staffID, bookingToModify->staffID);
+	cache.timeSlotsBooked[0] = bookingToModify->timeSlotsBooked[0];
+	cache.timeSlotsBooked[1] = bookingToModify->timeSlotsBooked[1];
+	cache.timeSlotsBooked[2] = bookingToModify->timeSlotsBooked[2];
+	cache.timeSlotsBooked[3] = bookingToModify->timeSlotsBooked[3];
+	cache.timeSlotsBooked[4] = bookingToModify->timeSlotsBooked[4];
+	cache.timeSlotsBooked[5] = bookingToModify->timeSlotsBooked[5];
+	strcpy(cache.usrID, bookingToModify->usrID);
+
+	printf(" Select: \n");
+	printf(" \t[1] Change Facility\n");
+	printf(" \t[2] Change Booking Date + Timeslot\n");
+	printf(" \t[3] Change Timeslot only\n");
+	printf("\n Your Choice ? ");
+	do {
+		getUserMenuChoice(choice, 9, "Your Choice ? ");
+	} while (choice[0] < '1' || choice[0] > '3');
+	int userPickedtimeslot;
+	switch (choice[0])
+	{
+	case '1':
+		bipChangeFacility(cache.facilityID);
+		// temporary variable for checking timeslot availablity
+		int tmpTS[6] = { 0,0,0,0,0,0 };
+		int tmpR = checkForTimeslotsAvailablity(&tmpTS[0], &data[0], 100, &cache.bookingDate, cache.facilityID);
+		if (!tmpR) // if no timeslot anymore
+		{
+			printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
+			bipChangeBookingDate(&cache.bookingDate);
+			bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+		}
+		else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
+		{
+			printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
+			bipChangeBookingDate(&cache.bookingDate);
+			bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+		}
+		printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", cache.bookingDate.d, cache.bookingDate.m, cache.bookingDate.y);
+		getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
+		if (tolower(choice[0]) != 'y')
+		{
+			bipChangeBookingDate(&cache.bookingDate);
+			bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+		}
+		break;
+	case '2':
+		bipChangeBookingDate(&cache.bookingDate);
+		bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+		break;
+	case '3':
+		bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+		break;
+	}
+
+	// since bipChangetimeslot doesnt directly modify array, i need to do it again
+	
+
+	return 1;
+}
+
 
 void bookingDisplayAll()
 {
@@ -1430,6 +1525,8 @@ int bipChangeBookingDate(Date *bookingDate)
 }
 
 // return 1 if timeslot is changed successfully
+// userPickedtimeslot is integer, not array
+// this function doesnt directly modify timeslot array
 int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID)
 {
 	int timeslotAvailable[6] = { 1,1,1,1,1,1 }; // to check for timeslot availablity
