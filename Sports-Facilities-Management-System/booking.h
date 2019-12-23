@@ -70,5 +70,6 @@ int _usrLogin(char *usrID, int size);
 
 // functions to deal with facility module
 int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX);
+int getFacilityCount(char facilityName[]);
 
 #endif

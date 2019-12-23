@@ -43,13 +43,13 @@ void bookingMain()
 	readBookingDataIntoStructArray(&data[0], 99);*/
 	// initialise error code for input validation use
 	err = 0;
-	
+
 	//// prompt staff login
 	//if (!_staffLogin(sessionStaffID, 99))
 	//{
 	//	return;
 	//}
-	strcpy(sessionStaffID , "Looz");
+	strcpy(sessionStaffID, "Looz");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
@@ -145,16 +145,16 @@ void bookingBook()
 			incrementBookingID(latestBookingID); // increment bookingID
 		}
 		int firstIteration = 1;
-		do{
+		do {
 			// Main Logic
-			if(firstIteration)
+			if (firstIteration)
 			{
 				bipChangeFacility(userPickedfacilityID);
 				bipChangeBookingDate(&userPickedDate);
 				bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
 				firstIteration = 0;
 			}
-			else 
+			else
 			{
 				printf(" Select: \n");
 				printf(" \t[1] Change Facility\n");
@@ -169,7 +169,7 @@ void bookingBook()
 				case '1':
 					bipChangeFacility(userPickedfacilityID);
 					// temporary variable for checking timeslot availablity
-					int tmpTS[6] = { 0,0,0,0,0,0 }; 
+					int tmpTS[6] = { 0,0,0,0,0,0 };
 					int tmpR = checkForTimeslotsAvailablity(&tmpTS[0], &data[0], 100, &userPickedDate, userPickedfacilityID);
 					if (!tmpR) // if no timeslot anymore
 					{
@@ -199,7 +199,7 @@ void bookingBook()
 					bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
 					break;
 				}
-				
+
 			}
 
 			// printing of display
@@ -214,7 +214,7 @@ void bookingBook()
 			printf(" | Booking Date : %-36.36s |\n", statusText[1]);
 			printf(" | Timeslot     : %-36.36s |\n", statusText[2]);
 			printf(" <----------------------------------------------------->\n\n");
-		
+
 			printf(" Do you want to change booking details ? (y=yes) ");
 			getUserMenuChoice(choice, 9, " Do you want to change booking details ? (y=yes) ");
 		} while (tolower(choice[0]) == 'y');
@@ -236,7 +236,7 @@ void bookingBook()
 			strcpy(data[count].facilityID, userPickedfacilityID);
 			// Important line here
 			writeBookingDataIntoFile(&data[0], ++count);
-				
+
 			printf("Booking have been handled by %s.\nThank you, %s for booking %s at %02d/%02d/%02d %s.\n",
 				// data[count - 1].staffID,
 				getStaffDataByID(data[count - 1].staffID)->stfName,
@@ -265,9 +265,10 @@ void bookingSearchRecords()
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
 	BookingData data[100];
 	BookingData *filteredData[100];
+	Facility *facFilter[100];
 	Staff *staffFilter[100];
 	userData *userFilter[100];
-	int sCount = 0, uCount = 0;
+	int sCount = 0, uCount = 0, fCount = 0;
 	int filteredDataCount;
 	int count = readBookingDataIntoStructArray(&data[0], 100);
 
@@ -279,7 +280,7 @@ void bookingSearchRecords()
 	int isSet[6] = { 0,0,0,0,0,0 };
 
 	do {
-		char statusText[6][100] = {"","","" ,"" ,"" ,"" };
+		char statusText[6][100] = { "","","" ,"" ,"" ,"" };
 		userPickedDataToViewIDX = -1;
 		if (isSet[0]) sprintf(statusText[0], "%02d/%02d/%04d - %02d/%02d/%04d", dotFrom.d, dotFrom.m, dotFrom.y, dotTo.d, dotTo.m, dotTo.y);
 		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y);
@@ -317,7 +318,19 @@ void bookingSearchRecords()
 				}
 			}
 		}
-		if (isSet[3]) {}
+		if (isSet[3])
+		{
+			for (int a = 0; a < fCount; a++)
+			{
+				if (a == 0) {
+					sprintf(statusText[3], "(%s) %s", facFilter[a]->id, facFilter[a]->name);
+				}
+				else
+				{
+					sprintf(statusText[3], "%s, (%s) %s", statusText[3], facFilter[a]->id, facFilter[a]->name);
+				}
+			}
+		}
 		if (isSet[4]) {
 			for (int a = 0; a < sCount; a++)
 			{
@@ -370,6 +383,7 @@ void bookingSearchRecords()
 			isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
 			break;
 		case '4':
+			isSet[3] = dispFilterFacInvolved(facFilter, &fCount);
 			break;
 		case '5':
 			isSet[4] = dispFilterStaffInvovled(staffFilter, &sCount);
@@ -382,8 +396,8 @@ void bookingSearchRecords()
 		case 'x':
 		case 'X':
 			filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], count, &isSet[0], &dotFrom, &dotTo, &bookFrom, &bookTo, &timeslot[0], staffFilter, sCount, userFilter, uCount);
-			if(filteredDataCount != 0){
-				do{
+			if (filteredDataCount != 0) {
+				do {
 					printf("\nEnter '0' to return to search criteria selections.\nSelect (%d-%d) to view more details. ", 1, filteredDataCount);
 				} while (!i_input(&userPickedDataToViewIDX) || (userPickedDataToViewIDX < 0 || userPickedDataToViewIDX > filteredDataCount));
 				if (userPickedDataToViewIDX == 0)
@@ -392,7 +406,7 @@ void bookingSearchRecords()
 				}
 				else
 				{
-					printBookingDetails(filteredData[userPickedDataToViewIDX-1]->bookingID, &data[0], 100);
+					printBookingDetails(filteredData[userPickedDataToViewIDX - 1]->bookingID, &data[0], 100);
 				}
 			}
 			break;
@@ -412,33 +426,39 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
 	for (int a = 0; a < dataCount; a++)
 	{
-		if (isSet[0])
+		if (isSet[0]) // Date of transaction filter is set
 		{
+			// If date is not in range
 			if (compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotFrom->d, dotFrom->m, dotFrom->y) == -1
 				|| compareDate(data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, dotTo->d, dotTo->m, dotTo->y) == 1)
 			{
 				continue;
 			}
 		}
-		if (isSet[1])
+		if (isSet[1]) // Booking Date filter is set
 		{
+			// If date is not in range
 			if (compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookFrom->d, bookFrom->m, bookFrom->y) == -1
 				|| compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookTo->d, bookTo->m, bookTo->y) == 1)
 			{
 				continue;
 			}
 		}
-		if (isSet[2])
+		if (isSet[2]) // If timeslot booked filter is set
 		{
-			if (!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)])
+			if (!timeslot[getTimeslotBooked(data[a].timeSlotsBooked)]) // if that timeslot is not selected
 			{
 				continue;
 			}
 		}
+		if (isSet[3]) // if facility filter is set
+		{
+
+		}
 		if (isSet[4])
 		{
 			int found = 0;
-			for (int b=0;b<sCount;b++){
+			for (int b = 0; b < sCount; b++) {
 				if (strcmp(data[a].staffID, staffFilter[b]->stfID) == 0)
 				{
 					found = 1;
@@ -453,7 +473,7 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 		if (isSet[5])
 		{
 			int found = 0;
-			for (int b = 0;b < uCount; b++)
+			for (int b = 0; b < uCount; b++)
 			{
 				if (strcmp(data[a].usrID, userFilter[b]->id) == 0)
 				{
@@ -545,10 +565,9 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 	// Filters to be used
 	Date dotFrom, dotTo, bookFrom, bookTo;
 	int timeslot[6] = { 0,0,0,0,0,0 }; // for TimeslotBooked
-	char facilityID[100][100];
-	// char *staffID[100];
+
+	Facility *facFilter[100];
 	Staff *staffFilter[100];
-	// char *userID[100];
 	userData *userFilter[100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
 	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
@@ -578,7 +597,19 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 					}
 				}
 			}
-			if (isSet[3]) break;
+			if (isSet[3])
+			{
+				for (int a = 0; a < fCount; a++)
+				{
+					if (a == 0) {
+						sprintf(statusText[3], "(%s) %s", facFilter[a]->id, facFilter[a]->name);
+					}
+					else
+					{
+						sprintf(statusText[3], "%s, (%s) %s", statusText[3], facFilter[a]->id, facFilter[a]->name);
+					}
+				}
+			}
 			if (isSet[4]) {
 				for (int a = 0; a < sCount; a++)
 				{
@@ -591,7 +622,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 					}
 				}
 			}
-			if (isSet[5]) 
+			if (isSet[5])
 			{
 				//for ()
 				//{
@@ -631,6 +662,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				isSet[2] = dispfilterTimeslotBooked(&timeslot[0]);
 				break;
 			case '4':
+				isSet[3] = dispFilterFacInvolved(facFilter, &fCount);
 				break;
 			case '5':
 				isSet[4] = dispFilterStaffInvovled(staffFilter, &sCount);
@@ -750,11 +782,11 @@ int dispfilterTimeslotBooked(int *timeslot)
 	{
 		return 0;
 	}
-	else 
+	else
 	{
 		return 1;
 	}
-	
+
 }
 
 // return 1 if user filter is updated sucessfully
@@ -770,7 +802,7 @@ int dispFilterUserInvolved(userData **userIDsfilter, int *uCount)
 	int elementRemoved = 0; // keep track if user input wants to remove from filter
 	int usrFound = 0; // keep track of user given username is found
 
-	do{
+	do {
 		elementRemoved = 0;
 		usrFound = 0;
 
@@ -780,7 +812,7 @@ int dispFilterUserInvolved(userData **userIDsfilter, int *uCount)
 			printf("\t%d. %s\n", a + 1, userIDsfilter[a]->name);
 		}
 		printf("\n");
-		
+
 		printf("--> Enter 'X' to comfirm user filters\n");
 		printf("--> Enter 'XXX' to unset user filters\n---> Enter the same username to unset them\n");
 		printf("--> Enter username to add into filter\n>>> ");
@@ -815,7 +847,7 @@ int dispFilterUserInvolved(userData **userIDsfilter, int *uCount)
 						// remove an element in array -> bad idea
 						for (int c = b; c < *uCount - 1; c++)
 						{
-							userIDsfilter[c] = userIDsfilter[c+1];
+							userIDsfilter[c] = userIDsfilter[c + 1];
 						}
 
 						elementRemoved = 1;
@@ -859,7 +891,7 @@ int dispFilterStaffInvovled(Staff **staffIDFilter, int *sCount)
 		printf("Staffs in filter: \n");
 		for (int a = 0; a < *sCount; a++)
 		{
-			printf("\t%d. %s\n", a+1, staffIDFilter[a]->stfName);
+			printf("\t%d. %s\n", a + 1, staffIDFilter[a]->stfName);
 		}
 
 		printf("<!> Enter XXX to unset all staff filters <!>\n");
@@ -873,7 +905,7 @@ int dispFilterStaffInvovled(Staff **staffIDFilter, int *sCount)
 		}
 		if (strcmp(trimwhitespace(staffName), "X") == 0)
 		{
-			if(*sCount > 0)
+			if (*sCount > 0)
 				return 1;
 			else
 				return 0;
@@ -917,6 +949,84 @@ int dispFilterFacInvolved(Facility **facFilter, int *fCount)
 		return 0;
 	}
 
+	printf("Facility Filter:\n");
+	for (int a = 0; a < *fCount; a++)
+	{
+		printf("%d. %s - %s\n", a + 1, facFilter[a]->id, facFilter[a]->name);
+	}
+
+	char userSearchFacility[200];
+	do {
+		printf("<!> Enter 'XXX' to unset filter <!>\n");
+		printf("Enter Facility Name to include in filter: ");
+		s_input(userSearchFacility, 199);
+
+		if (strcmp(userSearchFacility, "XXX") == 0 || strcmp(userSearchFacility, "xxx") == 0)
+		{
+			*fCount = 0;
+			return 0;
+		}
+	
+		int facCount = getFacilityCount(userSearchFacility);
+		if (facCount < 1) // if less than 1 match (no match)
+		{
+			printf("Facility of name \"%s\" is not found.\n", userSearchFacility);
+			system("pause");
+			continue;
+		}
+		for (int a = 0; a < facilityDataCount; a++)
+		{
+			if (strcmp(userSearchFacility, facData[a].name) == 0)
+			{
+
+				if (facCount > 1)
+				{
+					printf("There are more than 1 %s.\n\n", facData[a].name);
+					Facility *facList[100];
+					int tmp = 0;
+					for (int b = 0; b < facilityDataCount; b++)
+					{
+						if (strcmp(facData[b].name, userSearchFacility) == 0)
+						{
+							printf("\t%s - %s\n", facData[b].id, facData[b].name);
+							facList[tmp++] = &facData[b];
+						}
+					}
+					do {
+						printf("\nEnter 'a' to include all in filter, Enter facility ID to only choose one of them\n");
+						printf("Do you wish to include all in filter or only one of them ? ");
+						char specificFacilityID[30];
+						s_input(specificFacilityID, 29);
+						strcpy(specificFacilityID, trimwhitespace(specificFacilityID)); // get trimmed input
+						if (strcmp(specificFacilityID, "a") == 0)
+						{
+							for (int b = 0; b < tmp; b++)
+							{
+								facFilter[(*fCount)++] = facList[b];
+							}
+							return 1;
+						}
+						for (int b = 0; b < tmp; b++)
+						{
+							if (strcmp(specificFacilityID, facList[b]->id) == 0)
+							{
+								facFilter[(*fCount)++] = facList[b];
+								return 1;
+							}
+						}
+						// if user entered something thats not from the list
+						printf("Invalid Facility ID\n");
+						system("pause");
+					} while (1);
+				}
+				else if (facCount == 1) // if theres only 1 match
+				{
+					facFilter[(*fCount)++] = &facData[a];
+					return 1;
+				}
+			}
+		}
+	} while (1);
 }
 
 // print booking details based on bookingID
@@ -1210,7 +1320,7 @@ int bipChangeFacility(char *userPickedfacilityID)
 		system("pause");
 		return 0;
 	}
-	do{
+	do {
 		printf("Select one of the following facilities: \n");
 		/*
 		Insert code to get all facilities
@@ -1233,13 +1343,13 @@ int bipChangeFacility(char *userPickedfacilityID)
 				continueLoop = 0;
 				continue;
 			}
-			facList[idxNumbering-1] = &facData[a];
+			facList[idxNumbering - 1] = &facData[a];
 			printf("\t%d. %s\n", idxNumbering++, facData[a].name);
 		}
-		printf("\nSelect Facility you wish to book(%d-%d): ", 1, idxNumbering-1);
+		printf("\nSelect Facility you wish to book(%d-%d): ", 1, idxNumbering - 1);
 		if (i_input(&userChoice)) // if user entered integer
 		{
-			if (userChoice > 0 && userChoice <= idxNumbering-1) // if user input is within range
+			if (userChoice > 0 && userChoice <= idxNumbering - 1) // if user input is within range
 				break;
 		}
 		printf("\n<!> ERR: Invalid Choice. <!>\n");
@@ -1312,7 +1422,7 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 	err = 0;
 	// because there can be different free time slots for different facilty
 	// refer to checkOverallTimeslotsAvailablity() call in this function
-	findNextFreeFacID(getFacilityByID(facilityID)->name, facilityID, bookingDate, *userPickedtimeslot); 
+	findNextFreeFacID(getFacilityByID(facilityID)->name, facilityID, bookingDate, *userPickedtimeslot);
 	return 1;
 }
 
@@ -1324,7 +1434,7 @@ void readDataFromOtherModules()
 	FILE *f = fopen(UserInfoFilePath, "rb");
 	if (chkFileExist(f))
 	{
-		while (fread(&usrData[usrDataCount], sizeof(userData), 1, f) != 0) 
+		while (fread(&usrData[usrDataCount], sizeof(userData), 1, f) != 0)
 		{
 			usrDataCount++;
 		}
@@ -1333,7 +1443,7 @@ void readDataFromOtherModules()
 	f = fopen(staffFilePath, "rb");
 	if (chkFileExist(f))
 	{
-		while (fread(&staffData[staffDataCount], sizeof(Staff), 1, f) != 0) 
+		while (fread(&staffData[staffDataCount], sizeof(Staff), 1, f) != 0)
 		{
 			staffDataCount++;
 		}
@@ -1426,7 +1536,7 @@ int _usrLogin(char *usrID, int size)
 		return 0;
 	}
 
-	do 
+	do
 	{
 		printf("===============\n");
 		printf("| User Login |\n");
@@ -1493,6 +1603,20 @@ int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookin
 		}
 	}
 	return 0;
+}
+
+// Get amount of facility of specific name
+int getFacilityCount(char facilityName[])
+{
+	int c = 0;
+	for (int a = 0; a < facilityDataCount; a++)
+	{
+		if (strcmp(facilityName, facData[a].name) == 0)
+		{
+			c++;
+		}
+	}
+	return c;
 }
 
 // ============================================================================================
