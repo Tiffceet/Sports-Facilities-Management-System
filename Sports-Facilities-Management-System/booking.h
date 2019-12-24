@@ -44,6 +44,7 @@ int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo);
 int dispfilterTimeslotBooked(int *timeslot);
 int dispFilterUserInvolved(userData **userIDsfilter, int *uCount);
 int dispFilterStaffInvovled(Staff **staffIDFilter, int *sCount);
+int dispFilterFacInvolved(Facility **facFilter, int *fCount);
 void printBookingDetails(char *bookingID, BookingData *data, int dataSize);
 
 // Util Functions & Sub Functions
