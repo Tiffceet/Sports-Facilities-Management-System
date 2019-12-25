@@ -41,9 +41,10 @@ void bookingMain()
 
 	/*BookingData data[100];
 	readBookingDataIntoStructArray(&data[0], 99);*/
+
 	// initialise error code for input validation use
 	err = 0;
-
+	sessionStaffID[0] = '\0';
 	// prompt staff login
 	if (!_staffLogin(sessionStaffID, 99))
 	{
@@ -61,39 +62,36 @@ int bookingMenu()
 {
 	char choiceText[][100] = { "Book", "Search Records", "Modify records", "Display all bookings", "Log Out (Return to console)" };
 	int choice = globalMainMenu("Booking Module", 5, choiceText);
-	switch (choice)
+	if (choice > 0 && choice < 6)
+	{
+		mode = 'u'; // set userMode
+	}
+	if (choice < 0 && choice > -6)
+	{
+		mode = 's'; // set staffMode
+	}
+	switch (choice) // calling math.abs might be a better workaround
 	{
 	case 1:
-		bookingBook();
-		break;
-	case 2:
-		bookingSearchRecords(0, NULL, NULL); // null because i dont want raw records only
-		break;
-	case 3:
-		bookingModifyRecords();
-		break;
-	case 4:
-		bookingDisplayAll();
-		break;
-	case 5:
-		sessionStaffID[0] = '\0';
-		return 0;
-	// ctrl+enter input
 	case -1:
 		bookingBook();
 		break;
+	case 2:
 	case -2:
 		bookingSearchRecords(0, NULL, NULL); // null because i dont want raw records only
 		break;
+	case 3:
 	case -3:
 		bookingModifyRecords();
 		break;
+	case 4:
 	case -4:
 		bookingDisplayAll();
 		break;
+	case 5:
 	case -5:
 		sessionStaffID[0] = '\0';
-		return 0;		
+		return 0;
 	default:
 		return 1;
 	}
@@ -128,12 +126,20 @@ void bookingBook()
 		}
 	}
 
-	char loginUserID[100];
-
-	printf("Only registered user are allowed to make booking.\n");
-	if (!_usrLogin(loginUserID, 99))
+	char loginUserID[100] = "null";
+	if (mode == 'u') {
+		printf("Only registered user are allowed to make booking.\n");
+		if (!_usrLogin(loginUserID, 99))
+		{
+			return;
+		}
+	}
+	else if (mode == 's')
 	{
-		return;
+		if (!_staffPWReauth())
+		{
+			return;
+		}
 	}
 
 	char userPickedfacilityID[100];
@@ -292,12 +298,36 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 	int filteredDataCount;
 	int count = readBookingDataIntoStructArray(&data[0], 100);
 
+	// logins
+	char userID[100];
+	userID[0] = '\0';
+	if (mode == 'u') // user mode
+	{
+		if (!_usrLogin(userID, 100))
+		{
+			return;
+		}
+		userFilter[0] = getUserDataByID(userID);
+		uCount = 1;
+	}
+	else if (mode == 's') // staff mode
+	{
+		if (!_staffPWReauth())
+		{
+			return;
+		}
+	}
+
 	// inputs variable
 	char choice[10];
 	int userPickedDataToViewIDX = -1;
 
 	// Variables for sub menu
 	int isSet[6] = { 0,0,0,0,0,0 };
+	if (mode == 'u') // if it is on user mode, there should be exactly one entry in user filter
+	{
+		isSet[5] = 1;
+	}
 
 	do {
 		char statusText[6][100] = { "","","" ,"" ,"" ,"" };
@@ -306,14 +336,12 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 		if (isSet[1]) sprintf(statusText[1], "%02d/%02d/%04d - %02d/%02d/%04d", bookFrom.d, bookFrom.m, bookFrom.y, bookTo.d, bookTo.m, bookTo.y);
 		if (isSet[2])
 		{
-			int firstTime = 1;
 			for (int a = 0; a < 6; a++)
 			{
 				if (timeslot[a])
 				{
-					if (firstTime) {
+					if (getTimeslotArrayCount(timeslot) < 2) {
 						sprintf(statusText[2], "%s", TIMESLOTS[a]);
-						firstTime = 0;
 					}
 					else
 					{
@@ -409,7 +437,15 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 			isSet[4] = dispFilterStaffInvovled(staffFilter, &sCount);
 			break;
 		case '6':
-			isSet[5] = dispFilterUserInvolved(userFilter, &uCount);
+			if (mode == 's')
+			{
+				isSet[5] = dispFilterUserInvolved(userFilter, &uCount);
+			}
+			else
+			{
+				printf("User are not authorised to search bookings of other user.\n");
+				system("pause");
+			}
 			break;
 		case '7':
 			return;
@@ -573,14 +609,31 @@ void bookingModifyRecords()
 		// just print all data without filters
 		// i didnt use displayAll because i need the numbering infront so user can choose
 		int isSet[6] = { 0,0,0,0,0,0 };
-		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+		// logins
+		char userID[100];
+		userData *userFilter[2];
+		userID[0] = '\0';
+		if (mode == 'u') // user mode
+		{
+			if (!_usrLogin(userID, 100))
+			{
+				return;
+			}
+			userFilter[0] = getUserDataByID(userID);
+			isSet[5] = 1;
+		}
+		else if (mode == 's')
+		{
+			_staffPWReauth();
+		}
+		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, userFilter, 1, NULL, NULL);
 	}
 
 	if (filteredDataCount > 0)
 	{
 		int r; // to keep track of i_input() return val
 		do {
-			printf("<!> Enter '0' to return to menu <!>");
+			printf("<!> Enter '0' to return to menu <!>\n");
 			printf("Select records to modify (%d-%d) ", 1, filteredDataCount);
 			r = i_input(&userPickedIDX);
 			if (r)
@@ -592,6 +645,11 @@ void bookingModifyRecords()
 			}
 		} while (!r && userPickedIDX < 1 || userPickedIDX > filteredDataCount);
 		modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
+	}
+	else
+	{
+		printf("No records was found...\n");
+		system("pause");
 	}
 
 }
@@ -723,47 +781,79 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 void bookingDisplayAll()
 {
 	BookingData data[100];
+	BookingData *dataToPrint[100];
+	char userID[100];
 	int count = readBookingDataIntoStructArray(&data[0], 100);
+	int dataToPrintCount = 0;
 	if (count == 0)
 	{
 		printf("\n<!> ERR: No records found. <!>\n");
 		system("pause");
 		return;
 	}
+	if (mode == 's')
+	{
+		if (!_staffPWReauth())
+		{
+			return;
+		}
+		for (int a = 0; a < count; a++)
+		{
+			dataToPrint[a] = &data[a];
+		}
+	}
+	else if (mode == 'u')
+	{
+		if (!_usrLogin(userID, 100))
+		{
+			return;
+		}
+		for (int a = 0; a < count; a++)
+		{
+			if (strcmp(data[a].usrID, userID) == 0)
+			{
+				dataToPrint[dataToPrintCount++] = &data[a];
+			}
+		}
+	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "|                                               Booking Transactions                                                 |");
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "| DateofTransaction BookingID BookingDate TimeslotBooked FacilityBooked                 Booked by    Registered by   |");
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
-	for (int a = 0; a < count; a++)
+	for (int a = 0; a < dataToPrintCount; a++)
 	{
 		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
-			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
-			data[a].bookingID,
-			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
-			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
+			dataToPrint[a]->currentDate.d, dataToPrint[a]->currentDate.m, dataToPrint[a]->currentDate.y, dataToPrint[a]->currentTime.h, dataToPrint[a]->currentTime.m,
+			dataToPrint[a]->bookingID,
+			dataToPrint[a]->bookingDate.d, dataToPrint[a]->bookingDate.m, dataToPrint[a]->bookingDate.y,
+			TIMESLOTS[getTimeslotBooked(dataToPrint[a]->timeSlotsBooked)],
 			// data[a].facilityID,
-			getFacilityByID(data[a].facilityID)->name,
+			getFacilityByID(dataToPrint[a]->facilityID)->name,
 			//data[a].usrID,
-			getUserDataByID(data[a].usrID)->name,
+			getUserDataByID(dataToPrint[a]->usrID)->name,
 			//data[a].staffID);
-			getStaffDataByID(data[a].staffID)->stfName);
+			getStaffDataByID(dataToPrint[a]->staffID)->stfName);
 	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "======================================================================================================================");
-	printf("\n%d record(s) found. \n", count);
+	printf("\n%d record(s) found. \n", dataToPrintCount);
 
 	char filterChoice[10];
 	printf("\nDo you wish to add filters ? (Y = yes, other to return to menu) ");
 	getUserMenuChoice(filterChoice, 9, "Do you wish to add filters ? (Y = yes, other to return to menu) ");
+	// Overwrite filteredData into data to simplify bookingDisplayFilter() call
 	if (tolower(filterChoice[0]) == 'y')
 	{
-		bookingDisplayFilters(&data[0], count);
+		if (mode == 's')
+			bookingDisplayFilters(data, count, NULL);
+		else if (mode == 'u')
+			bookingDisplayFilters(data, count, userID);
 	}
-
 }
 
-void bookingDisplayFilters(BookingData *data, int dataCount)
+// userID is given if system is running in user mode
+void bookingDisplayFilters(BookingData *data, int dataCount, char userID[])
 {
 	BookingData *filteredData[100];
 	int filteredDataCount;
@@ -777,7 +867,14 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 	Staff *staffFilter[100];
 	userData *userFilter[100];
 	int fCount = 0, sCount = 0, uCount = 0; // to keep track of how many entries need to be selected
-	int isSet[] = { 0,0,0 ,0 ,0 ,0 }; // to keep track of what filters are set
+	int isSet[] = { 0,0,0,0,0,0 }; // to keep track of what filters are set
+
+	if (mode == 'u') // if it is on user mode, there should be exactly one entry in user filter
+	{
+		isSet[5] = 1;
+	}
+	userFilter[0] = getUserDataByID(userID);
+	uCount = 1;
 
 	char filterChoice[10];
 	int recordsCount = 0; // to keep track of how many records is printed
@@ -794,7 +891,7 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				{
 					if (timeslot[a])
 					{
-						if (a == 0) {
+						if (getTimeslotArrayCount(timeslot) < 2) {
 							sprintf(statusText[2], "%s", TIMESLOTS[a]);
 						}
 						else
@@ -875,7 +972,15 @@ void bookingDisplayFilters(BookingData *data, int dataCount)
 				isSet[4] = dispFilterStaffInvovled(staffFilter, &sCount);
 				break;
 			case '6':
-				isSet[5] = dispFilterUserInvolved(userFilter, &uCount);
+				if (mode == 's')
+				{
+					isSet[5] = dispFilterUserInvolved(userFilter, &uCount);
+				}
+				else
+				{
+					printf("User are not authorised to search bookings of other user.\n");
+					system("pause");
+				}
 				break;
 			case '7':
 				return;
@@ -1264,9 +1369,10 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	userData *usr = getUserDataByID(bData->usrID);
 	if (usr == NULL)
 	{
-		printf("User of ID \"%s\" was not found.\n", bData->usrID);
-		system("pause");
-		return;
+		/*printf("User of ID \"%s\" was not found.\n", bData->usrID);
+		system("pause");*/
+		userData nullUser = { "null", "null",-1,-1,-1,-1,-1,-1,"null" ,"null" ,"null" };
+		usr = &nullUser;
 	}
 	Facility *fac = getFacilityByID(bData->facilityID);
 	if (fac == NULL)
@@ -1504,6 +1610,18 @@ int getTimeslotBooked(int *timeslot)
 		}
 	}
 	return -1;
+}
+
+// get how many 1s are there in timeslot array
+int getTimeslotArrayCount(int*timeslot)
+{
+	int count = 0;
+	for (int a = 0; a < 6; a++)
+	{
+		if(timeslot[a])
+			count++;
+	}
+	return count;
 }
 // ============================================================================================
 // ============================================================================================
@@ -1769,15 +1887,42 @@ int _usrLogin(char *usrID, int size)
 		collectCensoredInput(pw, 99);
 		if (strcmp(pw, usr->password) == 0)
 		{
-			printf("\nUser Login Successful.\n");
+			printf("User Login Successful.\n");
 			return 1;
 		}
 		else {
-			printf("\nInvalid password.\n");
+			printf("Invalid password.\n");
 		}
 	} while (1);
 }
 
+// Reauthetication of staff
+// Return 1 is everything works
+// Return 0 if user wish to return to previous screen as always
+int _staffPWReauth()
+{
+	if (strlen(sessionStaffID) < 0)
+	{
+		printf("_staffPWReauth() call before sessionStaffID definition.\n");
+		system("pause");
+		return 0;
+	}
+	printf("<!> ENTER 'XXX' to return to previous screen <!>\n");
+	printf("Please re-enter staff password: ");
+	char pw[300];
+	collectCensoredInput(pw, 300);
+	if (strcmp(pw, "XXX") == 0 || strcmp(pw, "xxx") == 0)
+	{
+		return 0;
+	}
+	if (strcmp(getStaffDataByID(sessionStaffID)->stfPassW, pw) != 0)
+	{
+		printf("Wrong password !\n");
+		system("pause");
+		return 0; // return immediately because its bad to allow user to continue inputs
+	}
+	return 1;
+}
 
 // ============================================================================================
 // ============================================================================================

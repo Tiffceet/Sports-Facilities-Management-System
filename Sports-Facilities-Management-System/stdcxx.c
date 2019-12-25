@@ -298,6 +298,7 @@ void collectCensoredInput(char* str, int size)
 		if (buf == 13) // if enter key pressed
 		{
 			str[idx] = '\0';
+			printf("\n");
 			return;
 		}
 		

@@ -28,6 +28,8 @@ int usrDataCount;
 Facility facData[100];
 int facilityDataCount;
 
+char mode; // to keep track of what mode are the system in. 'u' if usermode, 's' if staffmode
+
 // Main functions
 void bookingMain();
 int bookingMenu();
@@ -38,7 +40,7 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot, Staff **staffFilter, int sCount, userData **userFilter, int uCount, Facility **facFilter, int fCount);
 void bookingModifyRecords();
 void bookingDisplayAll();
-void bookingDisplayFilters(BookingData *data, int dataCount);
+void bookingDisplayFilters(BookingData *data, int dataCount, char userID[]);
 int dispfilterDOT(int *isSet, Date *dotFrom, Date *dotTo);
 int dispfilterBookingDate(Date *bookingDateFrom, Date *bookingDateTo);
 int dispfilterTimeslotBooked(int *timeslot);
@@ -54,6 +56,7 @@ void incrementBookingID(char *oldStaffID);
 int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
 int checkOverallTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityName);
 int getTimeslotBooked(int *timeslot);
+int getTimeslotArrayCount(int *timeslot);
 
 // Functions for BIP (Book-In-Progress)
 int bipChangeFacility(char *userPickedfacilityID);
@@ -67,8 +70,8 @@ userData* getUserDataByID(char *id);
 Facility* getFacilityByID(char *id);
 
 // login functions
-int _staffLogin(char *staffID, int size);
 int _usrLogin(char *usrID, int size);
+int _staffPWReauth();
 
 // functions to deal with facility module
 int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX);
