@@ -42,6 +42,4 @@ Facility* getFacilityID(char* id);
 userData* getUserID(char* id);
 
 int err;
-// variable for filepath
-char fusageFilePath[1024];
 #endif

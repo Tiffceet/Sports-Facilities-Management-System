@@ -20,6 +20,7 @@ char staffFilePath[1024];
 char bookingFilePath[1024];
 char UserInfoFilePath[1024];
 char facilityFilePath[1024];
+char fUsageFilePath[1024];
 char sessionStaffID[100]; // to keep track of what staff is being log on
 typedef struct
 {

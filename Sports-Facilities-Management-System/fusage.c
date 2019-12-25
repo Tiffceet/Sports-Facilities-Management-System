@@ -23,7 +23,7 @@ void fusagemain()
 void fUsageRecord()
 {
 	totalRecord = 0;
-	FILE* f = fopen("facilityusage.txt", "r");
+	FILE* f = fopen(fUsageFilePath, "r");
 	if (!chkFileExist(f))
 	{
 		printf("There is currently no Facilities Usage Record in the system.\n");
@@ -56,7 +56,7 @@ void fUsageAddRecord()
 	Date currentDate;
 	getSystemDate(&currentDate);
 	
-	FILE* f = fopen("facilityusage.txt", "a");
+	FILE* f = fopen(fUsageFilePath, "a");
 	if (f == NULL)
 	{
 		printf("There are currently no Facilities Usage Record in system !!!\n");
@@ -377,7 +377,7 @@ void fUsageSearchRecord()
 	int count = 0;
 	int dateErr = 0;
 
-	FILE* f = fopen("facilityusage.txt", "r");
+	FILE* f = fopen(fUsageFilePath, "r");
 	if (!chkFileExist(f))
 	{
 		printf("There are currently no Facilities Usage Record in system !!!\n");
@@ -584,7 +584,7 @@ void fUsageModify()
 	int i = 0;
 	totalRecord = 0;
 
-	FILE* f = fopen("facilityusage.txt", "r");
+	FILE* f = fopen(fUsageFilePath, "r");
 	if (f == NULL)
 	{
 		printf("There are currently no Facilities Usage Record in system !!!\n");
@@ -732,7 +732,7 @@ void fUsageModify()
 		strcpy(fUsage[totalRecord].usageType, modifyFUsage.usageType);
 		fclose(f);
 
-		FILE* f2 = fopen("facilityusage.txt", "w");
+		FILE* f2 = fopen(fUsageFilePath, "w");
 		if (choice == 2)
 		{
 			fprintf(f2, "%02d/%02d/%d|%s|%s|%s|%s\n",
@@ -759,7 +759,7 @@ void fUsageDisplay()
 	FacilityUsage displayUsage;
 
 	int countRcd = 0;
-	FILE* f = fopen("facilityusage.txt", "r");
+	FILE* f = fopen(fUsageFilePath, "r");
 	if (!chkFileExist(f))
 	{
 		printf("There are currently no Facilities Usage Record in system !!!\n");
