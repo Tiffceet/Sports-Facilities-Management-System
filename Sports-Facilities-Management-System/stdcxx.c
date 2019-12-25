@@ -180,6 +180,10 @@ int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
 		{
 			return curPos;
 		}
+		if (input1 == 10) // if ctrl+enter is pressed
+		{
+			return (int)('a') - 1 + curPos;
+		}
 		if (input1 == 224) // if arrow key is pressed
 		{
 			input2 = _getch();

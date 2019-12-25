@@ -44,11 +44,11 @@ void bookingMain()
 	// initialise error code for input validation use
 	err = 0;
 
-	//// prompt staff login
-	//if (!_staffLogin(sessionStaffID, 99))
-	//{
-	//	return;
-	//}
+	// prompt staff login
+	if (!_staffLogin(sessionStaffID, 99))
+	{
+		return;
+	}
 	strcpy(sessionStaffID, "Looz");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
@@ -64,7 +64,7 @@ int bookingMenu()
 	switch (choice)
 	{
 	case 1:
-		bookingBook(); // add do while loop to ask user if want to book mores
+		bookingBook();
 		break;
 	case 2:
 		bookingSearchRecords(0, NULL, NULL); // null because i dont want raw records only
@@ -78,6 +78,22 @@ int bookingMenu()
 	case 5:
 		sessionStaffID[0] = '\0';
 		return 0;
+	// ctrl+enter input
+	case 'a':
+		bookingBook();
+		break;
+	case 'b':
+		bookingSearchRecords(0, NULL, NULL); // null because i dont want raw records only
+		break;
+	case 'c':
+		bookingModifyRecords();
+		break;
+	case 'd':
+		bookingDisplayAll();
+		break;
+	case 'e':
+		sessionStaffID[0] = '\0';
+		return 0;		
 	default:
 		return 1;
 	}
