@@ -43,6 +43,8 @@ void init();
 int _staffLogin(char *staffID, int size);
 
 // Function for every module's main menu
+// return user selection
+// if user ctrl+enter, it will return negative value of the selection
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100]);
 
 // ===================================================================================================

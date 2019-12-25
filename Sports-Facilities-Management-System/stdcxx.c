@@ -182,7 +182,7 @@ int globalMainMenu(char* title, int choiceCount, char choiceText[][100])
 		}
 		if (input1 == 10) // if ctrl+enter is pressed
 		{
-			return (int)('a') - 1 + curPos;
+			return -curPos;
 		}
 		if (input1 == 224) // if arrow key is pressed
 		{

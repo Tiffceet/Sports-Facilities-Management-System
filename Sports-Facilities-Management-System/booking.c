@@ -79,19 +79,19 @@ int bookingMenu()
 		sessionStaffID[0] = '\0';
 		return 0;
 	// ctrl+enter input
-	case 'a':
+	case -1:
 		bookingBook();
 		break;
-	case 'b':
+	case -2:
 		bookingSearchRecords(0, NULL, NULL); // null because i dont want raw records only
 		break;
-	case 'c':
+	case -3:
 		bookingModifyRecords();
 		break;
-	case 'd':
+	case -4:
 		bookingDisplayAll();
 		break;
-	case 'e':
+	case -5:
 		sessionStaffID[0] = '\0';
 		return 0;		
 	default:
