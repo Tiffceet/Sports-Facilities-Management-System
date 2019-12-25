@@ -6,12 +6,13 @@
 #include "userinfo.h"
 
 char timeSlots[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
+int totalRecord;
+BookingData bData[100];
 
 void fusagemain()
 {
 	if (staffLogin())
-	{
-		fUsageRecord();
+	{fUsageRecord();
 		while (fUsageMenu())
 		{
 			continue;
@@ -19,26 +20,26 @@ void fusagemain()
 	}
 }
 
-int fUsageRecord()
+void fUsageRecord()
 {
+	totalRecord = 0;
 	FILE* f = fopen("facilityusage.txt", "r");
 	if (!chkFileExist(f))
 	{
-		printf("File of facilityusage.txt cannot open\n");
+		printf("There is currently no Facilities Usage Record in the system.\n");
 		system("pause");
 		return 0;
 	}
-	int count = 0;
 
 	while (fscanf(f, "\n%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
-		&fUsage[count].date.d, &fUsage[count].date.m, &fUsage[count].date.y,
-		fUsage[count].time, fUsage[count].userID, fUsage[count].facilityID, fUsage[count].usageType) != EOF)
+		&fUsage[totalRecord].date.d, &fUsage[totalRecord].date.m, &fUsage[totalRecord].date.y,
+		fUsage[totalRecord].time, fUsage[totalRecord].userID,
+		fUsage[totalRecord].facilityID, fUsage[totalRecord].usageType) != EOF)
 	{
-		count++;
+		totalRecord++;
 	}
-
 	fclose(f);
-	return count;
+	system("pause");
 }
 
 void fUsageAddRecord()
@@ -46,6 +47,7 @@ void fUsageAddRecord()
 	Date chgDate;
 	FacilityUsage addFUsage;
 	
+	int back;
 	char ctn, cfrm, ctnChg;
 	char choice, selection[10], cfrm2;
 	char chgTime[30], chgUserID[6], chgFacilityID[6], chgUsageType[20];
@@ -57,24 +59,31 @@ void fUsageAddRecord()
 	FILE* f = fopen("facilityusage.txt", "a");
 	if (f == NULL)
 	{
-		printf("Cannot open facilityusage.txt !!!\n");
+		printf("There are currently no Facilities Usage Record in system !!!\n");
 		system("pause");
 		return 0;
 	}
-	
 	printf("+====================================+\n");
 	printf("|     Add Facility Usage Record      |\n");
 	printf("+====================================+\n");
+	printf("Enter '0' to EXIT (Other to Continue) >> ");
+	rewind(stdin);
+	scanf("%d", &back);
+	rewind(stdin);
+	if (back == 0)
+	{
+		return;
+	}
 	do
 	{
 		date(&addFUsage.date);
 		
-		chkTime(addFUsage.time);
+		chkTime(&addFUsage.time);
 		i = strtol(addFUsage.time, NULL, 10) - 1;
 	
-		slctFacilityID(addFUsage.facilityID);
+		slctFacilityID(&addFUsage.facilityID);
 		//chkAvailableAdd(&addFUsage.date, &addFUsage.time, addFUsage.facilityID);
-		getUserID(addFUsage.userID);
+		slctUserID(&addFUsage.userID);
 
 		printf("Enter Usage Type (walked-in / booked) : ");
 		rewind(stdin);
@@ -189,7 +198,7 @@ void fUsageAddRecord()
 					}
 					break;
 				case'2':
-					chkTime(addFUsage.time);
+					chkTime(&addFUsage.time);
 					i = strtol(addFUsage.time, NULL, 10) - 1;
 					printf("\n===================\n");
 					printf("Detail After Change\n");
@@ -222,7 +231,7 @@ void fUsageAddRecord()
 					}
 					break;
 				case'3':
-					getUserID(chgUserID);
+					slctUserID(&chgUserID);
 					i = strtol(addFUsage.time, NULL, 10) - 1;
 					printf("\n===================\n");
 					printf("Detail After Change\n");
@@ -255,7 +264,7 @@ void fUsageAddRecord()
 					}
 					break;
 				case'4':
-					slctFacilityID(chgFacilityID);
+					slctFacilityID(&chgFacilityID);
 					i = strtol(addFUsage.time, NULL, 10) - 1;
 					printf("\n===================\n");
 					printf("Detail After Change\n");
@@ -357,10 +366,7 @@ void fUsageSearchRecord()
 {
 	Date currentDate;
 	getSystemDate(&currentDate);
-
-	int totalRecord;
-	totalRecord = fUsageRecord();
-	char ctn;
+	FacilityUsage searchFUsage;
 	int day, month, year;
 	char userID[30];
 	char time[30];
@@ -368,11 +374,13 @@ void fUsageSearchRecord()
 	char usageType[30];
 	char choice[10];
 	int r, i;
+	int count = 0;
+	int dateErr = 0;
 
 	FILE* f = fopen("facilityusage.txt", "r");
 	if (!chkFileExist(f))
 	{
-		printf("File of facilityusage.txt cannot open\n");
+		printf("There are currently no Facilities Usage Record in system !!!\n");
 		system("pause");
 		return 0;
 	}
@@ -380,332 +388,370 @@ void fUsageSearchRecord()
 	printf("+=======================================+\n");
 	printf("|     Search Facility Usage Record      |\n");
 	printf("+=======================================+\n");
-	do {
-		int dateErr = 0;
 
-		printf("Search By :\n");
-		printf("+=====================+\n");
-		printf("| 1. Date             |\n");
-		printf("| 2. Time             |\n");
-		printf("| 3. User ID          |\n");
-		printf("| 4. Facility ID      |\n");
-		printf("| 5. Usage Type       |\n");
-		printf("+=====================+\n");
-		printf("Enter detail to search (1-5) : ");
-		getUserMenuChoice(choice, 9, "Invalid Input !!!\nEnter detail to search (1-5) : ");
-		while (choice[0] < '1' || choice[0] > '5')
+	printf("Search By :\n");
+	printf("+=====================+\n");
+	printf("| 1. Date             |\n");
+	printf("| 2. Time             |\n");
+	printf("| 3. User ID          |\n");
+	printf("| 4. Facility ID      |\n");
+	printf("| 5. Usage Type       |\n");
+	printf("+=====================+\n");
+	printf("Enter '0' to EXIT.\n");
+	printf("Enter detail to search (1-5) : ");
+	getUserMenuChoice(choice, 9, "Invalid Input !!!\nEnter detail to search (1-5) : ");
+	if (strcmp(choice, "0") == 0)
+	{
+		return;
+	}
+	while (choice[0] < '1' || choice[0] > '5')
+	{
+		printf("Invalid Input !!!\n");
+		printf("Enter Details to Change (1-5): ");
+		getUserMenuChoice(choice, 9, "Invalid Input !!!\nEnter Details to change (1-5): ");
+	}
+	switch (choice[0])
+	{
+	case'1':
+		do {
+			if (dateErr)
+			{
+				printf("Invalid Date, try again !!!\n");
+			}
+			dateErr = 1;
+			printf("Enter Date < DD/MM/YYYY > : ");
+			rewind(stdin);
+			r = scanf("%d/%d/%d", &day, &month, &year);
+			rewind(stdin);
+		} while (r != 3 || !validateDate(day, month, year) ||
+			compareDate(day, month, year, currentDate.d, currentDate.m, currentDate.y) != 1);
+		err = 0;
+
+		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+		printf("====\t\t====\t\t=======\t\t===========\t==========\n");
+		while (fscanf(f, "%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+			&searchFUsage.date.d, &searchFUsage.date.m, &searchFUsage.date.y,
+			searchFUsage.time, searchFUsage.userID, searchFUsage.facilityID, searchFUsage.usageType) != EOF)
+		{
+			if (searchFUsage.date.d == day && searchFUsage.date.m == month && searchFUsage.date.y == year)
+			{
+				printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", searchFUsage.date.d, searchFUsage.date.m,
+					searchFUsage.date.y, searchFUsage.time, searchFUsage.userID,
+					searchFUsage.facilityID, searchFUsage.usageType);
+				count++;
+			}
+		}
+		if (count != 0)
+		{
+			printf("\n<*! Total %d record founded on this DATE !*>\n", count);
+		}
+		if (count == 0)
+		{
+			printf("<*! No record founded on this DATE !*>\n");
+		}
+		break;
+	case'2':
+		chkTime(time);
+		int a = strtol(time, NULL, 10) - 1;
+		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+		printf("====\t\t====\t\t=======\t\t===========\t==========\n");
+		while (fscanf(f, "%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+			&searchFUsage.date.d, &searchFUsage.date.m, &searchFUsage.date.y,
+			searchFUsage.time, searchFUsage.userID, searchFUsage.facilityID, searchFUsage.usageType) != EOF)
+		{
+			if (strcmp(searchFUsage.time, timeSlots[a]) == 0)
+			{
+				printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", searchFUsage.date.d, searchFUsage.date.m,
+					searchFUsage.date.y, searchFUsage.time, searchFUsage.userID,
+					searchFUsage.facilityID, searchFUsage.usageType);
+				count++;
+			}
+		}
+		if (count != 0)
+		{
+			printf("\n<*! Total %d record founded on this TIME !*>\n", count);
+		}
+		if (count == 0)
+		{
+			printf("<*! No record founded on this TIME !*>\n");
+		}
+		break;
+	case'3':
+		slctUserID(&userID);
+		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+		printf("====\t\t====\t\t=======\t\t===========\t==========\n");
+		while (fscanf(f, "%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+			&searchFUsage.date.d, &searchFUsage.date.m, &searchFUsage.date.y,
+			searchFUsage.time, searchFUsage.userID, searchFUsage.facilityID, searchFUsage.usageType) != EOF)
+		{
+			if (strcmp(searchFUsage.userID, userID) == 0)
+			{
+				count++;
+				printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", searchFUsage.date.d, searchFUsage.date.m,
+					searchFUsage.date.y, searchFUsage.time, searchFUsage.userID,
+					searchFUsage.facilityID, searchFUsage.usageType);
+			}
+		}
+		if (count == 0)
+		{
+			printf("No record founded on this User ID.\n");
+		}
+		if (count != 0)
+		{
+			printf("\n<*! Total %d record founded on this User ID !*>\n", count);
+		}
+		break;
+	case'4':
+		slctFacilityID(facilityID);
+		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+		printf("====\t\t====\t\t=======\t\t===========\t==========\n");
+		while (fscanf(f, "%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+			&searchFUsage.date.d, &searchFUsage.date.m, &searchFUsage.date.y,
+			searchFUsage.time, searchFUsage.userID, searchFUsage.facilityID, searchFUsage.usageType) != EOF)
+		{
+			if (strcmp(searchFUsage.facilityID, facilityID) == 0)
+			{
+				printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", searchFUsage.date.d, searchFUsage.date.m,
+					searchFUsage.date.y, searchFUsage.time, searchFUsage.userID,
+					searchFUsage.facilityID, searchFUsage.usageType);
+				count++;
+			}
+		}
+		if (count != 0)
+		{
+			printf("\n<*! Total %d record founded on this Facility ID !*>\n", count);
+		}
+		if (count == 0)
+		{
+			printf("<*! No record founded on this Facility ID !*>\n");
+		}
+		break;
+	case'5':
+		printf("Enter Usage Type (walked-in / booked) : ");
+		rewind(stdin);
+		scanf("%[^\n]", usageType);
+		rewind(stdin);
+		while (strcmp(usageType, "walked-in") != 0 && strcmp(usageType, "booked") != 0)
 		{
 			printf("Invalid Input !!!\n");
-			printf("Enter Details to Change (1-5): ");
-			getUserMenuChoice(choice, 9, "Invalid Input !!!\nEnter Details to change (1-5): ");
-		}
-		switch (choice[0])
-		{
-		case'1':
-			do {
-				if (dateErr)
-				{
-					printf("Invalid Date, try again !!!\n");
-				}
-				dateErr = 1;
-				printf("Enter Date < DD/MM/YYYY > : ");
-				rewind(stdin);
-				r = scanf("%d/%d/%d", &day, &month, &year);
-				rewind(stdin);
-			} while (r != 3 || !validateDate(day, month, year) ||
-				compareDate(day, month, year, currentDate.d, currentDate.m, currentDate.y) != 1);
-			err = 0;
-			int count = 0;
-			printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
-			printf("====\t\t====\t\t=======\t\t===========\t==========\n");
-			for (i = 0; i < totalRecord; i++)
-			{
-				if (fUsage[i].date.d == day && fUsage[i].date.m == month && fUsage[i].date.y == year)
-				{
-					printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
-						fUsage[i].date.y, fUsage[i].time, fUsage[i].userID,
-						fUsage[i].facilityID, fUsage[i].usageType);
-					count++;
-				}
-			}
-			if (count != 0)
-			{
-				printf("\n<*! Total %d record founded on this DATE !*>\n", count);
-			}
-			if (count == 0)
-			{
-				printf("<*! No record founded on this DATE !*>\n");
-			}
-			break;
-		case'2':
-			chkTime(time);
-			int a = strtol(time, NULL, 10) - 1;
-			count = 0;
-			printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
-			printf("====\t\t====\t\t=======\t\t===========\t==========\n");
-			for (i = 0; i < totalRecord; i++)
-			{
-				if (strcmp(fUsage[i].time, timeSlots[a]) == 0)
-				{
-					printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
-						fUsage[i].date.y, fUsage[i].time, fUsage[i].userID,
-						fUsage[i].facilityID, fUsage[i].usageType);
-					count++;
-				}
-			}
-			if (count != 0)
-			{
-				printf("\n<*! Total %d record founded on this TIME !*>\n", count);
-			}
-			if (count == 0)
-			{
-				printf("<*! No record founded on this TIME !*>\n");
-			}
-			break;
-		case'3':
-			printf("Enter User ID : ");
-			rewind(stdin);
-			scanf("%[^\n]", userID);
-			rewind(stdin);
-			while (strncmp(userID, "U", 1) != 0 || strlen(userID) != 4 ||
-				!isdigit(userID[1]) || !isdigit(userID[2]) || !isdigit(userID[3]))
-			{
-				printf("Invalid Input !!!\n<!* Example : U001 *!>\n");
-				printf("Enter User ID : ");
-				rewind(stdin);
-				scanf("%[^\n]", userID);
-				rewind(stdin);
-			}
-			i = 0;
-			if (strcmp(fUsage[i].userID, userID) != 0)
-			{
-				printf("This User ID does not EXISTS !!!\n");
-			}
-			for (i = 0; i < totalRecord; i++)
-			{
-				if (strcmp(fUsage[i].userID, userID) == 0)
-				{
-					printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
-					printf("====\t\t====\t\t=======\t\t===========\t==========\n");
-					printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
-						fUsage[i].date.y, fUsage[i].time, fUsage[i].userID,
-						fUsage[i].facilityID, fUsage[i].usageType);
-				}
-			}
-			break;
-		case'4':
-			slctFacilityID(facilityID);
-			count = 0;
-			printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
-			printf("====\t\t====\t\t=======\t\t===========\t==========\n");
-			for (i = 0; i < totalRecord; i++)
-			{
-				if (strcmp(fUsage[i].facilityID, facilityID) == 0)
-				{
-					printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
-						fUsage[i].date.y, fUsage[i].time, fUsage[i].userID,
-						fUsage[i].facilityID, fUsage[i].usageType);
-					count++;
-				}
-			}
-			if (count != 0)
-			{
-				printf("\n<*! Total %d record founded on this Facility ID !*>\n", count);
-			}
-			if (count == 0)
-			{
-				printf("<*! No record founded on this Facility ID !*>\n");
-			}
-			break;
-		case'5':
-			printf("Enter Usage Type (walked-in / booked) : ");
+			printf("Re-enter Usage Type (walked-in / booked) : ");
 			rewind(stdin);
 			scanf("%[^\n]", usageType);
 			rewind(stdin);
-			while (strcmp(usageType, "walked-in") != 0 && strcmp(usageType, "booked") != 0)
-			{
-				printf("Invalid Input !!!\n");
-				printf("Re-enter Usage Type (walked-in / booked) : ");
-				rewind(stdin);
-				scanf("%[^\n]", usageType);
-				rewind(stdin);
-			}
-			count = 0;
-			printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
-			printf("====\t\t====\t\t=======\t\t===========\t==========\n");
-			for (i = 0; i < totalRecord; i++)
-			{
-				if (strcmp(fUsage[i].usageType, usageType) == 0)
-				{
-					printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", fUsage[i].date.d, fUsage[i].date.m,
-						fUsage[i].date.y, fUsage[i].time, fUsage[i].userID,
-						fUsage[i].facilityID, fUsage[i].usageType);
-					count++;
-				}
-			}
-			if (count != 0)
-			{
-				printf("\n<*! Total %d record founded on this Facility UsageType !*>\n", count);
-			}
-			if (count == 0)
-			{
-				printf("<*! No record founded on this Facility UsageType !*>\n");
-			}
-			break;
-		default:
-			return;
 		}
-		printf("\nContinue to search other record ? (Y=Yes/N=No) : ");
-		rewind(stdin);
-		scanf("%c", &ctn);
-		rewind(stdin);
-		while (toupper(ctn) != 'Y' && toupper(ctn) != 'N')
+		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+		printf("====\t\t====\t\t=======\t\t===========\t==========\n");
+		while (fscanf(f, "%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+			&searchFUsage.date.d, &searchFUsage.date.m, &searchFUsage.date.y,
+			searchFUsage.time, searchFUsage.userID, searchFUsage.facilityID, searchFUsage.usageType) != EOF)
 		{
-			printf("Invalid Input !!!\nPlease enter between (Y/N).\n");
-			printf("Continue to search other record ? (Y=Yes/N=No) : ");
-			rewind(stdin);
-			scanf("%c", &ctn);
-			rewind(stdin);
+			if (strcmp(searchFUsage.usageType, usageType) == 0)
+			{
+				printf("%02d/%02d/%-9d %-15s %-15s %-15s %s\n", searchFUsage.date.d, searchFUsage.date.m,
+					searchFUsage.date.y, searchFUsage.time, searchFUsage.userID,
+					searchFUsage.facilityID, searchFUsage.usageType);
+				count++;
+			}
 		}
-	} while (toupper(ctn) == 'Y');
+		if (count != 0)
+		{
+			printf("\n<*! Total %d record founded on this Facility UsageType !*>\n", count);
+		}
+		if (count == 0)
+		{
+			printf("<*! No record founded on this Facility UsageType !*>\n");
+		}
+		break;
+	default:
+		return;
+	}
+
 	fclose(f);
 	system("pause");
 }
 
 void fUsageModify()
 {
-	FacilityUsage modifyUsage;
+	FacilityUsage modifyFUsage;
 	Date currentDate;
 	getSystemDate(&currentDate);
 
-	int totalRecord = fUsageRecord();
-	char uID[6];
-	char selection[10];
+	int selection;
+	int choice;
 	char cfrm;
-	int aftD, aftM, aftY;
-	char aftTime[30], aftFacilityID[20];
-	int dateErr = 0, r;
+	int r = 0;
+	int count = 0;
+	int i = 0;
+	totalRecord = 0;
 
 	FILE* f = fopen("facilityusage.txt", "r");
-	if (!chkFileExist(f))
+	if (f == NULL)
 	{
-		printf("File of facilityusage.txt cannot open\n");
+		printf("There are currently no Facilities Usage Record in system !!!\n");
 		system("pause");
 		return 0;
 	}
+
 	printf("+=======================================+\n");
 	printf("|     Modify Facility Usage Record      |\n");
 	printf("+=======================================+\n");
 
-	printf("Modify by enter User ID : ");
-	rewind(stdin);
-	scanf("%[^\n]", uID);
-	rewind(stdin);
-	while (strncmp(uID, "U", 1) != 0 || strlen(uID) != 4 ||
-		!isdigit(uID[1]) || !isdigit(uID[2]) || !isdigit(uID[3]))
+	printf("No.\tDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
+	printf("===\t====\t\t====\t\t=======\t\t===========\t==========\n");
+
+	while (fscanf(f, "\n%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
+		&fUsage[totalRecord].date.d, &fUsage[totalRecord].date.m, &fUsage[totalRecord].date.y,
+		fUsage[totalRecord].time, fUsage[totalRecord].userID,
+		fUsage[totalRecord].facilityID, fUsage[totalRecord].usageType) != EOF)
 	{
-		printf("Invalid Input !!!\n<!* Example : U001 *!>\n");
-		printf("Enter User ID : ");
+		count++;
+		printf("%-7d %02d/%02d/%-9d %-15s %-15s %-15s %s\n", count,
+			fUsage[totalRecord].date.d, fUsage[totalRecord].date.m, fUsage[totalRecord].date.y,
+			fUsage[totalRecord].time, fUsage[totalRecord].userID,
+			fUsage[totalRecord].facilityID, fUsage[totalRecord].usageType);
+	}
+	
+	modifyFUsage.date.d = fUsage[totalRecord].date.d;
+	modifyFUsage.date.m = fUsage[totalRecord].date.m;
+	modifyFUsage.date.y = fUsage[totalRecord].date.y;
+	strcpy(modifyFUsage.userID, fUsage[totalRecord].userID);
+	strcpy(modifyFUsage.facilityID, fUsage[totalRecord].facilityID);
+	strcpy(modifyFUsage.time, fUsage[totalRecord].time);
+	strcpy(modifyFUsage.usageType, fUsage[totalRecord].usageType);
+	
+	printf("\nEnter '0' to EXIT.\n");
+	printf("Choose No. of record to modify (1 - %d) : ", count);
+	rewind(stdin);
+	scanf("%d", &selection);
+	rewind(stdin);
+	if (selection == 0)
+	{
+		return;
+	}
+	while (selection<1 || selection>count)
+	{
+		printf("Invalid Input !!!\n");
+		printf("Please select between (1 - %d) : ", count);
 		rewind(stdin);
-		scanf("%[^\n]", uID);
+		scanf("%d", &selection);
 		rewind(stdin);
 	}
-	for (int i = 0; i < totalRecord; i++)
+
+	if (selection >= 1 || selection <= count)
 	{
-		while (fscanf(f, "\n%d/%d/%d|%[^|]|%[^|]|%[^|]|%[^\n]\n",
-			&fUsage[i].date.d, &fUsage[i].date.m, &fUsage[i].date.y,
-			fUsage[i].time, fUsage[i].userID, fUsage[i].facilityID, fUsage[i].usageType) != EOF)
+		printf("\nModify :\n");
+		printf("+==================+\n");
+		printf("| 1. Date          |\n");
+		printf("| 2. Time          |\n");
+		printf("| 3. Facility ID   |\n");
+		printf("+==================+\n");
+		printf("Enter your choice (1 - 3) : ");
+		rewind(stdin);
+		scanf("%d", &choice);
+		rewind(stdin);
+		while (choice < 1 || choice > 3)
 		{
-			if (strcmp(uID, fUsage[i].userID) == 0)
-			{
-				printf("\nRecord Before Modify\n");
-				printf("====================\n");
-				printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-					fUsage[i].date.m, fUsage[i].date.y);
-				printf("Time        : %s\n", fUsage[i].time);
-				printf("User ID     : %s\n", fUsage[i].userID);
-				printf("Facility ID : %s\n", fUsage[i].facilityID);
-				printf("Usage Type  : %s\n", fUsage[i].usageType);
-
-				printf("\n+=====================================+\n");
-				printf("|          Details to Modify          |\n");
-				printf("+=====================================+\n");
-				printf("| 1. Date                             |\n");
-				printf("| 2. Time                             |\n");
-				printf("| 3. FacilityID                       |\n");
-				printf("+=====================================+\n");
-				printf("Enter Details to Modify (1-3) : ");
-				getUserMenuChoice(selection, 9, "Invalid Input !!!\nEnter detail to modify (1-3) : ");
-				while (selection[0] < '1' || selection[0] > '3')
-				{
-					printf("Invalid Input !!!\n");
-					printf("Enter Details to modify (1-3): ");
-					getUserMenuChoice(selection, 9, "Invalid Input !!!\nEnter Details to modify (1-3): ");
-				}
-
-				switch (selection[0])
-				{
-				case'1':
-					do {
-						if (dateErr)
-						{
-							printf("Invalid Date, try again !!!\n");
-						}
-						dateErr = 1;
-						printf("Enter Date < DD/MM/YYYY > : ");
-						rewind(stdin);
-						r = scanf("%d/%d/%d", &aftD, &aftM, &aftY);
-						rewind(stdin);
-					} while (r != 3 || !validateDate(aftD, aftM, aftY) ||
-						compareDate(aftD, aftM, aftY, currentDate.d, currentDate.m, currentDate.y) != 1);
-					err = 0;
-					printf("\nRecord After Modify\n");
-					printf("===================\n");
-					printf("Date        : %02d/%02d/%d\n", aftD, aftM, aftY);
-					printf("Time        : %s\n", fUsage[i].time);
-					printf("User ID     : %s\n", fUsage[i].userID);
-					printf("Facility ID : %s\n", fUsage[i].facilityID);
-					printf("Usage Type  : %s\n", fUsage[i].usageType);
-					break;
-
-				case'2':
-					chkTime(aftTime);
-					int b = strtol(aftTime, NULL, 10) - 1;
-					printf("\nRecord After Modify\n");
-					printf("===================\n");
-					printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-						fUsage[i].date.m, fUsage[i].date.y);
-					printf("Time        : %s\n", timeSlots[b]);
-					printf("User ID     : %s\n", fUsage[i].userID);
-					printf("Facility ID : %s\n", fUsage[i].facilityID);
-					printf("Usage Type  : %s\n", fUsage[i].usageType);
-					break;
-
-				case'3':
-					slctFacilityID(aftFacilityID);
-					printf("\nRecord After Modify\n");
-					printf("===================\n");
-					printf("Date        : %02d/%02d/%d\n", fUsage[i].date.d,
-						fUsage[i].date.m, fUsage[i].date.y);
-					printf("Time        : %s\n", fUsage[i].time);
-					printf("User ID     : %s\n", fUsage[i].userID);
-					printf("Facility ID : %s\n", aftFacilityID);
-					printf("Usage Type  : %s\n", fUsage[i].usageType);
-					break;
-
-				default:
-					return;
-				}
-			}
+			printf("Invalid Input !!!\n");
+			printf("Please select between (1 - 3) : ");
+			rewind(stdin);
+			scanf("%d", &choice);
+			rewind(stdin);
+		}
+		switch (choice)
+		{
+		case 1:
+			date(&modifyFUsage.date);
+			break;
+		case 2:
+			chkTime(modifyFUsage.time);
+			i = strtol(modifyFUsage.time, NULL, 10) - 1;
+			break;
+		case 3:
+			slctFacilityID(modifyFUsage.facilityID);
+			break;
+		default:
+			break;
 		}
 	}
-	fclose(f);
+
+	printf("\n+============================+\n");
+	printf("|    Record before Modify    |\n");
+	printf("+============================+\n");
+	printf("Date        : %02d/%02d/%d\n", fUsage[selection - 1].date.d,
+		fUsage[selection - 1].date.m, fUsage[selection - 1].date.y);
+	printf("Time        : %s\n", fUsage[selection - 1].time);
+	printf("User ID     : %s\n", fUsage[selection - 1].userID);
+	printf("Facility ID : %s\n", fUsage[selection - 1].facilityID);
+	printf("Usage Type  : %s\n", fUsage[selection - 1].usageType);
+
+	if (choice == 1 || choice == 3)
+	{
+		printf("\n+============================+\n");
+		printf("|    Record After Modify     |\n");
+		printf("+============================+\n");
+		printf("Date        : %02d/%02d/%d\n", modifyFUsage.date.d,
+			modifyFUsage.date.m, modifyFUsage.date.y);
+		printf("Time        : %s\n", modifyFUsage.time);
+		printf("User ID     : %s\n", modifyFUsage.userID);
+		printf("Facility ID : %s\n", modifyFUsage.facilityID);
+		printf("Usage Type  : %s\n", modifyFUsage.usageType);
+	}
+	if (choice == 2)
+	{
+		printf("\n+============================+\n");
+		printf("|    Record After Modify     |\n");
+		printf("+============================+\n");
+		printf("Date        : %02d/%02d/%d\n", modifyFUsage.date.d,
+			modifyFUsage.date.m, modifyFUsage.date.y);
+		printf("Time        : %s\n", timeSlots[i]);
+		printf("User ID     : %s\n", modifyFUsage.userID);
+		printf("Facility ID : %s\n", modifyFUsage.facilityID);
+		printf("Usage Type  : %s\n", modifyFUsage.usageType);
+	}
+
+	printf("Confirm to modify this Record ? (Y=Yes/N=No) : ");
+	rewind(stdin);
+	scanf("%c", &cfrm);
+	rewind(stdin);
+	while (toupper(cfrm) != 'Y' && toupper(cfrm) != 'N')
+	{
+		printf("Invalid Input !!!\nPlease try again.\n");
+		printf("Confirm to modify Record ? (Y=Yes/N=No) : ");
+		rewind(stdin);
+		scanf("%c", &cfrm);
+		rewind(stdin);
+	}
+	if (toupper(cfrm) == 'Y')
+	{
+		fUsage[totalRecord].date.d = modifyFUsage.date.d;
+		fUsage[totalRecord].date.m = modifyFUsage.date.m;
+		fUsage[totalRecord].date.y = modifyFUsage.date.y;
+		strcpy(fUsage[totalRecord].userID, modifyFUsage.userID);
+		strcpy(fUsage[totalRecord].facilityID, modifyFUsage.facilityID);
+		strcpy(fUsage[totalRecord].time, modifyFUsage.time);
+		strcpy(fUsage[totalRecord].usageType, modifyFUsage.usageType);
+		fclose(f);
+
+		FILE* f2 = fopen("facilityusage.txt", "w");
+		if (choice == 2)
+		{
+			fprintf(f2, "%02d/%02d/%d|%s|%s|%s|%s\n",
+				fUsage[totalRecord].date.d, fUsage[totalRecord].date.m, fUsage[totalRecord].date.y,
+				timeSlots[i], fUsage[totalRecord].userID,
+				fUsage[totalRecord].facilityID, fUsage[totalRecord].usageType);
+		}
+		if (choice == 1 || choice == 3)
+		{
+			fprintf(f2, "%02d/%02d/%d|%s|%s|%s|%s\n",
+				fUsage[totalRecord].date.d, fUsage[totalRecord].date.m, fUsage[totalRecord].date.y,
+				fUsage[totalRecord].time, fUsage[totalRecord].userID,
+				fUsage[totalRecord].facilityID, fUsage[totalRecord].usageType);
+		}
+		fclose(f2);
+	}
+
+	
 	system("pause");
-}
-
-void fUsageDelete()
-{
-
 }
 
 void fUsageDisplay()
@@ -716,7 +762,7 @@ void fUsageDisplay()
 	FILE* f = fopen("facilityusage.txt", "r");
 	if (!chkFileExist(f))
 	{
-		printf("File of facilityusage.txt cannot open\n");
+		printf("There are currently no Facilities Usage Record in system !!!\n");
 		system("pause");
 		return 0;
 	}
@@ -746,9 +792,8 @@ void fUsageDisplay()
 int fUsageMenu()
 {		
 	char choiceText[][100] = { "Add Facilities Usage","Search Facilities Usage Record",
-		"Modify Facilities Usage Record", "Delete Facilities Usage Record",
-		"Display all Facilities Usage Record","Return to console" };
-	int choice = globalMainMenu("Facilities Usage Module", 6, choiceText);
+		"Modify Facilities Usage Record","Display all Facilities Usage Record","Return to console" };
+	int choice = globalMainMenu("Facilities Usage Module", 5, choiceText);
 	system("cls");
 	switch (choice)
 	{
@@ -762,12 +807,9 @@ int fUsageMenu()
 		fUsageModify();
 		break;
 	case 4:
-		fUsageDelete();
-		break;
-	case 5:
 		fUsageDisplay();
 		break;
-	case 6:
+	case 5:
 		sessionStaffID[0] = '\0';
 		return 0;
 	default:
@@ -795,7 +837,7 @@ int date(Date* date)
 	{
 		if (dateErr)
 		{
-			printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
+			printf("Invalid Date, try again.\nEnter today date is not allowed.\n");
 		}
 		dateErr = 1;
 		printf("Enter Date < DD/MM/YYYY > : ");
@@ -825,81 +867,126 @@ int date(Date* date)
 	}
 }
 
- void slctFacilityID(char *facilityID)
+ void slctFacilityID(char* facilityID)
  {
+	 Facility* fID;
+	 fDataCount = 0;
+	 FILE* f2 = fopen(facilityFilePath, "rb");
+	 if (chkFileExist(f2))
+	 {
+		 while (fread(&fData[fDataCount], sizeof(Facility), 1, f2) != 0)
+		 {
+			 fDataCount++;
+		 }
+	 }
+	 fclose(f2);
+
+	 printf("+====================================================+\n"
+		 "|       Facility Type       |       Facility ID      |\n"
+		 "+====================================================+\n");
+	 for (int i = 0; i < fDataCount; i++)
+	 {
+		 printf("%-20s%25s\n", fData[i].name, fData[i].id);
+	 }
 	 printf("+====================================================+\n");
-	 printf("|       Facility Type       |       Facility ID      |\n"
-			"+====================================================+\n"
-			"|       Badminton Court     |          F001          |\n"
-			"|       Soccer Field        |          F002          |\n"
-			"|       Squash Court        |          F003          |\n"
-			"|       Ping Pong Table     |          F004          |\n"
-			"|       Facility 5          |          F005          |\n"
-			"+====================================================+\n");
+
 	 printf("Enter Facility ID : ");
 	 rewind(stdin);
 	 scanf("%[^\n]", facilityID);
 	 rewind(stdin);
-	 while (strcmp(facilityID, "F001") != 0 && strcmp(facilityID, "F002") != 0 && strcmp(facilityID, "F003") != 0 &&
-		 strcmp(facilityID, "F004") != 0 && strcmp(facilityID, "F005") != 0)
+	 fID = getFacilityID(facilityID);
+	 while (fID == NULL)
 	 {
-		 printf("Invalid Input !!!\nPlease select between ( F001 - F005 )\n");
+		 printf("This Facility ID does not EXIST !!!\nPlease try again.\n");
 		 printf("Enter Facility ID : ");
 		 rewind(stdin);
 		 scanf("%[^\n]", facilityID);
 		 rewind(stdin);
+		 fID = getFacilityID(facilityID);
 	 }
  }
 
- void getUserID(char* userID)
+ Facility* getFacilityID(char* id)
  {
-	 int totalReocrd = fUsageRecord();
-	 printf("\n");
-	 FILE* f2 = fopen(UserInfoFilePath, "rb");
-	 if (!chkFileExist(f2))
+	 if (fDataCount == 0)
 	 {
-		 printf("Cannot open UserInfoFilePath !!!\n");
-		 system("pause");
-		 return 0;
+		 return NULL;
 	 }
+	 for (int i = 0; i < fDataCount; i++)
+	 {
+		 if (strcmp(fData[i].id, id) == 0)
+		 {
+			 return &fData[i];
+		 }
+	 }
+	 return NULL;
+ }
+
+ void slctUserID(char* userID)
+ {
+	 userData *uID;
+	 uDataCount = 0;
+	 FILE* f2 = fopen(UserInfoFilePath, "rb");
+	 if (chkFileExist(f2))
+	 {
+		 while (fread(&uData[uDataCount], sizeof(userData), 1, f2) != 0)
+		 {
+			 uDataCount++;
+		 }
+	 }
+	 fclose(f2);
+
 	 printf("Enter User ID : ");
 	 rewind(stdin);
 	 scanf("%[^\n]", userID);
 	 rewind(stdin);
-	 while (strncmp(userID, "U", 1) != 0 || strlen(userID) != 4 ||
-		 !isdigit(userID[1]) || !isdigit(userID[2]) || !isdigit(userID[3]))
+	 uID = getUserID(userID);
+	 while (uID == NULL)
 	 {
-		 printf("Invalid Input !!!\n<!* Example : U001 *!>\n");
+		 printf("This User ID does not EXIST !!!\nPlease try again.\n");
 		 printf("Enter User ID : ");
 		 rewind(stdin);
 		 scanf("%[^\n]", userID);
 		 rewind(stdin);
+		 uID = getUserID(userID);
 	 }
-	 for (int i = 0; i < totalReocrd; i++)
+ }
+
+ userData* getUserID(char* id)
+ {
+	 if (uDataCount == 0)
 	 {
-		 while (fread(&uData[i], sizeof(userData), 1, f2) != 0)
+		 return NULL;
+	 }
+	 for (int i = 0; i < uDataCount; i++)
+	 {
+		 if (strcmp(uData[i].id, id) == 0)
 		 {
-			 while (strcmp(userID, uData[i].id) == 0)
-			 {
-				 printf("This User ID has been TAKEN !!!\nPlease try again.\n");
-				 printf("Enter User ID : ");
-				 rewind(stdin);
-				 scanf("%[^\n]", userID);
-				 rewind(stdin);
-				 while (strncmp(userID, "U", 1) != 0 || strlen(userID) != 4 ||
-					 !isdigit(userID[1]) || !isdigit(userID[2]) || !isdigit(userID[3]))
-				 {
-					 printf("Invalid Input !!!\n<!* Example : U001 *!>\n");
-					 printf("Enter User ID : ");
-					 rewind(stdin);
-					 scanf("%[^\n]", userID);
-					 rewind(stdin);
-				 }
-			 }
+			 return &uData[i];
 		 }
 	 }
-	 fclose(f2);
+	 return NULL;
  }
+
+ /*void readBookingFileToFUsageFile()
+ {
+	 bDataCount = 0;
+  
+	 while (fscanf(f2, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
+		 bData[bDataCount].bookingID,
+		 &bData[bDataCount].currentDate.d, &bData[bDataCount].currentDate.m, &bData[bDataCount].currentDate.y,
+		 &bData[bDataCount].currentTime.h, &bData[bDataCount].currentTime.m, &bData[bDataCount].currentTime.s,
+		 &bData[bDataCount].bookingDate.d, &bData[bDataCount].bookingDate.m, &bData[bDataCount].bookingDate.y,
+		 &bData[bDataCount].timeSlotsBooked[0], &bData[bDataCount].timeSlotsBooked[1],
+		 &bData[bDataCount].timeSlotsBooked[2], &bData[bDataCount].timeSlotsBooked[3],
+		 &bData[bDataCount].timeSlotsBooked[4], &bData[bDataCount].timeSlotsBooked[5],
+		 bData[bDataCount].usrID, bData[bDataCount].staffID, bData[bDataCount].facilityID) != EOF)
+		{
+			 bDataCount++;
+		}
+	 system("pause");
+ }*/
+
  /*void chkAvailableAdd(Date* date, int* time, char* facilityID)
  {
 	 BookingData bData[100];
@@ -929,5 +1016,6 @@ int date(Date* date)
 			 }
 		 }
 	 }
+	 
 	 fclose(f);
  }*/
