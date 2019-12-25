@@ -8,7 +8,7 @@
 typedef struct
 {
 	Date date;
-	int time[6];
+	char time[20];
 	char userID[30], facilityID[10];
 	char usageType[20];
 } FacilityUsage;
@@ -16,15 +16,17 @@ typedef struct
 FacilityUsage fUsage[100];
 userData uData[100];
 Facility fData[100];
+int uDataCount;
+int fDataCount;
+int bDataCount;
 
 int staffLogin();
 
 void fusagemain();
-int fUsageRecord();
+void fUsageRecord();
 void fUsageAddRecord();
 void fUsageSearchRecord();
 void fUsageModify();
-void fUsageDelete();
 void fUsageDisplay();
 int fUsageMenu();
 
@@ -32,8 +34,12 @@ int date(Date* date);
 int chkTime(char* time);
 
 void slctFacilityID(char*facilityID);
-void getUserID(char* userID);
+void slctUserID(char* userID);
 //void chkAvailableAdd(Date* date, int* time, char* facilityID);
+//void readBookingFileToFUsageFile();
+
+Facility* getFacilityID(char* id);
+userData* getUserID(char* id);
 
 int err;
 // variable for filepath
