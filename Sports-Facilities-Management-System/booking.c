@@ -174,7 +174,7 @@ void bookingBook()
 			{
 				bipChangeFacility(userPickedfacilityID);
 				bipChangeBookingDate(&userPickedDate);
-				bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+				bipChangeTimeslot(0, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 				firstIteration = 0;
 			}
 			else
@@ -193,33 +193,33 @@ void bookingBook()
 					bipChangeFacility(userPickedfacilityID);
 					// temporary variable for checking timeslot availablity
 					int tmpTS[6] = { 0,0,0,0,0,0 };
-					int tmpR = checkForTimeslotsAvailablity(&tmpTS[0], &data[0], 100, &userPickedDate, userPickedfacilityID);
+					int tmpR = checkOverallTimeslotsAvailablity(&tmpTS[0], &data[0], count, &userPickedDate, getFacilityByID(userPickedfacilityID)->name);
 					if (!tmpR) // if no timeslot anymore
 					{
 						printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
 						bipChangeBookingDate(&userPickedDate);
-						bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
 					{
 						printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
 						bipChangeBookingDate(&userPickedDate);
-						bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 					getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
 					if (tolower(choice[0]) != 'y')
 					{
 						bipChangeBookingDate(&userPickedDate);
-						bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					break;
 				case '2':
 					bipChangeBookingDate(&userPickedDate);
-					bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					break;
 				case '3':
-					bipChangeTimeslot(&userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID);
+					bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					break;
 				}
 			}
@@ -348,22 +348,6 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 				if (timeslot[a])
 				{
 					if (getTimeslotArrayCount(timeslot) < 2) {
-						sprintf(statusText[2], "%s", TIMESLOTS[a]);
-					}
-					else
-					{
-						sprintf(statusText[2], "%s, %s", statusText[2], TIMESLOTS[a]);
-					}
-				}
-			}
-		}
-		if (isSet[2])
-		{
-			for (int a = 0; a < 6; a++)
-			{
-				if (timeslot[a])
-				{
-					if (a == 0) {
 						sprintf(statusText[2], "%s", TIMESLOTS[a]);
 					}
 					else
@@ -674,7 +658,7 @@ void bookingModifyRecords()
 // return 1 if it modified successfully
 int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int dataCount)
 {
-	char choice[10]
+	char choice[10];
 	// caching data for changes
 	BookingData cache;
 	strcpy(cache.bookingID, bookingToModify->bookingID);
@@ -711,34 +695,34 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 			bipChangeFacility(cache.facilityID);
 			// temporary variable for checking timeslot availablity
 			int tmpTS[6] = { 0,0,0,0,0,0 };
-			int tmpR = checkForTimeslotsAvailablity(&tmpTS[0], &data[0], 100, &cache.bookingDate, cache.facilityID);
+			int tmpR = checkForTimeslotsAvailablity(&tmpTS[0], &data[0], 100, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			if (!tmpR) // if no timeslot anymore
 			{
 				printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
 				bipChangeBookingDate(&cache.bookingDate);
-				bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
 			{
 				printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
 				bipChangeBookingDate(&cache.bookingDate);
-				bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", cache.bookingDate.d, cache.bookingDate.m, cache.bookingDate.y);
 			getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
 			if (tolower(choice[0]) != 'y')
 			{
 				bipChangeBookingDate(&cache.bookingDate);
-				bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			break;
 		case '2':
 			bipChangeBookingDate(&cache.bookingDate);
-			bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+			bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			printf("\n\n%s\n\n", bookingToModify->bookingID);
 			break;
 		case '3':
-			bipChangeTimeslot(&userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID);
+			bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			break;
 		}
 		printf(" Do you want to change more booking details ? (y=yes) ");
@@ -1552,12 +1536,17 @@ void incrementBookingID(char *oldBookID)
 // Set timeslot to 0 if the timeslot is not free
 // timeslot array need to be size 6 (6 timeslots stated)
 // Return True if there are timeslots available
-int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID)
+// exluding bookingID for modify() use
+int checkForTimeslotsAvailablity(int *timeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID, char bookingIDToExclude[])
 {
 	// make sure timeslot is properly initialised
 	timeslot[0] = 1; timeslot[1] = 1; timeslot[2] = 1; timeslot[3] = 1; timeslot[4] = 1; timeslot[5] = 1;
 	for (int a = 0; a < dataSize; a++)
 	{
+		if (strcmp(data[a].bookingID, bookingIDToExclude) == 0)
+		{
+			continue;
+		}
 		if (strcmp(data[a].facilityID, facilityID) == 0
 			&& compareDate(data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y, bookingDate->d, bookingDate->m, bookingDate->y) == 0)
 		{
@@ -1597,7 +1586,7 @@ int checkOverallTimeslotsAvailablity(int *timeslot, BookingData *data, int dataS
 	}
 	int tmpTS[6];
 	for (int a = 0; a < tmp; a++) {
-		checkForTimeslotsAvailablity(&tmpTS[0], data, dataSize, bookingDate, facList[a]->id);
+		checkForTimeslotsAvailablity(&tmpTS[0], data, dataSize, bookingDate, facList[a]->id, "");
 		for (int b = 0; b < 6; b++)
 		{
 			if (tmpTS[b])
@@ -1732,13 +1721,16 @@ int bipChangeBookingDate(Date *bookingDate)
 // userPickedtimeslot is integer, not array
 // this function doesnt directly modify timeslot array
 // NOTE: userPickedTimeslot is being minus 1 at the end
-int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID)
+// userAlreadyPickedTimeslot flag to know if user picked the timeslot before
+int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID, char bookingIDToExclude[])
 {
 	int timeslotAvailable[6] = { 1,1,1,1,1,1 }; // to check for timeslot availablity
-	if (!checkOverallTimeslotsAvailablity(timeslotAvailable, data, dataSize, bookingDate, getFacilityByID(facilityID)->name)) {
+	if (!checkOverallTimeslotsAvailablity(timeslotAvailable, data, dataSize, bookingDate, getFacilityByID(facilityID)->name) && !userAlreadyPickedTimeslot) {
 		printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date\n");
 		return 0;
 	}
+	if(userAlreadyPickedTimeslot)
+		timeslotAvailable[*userPickedtimeslot] = 1;
 	printf("Timeslots: \n");
 	for (int a = 0; a < 6; a++)
 	{
@@ -1768,7 +1760,7 @@ int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, 
 	err = 0;
 	// because there can be different free time slots for different facilty
 	// refer to checkOverallTimeslotsAvailablity() call in this function
-	findNextFreeFacID(getFacilityByID(facilityID)->name, facilityID, bookingDate, *userPickedtimeslot);
+	findNextFreeFacID(getFacilityByID(facilityID)->name, facilityID, bookingDate, *userPickedtimeslot, bookingIDToExclude);
 	return 1;
 }
 
@@ -1951,8 +1943,9 @@ int _staffPWReauth()
 
 // Find next FacilityID that is free to be booked
 // if found, return 1, else 0
-// Input: facility name, booking date, booking slot IDX
-int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX)
+// Input: facility name, booking date, booking slot IDX, bookingIDToExclude
+// NOTE: BookingIDToexlude is used in modify call
+int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX, char bookingIDToExclude[])
 {
 	if (facilityDataCount == 0)
 	{
@@ -1967,7 +1960,7 @@ int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookin
 		int tmpTS[6]; // timeslot array
 		if (strcmp(facData[a].name, facName) == 0)
 		{
-			checkForTimeslotsAvailablity(&tmpTS[0], &data2[0], dataCount, bookingDate, facData[a].id);
+			checkForTimeslotsAvailablity(&tmpTS[0], &data2[0], dataCount, bookingDate, facData[a].id, bookingIDToExclude);
 			if (tmpTS[bookingSlotIDX])
 			{
 				strcpy(facID, facData[a].id);
