@@ -800,6 +800,7 @@ void bookingDisplayAll()
 		for (int a = 0; a < count; a++)
 		{
 			dataToPrint[a] = &data[a];
+			dataToPrintCount++;
 		}
 	}
 	else if (mode == 'u')

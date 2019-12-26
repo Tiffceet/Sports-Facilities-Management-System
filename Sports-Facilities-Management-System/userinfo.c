@@ -431,6 +431,11 @@ void modifyInfo2()
 				scanf("%s", &confirmation);
 
 			}
+			if (toupper(confirmation[0]) == 'Y')
+			{
+				break;
+					
+			}
 
 		}
 
