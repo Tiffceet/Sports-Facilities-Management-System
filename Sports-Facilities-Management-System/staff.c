@@ -137,7 +137,7 @@ void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY EN
 			ifUsed = 1;
 			totalCondition = 3;
 			printf("Enter staff ID(4 characters): ");
-			scanf("%[^\n]", toupper(addStaff.stfID));
+			scanf("%[^\n]", addStaff.stfID);
 			rewind(stdin);
 			if (strlen(addStaff.stfID) == 4)
 			{
@@ -280,12 +280,14 @@ int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 				}
 				else if (stfcount >= totstaff)
 				{
-					printf("There's no such person please reenter staff name.\n");
+					printf("There's no such person in our system.\n");
+					system("pause");
+					return;
 				}
 				else;
 			}
 			printf("After viewing staff's infomation enter y to continue,anything else to search for another staff :");
-			scanf("%c", tolower(&ans));
+			scanf("%c", &ans);
 			rewind(stdin);
 		} while (ans != 'y');
 		staffAdd = i;
