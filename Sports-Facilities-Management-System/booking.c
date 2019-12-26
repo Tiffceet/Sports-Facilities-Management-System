@@ -674,7 +674,7 @@ void bookingModifyRecords()
 // return 1 if it modified successfully
 int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int dataCount)
 {
-	char choice[10]
+	char choice[10];
 	// caching data for changes
 	BookingData cache;
 	strcpy(cache.bookingID, bookingToModify->bookingID);
