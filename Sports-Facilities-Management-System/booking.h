@@ -35,7 +35,7 @@ void bookingMain();
 int bookingMenu();
 void printBookingInfo();
 void bookingBook();
-void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords, int *filteredRecordsCount);
+void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords, int *filteredRecordsCount, int requireUserLogin, char passedUID[], BookingData *passedData, int passedDataCount);
 int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int dataCount);
 int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot, Staff **staffFilter, int sCount, userData **userFilter, int uCount, Facility **facFilter, int fCount);
 void bookingModifyRecords();
