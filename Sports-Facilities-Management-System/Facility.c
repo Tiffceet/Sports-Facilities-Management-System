@@ -23,7 +23,9 @@ void facInfoMain()
 	}
 	// if user finally wants to log out
 	sessionStaffID[0] = '\0';
+
 }
+
 
 void addNewFacility()
 {
@@ -102,8 +104,7 @@ void addNewFacility()
 
 void searchFacility()
 {
-	/*int choice1=0;
-
+	char searchFacilityName[200];
 	Facility facility[10] = {"0"};
 	FILE*facilityFile;
 	facilityFile = fopen(facilityFilePath, "rb");
@@ -114,31 +115,30 @@ void searchFacility()
 		return;
 	}
 
-	printf("(1) Badminton\n");
-	printf("(2) Basketball\n");
-	printf("(3) Tennis\n");
-	printf("(4) Ping Pong\n");
-	printf("What facility are you searching for? :");
-	rewind(stdin);
-	scanf("%d", choice1);
+	printf("Search by name:");
+	s_input(searchFacilityName,199);
 
-	switch (choice1)
+	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
 	{
-	case '1':
-		printf("");
-		break;
-	case '2':
-		printf("");
-		break;
-	case '3':
-		printf("");
-		break;
-	case '4':
-		printf("");
-		break;010802
-	default:
-		return;
-	}*/
+
+		if (strcmp(facility[0].name, searchFacilityName) == 0)
+		{
+
+			printf("Name = %s\n", facility[0].name);
+			printf("ID   = %s\n", facility[0].id);
+			printf(" Maintenance Date =%02d/%02d\n", facility[0].maintenanceDate);
+			printf(" Remarks = %s\n", facility[0].remarks);
+			system("pause");
+			return;
+		}
+		else 
+		{
+			printf("No facility can be found!");
+			return;
+		}
+
+	}
+			
 }
 
 void modifyFacility()
