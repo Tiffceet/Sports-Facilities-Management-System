@@ -60,7 +60,7 @@ void bookingMain()
 
 int bookingMenu()
 {
-	char choiceText[][100] = { "Book", "Search Records", "Modify records", "Display all bookings", "Log Out (Return to console)" };
+	char choiceText[][100] = { "Book", "Search bookings", "Modify bookings", "Display all bookings", "Log Out (Return to console)" };
 	int choice = globalMainMenu("Booking Module", 5, choiceText);
 	if (choice > 0 && choice < 6)
 	{
@@ -225,7 +225,7 @@ void bookingBook()
 			}
 
 			// printing of display
-			strcpy(statusText[0], getFacilityByID(userPickedfacilityID)->name);
+			sprintf(statusText[0], "(%s) %s",userPickedfacilityID, getFacilityByID(userPickedfacilityID)->name);
 			sprintf(statusText[1], "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 			strcpy(statusText[2], TIMESLOTS[userPickedtimeslot]);
 
@@ -265,7 +265,7 @@ void bookingBook()
 				// data[count - 1].usrID,
 				getUserDataByID(data[count - 1].usrID)->name,
 				// data[count - 1].facilityID,
-				getFacilityByID(data[count - 1].facilityID)->id,
+				getFacilityByID(data[count - 1].facilityID)->name,
 				data[count - 1].bookingDate.d,
 				data[count - 1].bookingDate.m,
 				data[count - 1].bookingDate.y,
@@ -568,13 +568,14 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			}
 		}
 
-		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-24.24s %-12.12s %-15.15s |\n",
+		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s %-12.12s %-15.15s |\n",
 			count + 1,
 			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
 			// data[a].facilityID,
+			data[a].facilityID,
 			getFacilityByID(data[a].facilityID)->name,
 			//data[a].usrID,
 			getUserDataByID(data[a].usrID)->name,
@@ -598,7 +599,7 @@ void bookingModifyRecords()
 	char choice[10];
 	int userPickedIDX;
 	printf("Would you like to filter the bookings before selecting records to modify (y=yes)? ");
-	getUserMenuChoice(choice, 9, "Would you like to search the bookings before selecting records to modify ? ");
+	getUserMenuChoice(choice, 9, "Would you like to filter the bookings before selecting records to modify (y=yes)? ");
 	if (tolower(choice[0]) == 'y')
 	{
 		// This function have generateFilteredSearchResult() call in it
@@ -824,12 +825,13 @@ void bookingDisplayAll()
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
 	for (int a = 0; a < dataToPrintCount; a++)
 	{
-		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-30.30s %-12.12s %-15.15s |\n",
+		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s %-12.12s %-15.15s |\n",
 			dataToPrint[a]->currentDate.d, dataToPrint[a]->currentDate.m, dataToPrint[a]->currentDate.y, dataToPrint[a]->currentTime.h, dataToPrint[a]->currentTime.m,
 			dataToPrint[a]->bookingID,
 			dataToPrint[a]->bookingDate.d, dataToPrint[a]->bookingDate.m, dataToPrint[a]->bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(dataToPrint[a]->timeSlotsBooked)],
 			// data[a].facilityID,
+			dataToPrint[a]->facilityID,
 			getFacilityByID(dataToPrint[a]->facilityID)->name,
 			//data[a].usrID,
 			getUserDataByID(dataToPrint[a]->usrID)->name,

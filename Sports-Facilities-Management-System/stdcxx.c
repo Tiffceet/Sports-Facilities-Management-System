@@ -58,7 +58,7 @@ int _staffLogin(char *staffID, int size)
 		printf("%40sEnter 'XXX' to return to previous screen\n", "");
 		printf("%47sStaff ID -> ", "");
 		s_input(staffID, size);
-		if (strcmp(staffID, "XXX") == 0)
+		if (strcmp(staffID, "XXX") == 0 || strcmp(staffID, "xxx") == 0)
 		{
 			return 0;
 		}
