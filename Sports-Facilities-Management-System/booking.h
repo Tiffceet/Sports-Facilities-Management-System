@@ -35,7 +35,7 @@ void bookingMain();
 int bookingMenu();
 void printBookingInfo();
 void bookingBook();
-void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords, int *filteredRecordsCount);
+void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords, int *filteredRecordsCount, int requireUserLogin, char passedUID[], BookingData *passedData, int passedDataCount);
 int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int dataCount);
 int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, int dataCount, int *isSet, Date *dotFrom, Date *dotTo, Date *bookFrom, Date *bookTo, int *timeslot, Staff **staffFilter, int sCount, userData **userFilter, int uCount, Facility **facFilter, int fCount);
 void bookingModifyRecords();
@@ -61,7 +61,7 @@ int getTimeslotArrayCount(int *timeslot);
 // Functions for BIP (Book-In-Progress)
 int bipChangeFacility(char *userPickedfacilityID);
 int bipChangeBookingDate(Date *bookingDate);
-int bipChangeTimeslot(int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID);
+int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, BookingData *data, int dataSize, Date *bookingDate, char *facilityID, char bookingIDToExclude[]);
 
 // Functions for obtaining data from other modules
 void readDataFromOtherModules();
@@ -74,7 +74,7 @@ int _usrLogin(char *usrID, int size);
 int _staffPWReauth();
 
 // functions to deal with facility module
-int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX);
+int findNextFreeFacID(char facName[], char *facID, Date *bookingDate, int bookingSlotIDX, char bookingIDToExclude[]);
 int getFacilityCount(char facilityName[]);
 
 #endif

@@ -12,19 +12,22 @@ void init()
 	// sprintf(UserInfoFilePath, "%s\\SFMS\\%s", APPDATA_PATH, "userinfo.dat");
 	sprintf(facilityFilePath, "%s\\SFMS\\facility.dat", APPDATA_PATH);
 	sprintf(fUsageFilePath, "%s\\SFMS\\facilityusage.txt", APPDATA_PATH);
+
+	FILE *f = fopen(staffFilePath, "r");
+	if (!chkFileExist(f))
+	{
+		f = fopen(staffFilePath, "w");
+		Date d;
+		Time t;
+		getSystemDate(&d);
+		getSystemTime(&t);
+		Staff s = {"admin", "admin", "admin","admin", "ADMIN",d,d,t,t};
+		fwrite(&s, sizeof(Staff), 1, f);
+	}
+	fclose(f);
+
 	sessionStaffID[0] = '\0'; // initialise sessionStaffID
 }
-
-/*
-// Print splash screen
-	printf("%37sWelcome to Sports Facility Management System\n", "");
-	if (!_staffLogin(sessionStaffID, 99)) // if staff login is not possible
-	{
-		printf("exit(0) in future\n");
-	}
-	printf("%41sPress any key to enter the system...", "");
-	system("pause >nul");
-*/
 
 int _staffLogin(char *staffID, int size)
 {
@@ -58,7 +61,7 @@ int _staffLogin(char *staffID, int size)
 		printf("%40sEnter 'XXX' to return to previous screen\n", "");
 		printf("%47sStaff ID -> ", "");
 		s_input(staffID, size);
-		if (strcmp(staffID, "XXX") == 0)
+		if (strcmp(staffID, "XXX") == 0 || strcmp(staffID, "xxx") == 0)
 		{
 			return 0;
 		}
@@ -94,7 +97,6 @@ int _staffLogin(char *staffID, int size)
 			printf("\n%53sWrong password.\n", "");
 		}
 	} while (1);
-
 }
 
 int globalMainMenu(char* title, int choiceCount, char choiceText[][100])

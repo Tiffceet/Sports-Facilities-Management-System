@@ -1,6 +1,13 @@
 #include "stdcxx.h"
 #include "staff.h"
 
+/*
+TO DO LIST
+1.ADD CHECKING FOR ALL FILE PATHS
+2.ADD CENCORED TO PASSWORD
+3.MAKE IT SO THIERS ONLY ONE ADMIN WHO CAN DICIDE PASS THEIR POSITION
+3iMAKE A NEW NO STAFF MEMBER REGISTRATION MODULE
+*/
 
 Staff staffCache[30];//Main array to keep staff info from files
 Staff loggedinstf;//To check for globla logged in status
@@ -390,9 +397,8 @@ void changeStfList()
 			printf("What do you want to change about this staff?\n");
 			printf("1. Name\n");
 			printf("2. Password\n");
-			printf("3. ID\n");
-			printf("4. Position\n");
-			printf("5. exit\n");
+			printf("3. Position\n");
+			printf("4. exit\n");
 
 			printf("Enter a choice :");
 			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
@@ -473,45 +479,6 @@ void changeStfList()
 				}
 				break;
 			case '3':
-				do {
-					strLength = 0;
-					ifUsed = 1;
-					totalCondition = 3;
-					printf("Enter new staff ID(4 characters): ");
-					scanf("%[^\n]", toupper(staffChange.stfID));
-					rewind(stdin);
-					if (strlen(staffChange.stfID) == 4)
-					{
-						strLength = 1;
-					}
-					valid = isAlNum(staffChange.stfID);
-					for (i = 0; i < totstaff; i++)
-					{
-						while (strcmp(staffChange.stfID, staffCache[i].stfID) == 0)
-						{
-							ifUsed = 0;
-						}
-					}
-					if (totalCondition != ifUsed + strLength + valid)
-					{
-						printf("ID fails to meet the following condition \n");
-						if (valid != 1)
-						{
-							printf("Only numbers and alphabet are allowed in entry.\n");
-						}
-						if (ifUsed != 1)
-						{
-							printf("ID exist in our system.\n");
-						}
-						if (strLength != 1)
-						{
-							printf("Length of entry is not 4\n");
-						}
-						rewind(stdin);
-					}
-				} while (totalCondition != strLength + ifUsed + valid);
-				break;
-			case '4':
 				do //maybe add more options
 				{
 					printf("1.Admin\n2.staff\nEnter staff position : ");
@@ -532,10 +499,10 @@ void changeStfList()
 				} while (choice[0] == 0);
 				rewind(stdin);
 				break;
-			case '5':
+			case '4':
 				printf("Exiting");
 				return;
-
+				break;
 			default:
 				printf("Invalid choice !\n");
 			}
@@ -557,7 +524,6 @@ void changeStfList()
 			if (tolower(choice[0]) == 'y')
 			{
 				strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
-				strcpy(staffCache[oldStaffAdd].stfID, staffChange.stfID);
 				strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
 				strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
 				Date sysDate;
@@ -578,7 +544,7 @@ void changeStfList()
 				system("cls");
 				displayStaffList();
 			}
-		} while (choice != '5');
+		} while (choice != '4');
 	}
 	else
 	{
@@ -589,17 +555,19 @@ void changeStfList()
 
 void login()//log in
 {
-	char nameEntered[30], passwordEntered[30];
-	int i = 0, totstaff, stfcount = 0, stfSuccessfullLogin=0,incorrectlogins=0;
+	char nameEntered[30], passwordEntered[30],ans;
+	int i = 0, totstaff, stfcount = 0, stfSuccessfullLogin=0,incorrectlogins=0,failedlogins=0;
 	totstaff = readStfList();
-
-	printf("NOTE:Only staffs are allowed to login to staff module.\n");
-	printf("Normal account will not be allowed to login here.\n\n");
 	if (totstaff != 0)
 	{
 
 		do
 		{
+			printf("%25s====================================================================\n", "");
+			printf("%25s|%26s<STAFF LOGIN>%27s|\n", "", "", "");
+			printf("%25s|%5sNOTE:Only staffs are allowed to login to staff module.%7s|\n", "", "", "");
+			printf("%25s|%5sNormal account will not be allowed to login here.%12s|\n", "", "", "");
+			printf("%25s====================================================================\n", "");
 			printf("Name :");
 			scanf("%[^\n]", nameEntered);
 			rewind(stdin);
@@ -618,8 +586,26 @@ void login()//log in
 				else
 				{
 					incorrectlogins++;
-					if(incorrectlogins >= totstaff)
-					printf("Password or log in ID is incorrect.\n");
+					if (incorrectlogins >= totstaff) 
+					{
+						printf("Password or log in ID is incorrect.\n");
+						system("pause");
+						failedlogins++;
+						if (failedlogins >= 3)
+						{
+							printf("Do you want to reset your password?(enter y to proceed to reset):");
+							scanf("%c",&ans);
+							if (ans=='y')
+							{
+								system("cls");
+								rewind(stdin);
+								pwRecover();
+							}
+							else
+							system("cls");
+						}
+						system("cls");
+					}
 				}
 			}
 		} while (stfSuccessfullLogin == 0);
@@ -661,23 +647,114 @@ int checkPosition()
 
 void pwRecover()
 {
-	char staffIDEntered[30];
-	int totstaff = 0;
+	FILE*stfopen;
+	stfopen = fopen(staffFilePath, "rb");
+	char staffIDEntered[30], ans, newpw[100], newconpw[100];
+	int totstaff = 0, i = 0, stfcount = 0, stafffound = 0, staffadd = 0;
 	totstaff = readStfList();
 	printf("%25s====================================================================\n", "");
 	printf("%25s|%24sPASSWORD RECOVERER%24s|\n", "", "", "");
 	printf("%25s|%4s**YOU NEED TO ENTER YOUR STAFF ID TO CHANGE YOUR PASSWORD**%3s|\n", "", "", "");
 	printf("%25s|%9sASK AN ADMIN FOR HELP IF YOU FORGOT YOUR STAFFID%9s|\n", "", "", "");
 	printf("%25s====================================================================\n", "");
+	do
+	{
+		printf("Enter staff ID :");
+		scanf("%[^\n]", staffIDEntered);
+		rewind(stdin);
+		for (i = 0; i < totstaff; i++)
+		{
+			stfcount++;
+			if (strcmp(staffIDEntered, staffCache[i].stfID) == 0)
+			{
+				printf("%25s====================================================================\n", "");
+				printf("%25s|%28sSTAFF LIST%28s|\n", "", "", "");
+				printf("%25s====================================================================\n", "");
+				printf("%25s|Name :%-60s|\n%25s|ID :%-62s|\n%25s|Position :%-56s|\n", "", staffCache[i].stfName, "", staffCache[i].stfID, "", staffCache[i].stfPosi);
+				printf("%25s====================================================================\n", "");
+				stafffound = 1;
+				staffadd = i;
+				break;
+			}
+			else if (stfcount >= totstaff)
+			{
+				printf("There's no such person please reenter staff ID.\n");
+				printf("Enter y to return to log in or n to reenter ID :");
+				scanf("%c", &ans);
+				rewind(stdin);
+				if (ans == 'y')
+				{
+					printf("Returning to login.\n");
+					system("pause");
+					system("cls");
+					fclose(stfopen);
+					return;
+				}
+			}
+		}
+	} while (stafffound != 1);
 
-	printf("Enter staff ID\n");
-	scanf("%[^\n]", staffIDEntered);
+	printf("Enter new password(MINUMUM 8):");
+	scanf("%[^\n]",&newpw);
 	rewind(stdin);
-	
-	
+	while (strlen(newpw) < 8)
+	{
+		printf("Password too short please reenter : \n");
+		scanf("%[^\n]",&newpw);
+		rewind(stdin);
+	}
+	printf("Reenter password to confirm :");
+	scanf("%[^\n]",&newconpw);
+	rewind(stdin);
+	while (strcmp(newconpw,newpw) != 0)
+	{
+		printf("Passwords does not match please reenter !\n");
+		rewind(stdin);
+		printf("Enter staff Passwords(MINIMUM 8) :");
+		scanf("%[^\n]",&newpw);
+		rewind(stdin);
+		while (strlen(newpw) < 8)
+		{
+			printf("password too short please reenter : \n");
+			printf("Enter staff Passwords(MINIMUM 8): ");
+			scanf("%[^\n]",&newpw);
+			rewind(stdin);
+		}
+		printf("Reenter password to confirm :");
+		scanf("%[^\n]",&newconpw);
+		rewind(stdin);
+	}
+	printf("Here's your new password :%s\n",newpw);
+	printf("Do you want to make the change?(y to make change n to cancel changes) :");
+	scanf("%c", &ans);
+	rewind(stdin);
+	if (ans == 'y')
+	{
+		Date sysDate;
+		getSystemDate(&sysDate);
+		printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+		staffCache[staffadd].dateModi = sysDate;
+		strcpy(staffCache[staffadd].stfPassW, newpw);
+		stfopen = fopen(staffFilePath, "wb");
+		for (int a = 0; a < totstaff; a++)
+		{
+			fwrite(&staffCache[a], sizeof(Staff), 1, stfopen);
+		}
+		fclose(stfopen);
+		printf("changes have been made proceding to log in.\n");
+		system("pause");
+		return;
+	}
+	else
+	{
+		printf("Changes was canceled proceeding back to log in.\n");
+		fclose(stfopen);
+		system("pause");
+		return;
+	}
 }
 
-void staffMain()// still need to add places to indentify position
+void staffMain()
 {
 	FILE*stflist;
 	stflist = fopen(staffFilePath, "ab");
@@ -690,9 +767,10 @@ void staffMain()// still need to add places to indentify position
 	int err = 0;
 	char choice[10];
 	login();
-	int position = checkPosition();
 	do
 	{
+		int position = checkPosition();
+
 		system("cls");
 		char choiceText[][100] = { "Staff list", "Add staff", "Search staff", "Change staff info", "Exit" };
 		int choice = globalMainMenu("<!> Staff infomations Console <!>", 5, choiceText);

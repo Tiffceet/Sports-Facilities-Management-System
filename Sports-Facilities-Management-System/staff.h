@@ -22,6 +22,7 @@ void staffMain();
 void pwRecover();
 void changeStfList();
 void login();
+void pwRecover();
 void staffSearchID();
 int staffSearchName();
 int checkPosition();
