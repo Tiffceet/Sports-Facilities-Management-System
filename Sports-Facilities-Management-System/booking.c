@@ -10,37 +10,7 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
-	/*FILE *f = fopen(UserInfoFilePath, "wb");
-	userData usr = { "Ali", "U001", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr, sizeof(userData), 1, f);
-	userData usr2 = { "Ahmad", "U002", 2019,12,10,9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr2, sizeof(userData), 1, f);
-	userData usr3 = { "Felix", "U003", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr3, sizeof(userData), 1, f);
-	userData usr4 = { "Gohan", "U004", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr4, sizeof(userData), 1, f);
-	fclose(f);
-	f = fopen(staffFilePath, "wb");
-	Staff stf = {"Looz", "010802", "010802", "Looz", "ADMIN", 1,1,2020,1,1,2020,12,12,12,12};
-	fwrite(&stf, sizeof(Staff), 1, f);
-	fclose(f);
-	f = fopen(facilityFilePath, "wb");
-	Facility fac1 = {"F001", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18};
-	fwrite(&fac1, sizeof(Facility), 1, f);
-	Facility fac2 = { "F002", "Squash Court", 2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac2, sizeof(Facility), 1, f);
-	Facility fac3 = { "F003", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac3, sizeof(Facility), 1, f);
-	Facility fac4 = { "F004", "Basketball Court",  2019,12,12 , "", "Looz",2019,12,18 };
-	fwrite(&fac4, sizeof(Facility), 1, f);
-	Facility fac5 = { "F005", "Swimming pool",  2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac5, sizeof(Facility), 1, f);
-	fclose(f);*/
-
 	readDataFromOtherModules();
-
-	/*BookingData data[100];
-	readBookingDataIntoStructArray(&data[0], 99);*/
 
 	// initialise error code for input validation use
 	err = 0;
@@ -126,7 +96,7 @@ void bookingBook()
 		}
 	}
 
-	char loginUserID[100] = "null";
+	char loginUserID[100] = "null"; // initialise so when booking is done in staff mode, it wont write corrupted data into file
 	if (mode == 'u') {
 		printf("Only registered user are allowed to make booking.\n");
 		if (!_usrLogin(loginUserID, 99))
@@ -158,7 +128,7 @@ void bookingBook()
 
 	// Sub Menu goes here
 	printBookingInfo();
-	char statusText[3][100];
+	char statusText[3][100]; // to be used to show booking details after first iteration
 
 	char choice[10];
 	char choiceToContinueNextBooking[10] = "\0";
