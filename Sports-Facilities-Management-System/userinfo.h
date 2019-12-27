@@ -5,7 +5,7 @@
 void searchInfo();
 void displayInfo();
 void userinfoMain();
-void userInfo();
+int userInfo();
 void registerInfo();
 void modifyInfo2();
 int totalNumUser();

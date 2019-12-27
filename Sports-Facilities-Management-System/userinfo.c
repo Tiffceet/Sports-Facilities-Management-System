@@ -66,6 +66,7 @@ int totalNumUser()
 
 	return i;
 }
+
 int exitProgram(char quit[10])
 {
 	char s[10] = { "exit" };
@@ -82,6 +83,7 @@ int exitProgram(char quit[10])
 	}
 
 }
+
 void registerInfo()
 
 {
@@ -94,7 +96,6 @@ void registerInfo()
 	userData userData1;
 	FILE * userinfo;
 	char id[16];
-	char nameChck[20];
 	char chckContact[20];
 
 
@@ -173,31 +174,6 @@ void registerInfo()
 	printf("Enter your name = ");
 	rewind(stdin);
 	scanf("%[^\n]", userData1.name);
-
-
-	strcpy(nameChck, userData1.name);
-	for (i = 0; i < strlen(nameChck); i++)
-	{
-		while (isalpha(nameChck[i]) == 0)
-		{
-			printf("Please enter alphabets only.\n");
-			printf("Please enter your name (without spacing):  ");
-			rewind(stdin);
-			scanf("%[^\n]", &nameChck);
-
-			strcpy(exitProg, nameChck);
-			programExit = exitProgram(exitProg);
-			if (programExit == 1)
-			{
-				fclose(userinfo);
-				return;
-			}
-			i = 0;
-		}
-	}
-	strcpy(userData1.name, nameChck);
-
-
 
 	printf("Enter your password(minimum 6) = ");
 	rewind(stdin);
@@ -335,6 +311,7 @@ void registerInfo()
 
 
 }
+
 void modifyInfo2()
 {
 	char confirmation[20];
@@ -391,7 +368,7 @@ void modifyInfo2()
 		}
 
 
-		printf("Do you want to change the current id that have entered?(Y = Yes/N = No) = ");
+		printf("Do you want to retype the current id that have entered?(Y = Yes/N = No) = ");
 		rewind(stdin);
 		scanf("%s", &confirmation);
 
@@ -458,7 +435,7 @@ void modifyInfo2()
 
 
 		}
-		printf("Is the current password is ok?(Y = Yes/N = No) = ");
+		printf("Is the current password enter by user is ok?(Y = Yes/N = No) = ");
 		rewind(stdin);
 		scanf("%c", &confirmation);
 
@@ -531,47 +508,17 @@ void modifyInfo2()
 					printf("__________________________\n");
 					printf("Modify Info Module\n");
 					printf("__________________________\n");
-					printf("1. Change ID\n");
-					printf("2. Change Password\n");
-					printf("3. Change Contact Number\n");
-					printf("4. Exit\n");
+					printf("1. Change Password\n");
+					printf("2. Change Contact Number\n");
+					printf("3. Exit\n");
 					printf("\nMenu Choice: ");
 
 					char choice[6];
 					getUserMenuChoice(choice, 6, "Menu Choice: ");
 					switch (choice[0])
 					{
+					
 					case '1':userinfo1 = fopen(UserInfoFilePath, "wb");
-
-						printf("Enter new ID = ");
-						scanf("%s", s);
-						while (strlen(s) != 4)
-						{
-
-							if (strlen(s) != 4)
-							{
-								printf("Enter a id that has 4 characters  = ");
-								rewind(stdin);
-								scanf("%s", s);
-
-
-							}
-
-						}
-						strcpy(user2[i].id, s);
-
-						for (i = 0; i < x; i++) {
-							fwrite(&user2[i], sizeof(userData), 1, userinfo1);
-						}
-						fclose(userinfo1);
-						v = 1;
-						if (v == 1)
-						{
-							printf("User Id has been change\n");
-						}
-
-						break;
-					case '2':userinfo1 = fopen(UserInfoFilePath, "wb");
 
 						printf("Enter new password = ");
 						scanf("%s", s);
@@ -598,7 +545,7 @@ void modifyInfo2()
 						}
 
 						break;
-					case '3':
+					case '2':
 						fclose(userinfo1);
 						userinfo1 = fopen(UserInfoFilePath, "wb");
 
@@ -630,7 +577,7 @@ void modifyInfo2()
 
 						break;
 
-					case '4':return;
+					case '3':return;
 						break;
 
 					default:printf("\nPls choose case 1 - 4 only \n");
@@ -762,10 +709,6 @@ void modifyInfo2()
 	}
 }
 
-
-
-
-
 void displayInfo()
 {
 	int i = 0;
@@ -808,9 +751,13 @@ void displayInfo()
 	return;
 }
 
-
 void searchInfo()
 {
+
+
+
+	char userAnswer;
+	int validationCheck = 0;
 	int i = 0;
 	char id[15];
 	char password[20];
@@ -827,52 +774,64 @@ void searchInfo()
 
 
 
-
-	printf("Enter your user ID(4 characters) = ");
-	rewind(stdin);
-	scanf("%s", id);
-	while (strlen(id) != 4)
+	while (1)
 	{
-
-		if (strlen(id) != 4)
-		{
-			printf("Enter a id that is 4 characters  = ");
-			rewind(stdin);
-			scanf("%s", id);
-		}
-
-
-	}
-
-
-
-	printf("Enter user password = ");
-	rewind(stdin);
-	scanf("%s", password);
-	while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
-	{
-
-		if (strcmp(user1.id, id) == 0 && strcmp(user1.password, password) == 0)
+		printf("Enter your user ID(4 characters) = ");
+		rewind(stdin);
+		scanf("%s", id);
+		while (strlen(id) != 4)
 		{
 
-			printf("Name = %s\n", user1.name);
-			printf("ID   = %s\n", user1.id);
-			printf("Password = %s\n", user1.password);
-			printf("Gender is = %s\n", user1.gender);
-			printf("Contact number is = %s\n", user1.contact);
-			system("pause");
-			return;
-
-
+			if (strlen(id) != 4)
+			{
+				printf("Enter a id that is 4 characters  = ");
+				rewind(stdin);
+				scanf("%s", id);
+			}
 
 
 		}
 
 
+
+
+		while (fread(&user1, sizeof(userData), 1, userinfo1) != 0)
+		{
+
+			if (strcmp(user1.id, id) == 0)
+			{
+
+				printf("Name = %s\n", user1.name);
+				printf("ID   = %s\n", user1.id);
+				printf("Password = %s\n", user1.password);
+				printf("Gender is = %s\n", user1.gender);
+				printf("Contact number is = %s\n", user1.contact);
+				system("pause");
+				return;
+				
+
+
+
+
+			}
+
+
+		}
+		
+			
+			
+
+
+
+	
+
+
+
 	}
+	
 }
 
-void userInfo()
+int userInfo()
 {
 	/*system("cls");
 	printf("\t\t\t\t\t\t__________________________\n");
@@ -911,6 +870,16 @@ void userInfo()
 void userinfoMain() {
 
 
-	userInfo();
+	
+	if (!_staffLogin(sessionStaffID, 99))
+	{
+		return ;
+	}
+	
+	while (userInfo())
+	{
+		continue;
+	}
+	
 
 }
