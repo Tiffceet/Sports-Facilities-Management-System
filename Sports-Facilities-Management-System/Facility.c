@@ -8,10 +8,6 @@ void facInfoMain()
 	{
 		return;
 	}
-	while (facilityMenu())
-	{
-		continue;
-	}
 	FILE *f = fopen(staffFilePath, "rb");
 	// find staffData of the staff log on
 	while (fread(&staffLogon, sizeof(Staff), 1, f) != 0) 
@@ -86,7 +82,7 @@ void addNewFacility()
 		getSystemDate(&fac.lastModified);
 
 		printf("\nFacility ID              : %s\n", fac.id);
-		printf("Facility Name            : %s\n", fac.name);
+		printf("Facility Name            : %s\n",toupper(fac.name));
 		printf("Facility Maintenance Date: %02d/%02d\n", fac.maintenanceDate.d, fac.maintenanceDate.m);
 		printf("Facility Remarks         : %s\n", fac.remarks);
 		printf("\nComfirm Adding facility ? (y = yes) ");
@@ -111,11 +107,10 @@ void addNewFacility()
 void searchFacility()
 {
 	char searchFacilityName[200];
-	Facility facility[10] = {"0"};
-	FILE*facilityFile;
-	facilityFile = fopen(facilityFilePath, "rb");
+	Facility facData[100];
+	FILE *f = fopen(facilityFilePath, "rb");
 
-	while (!chkFileExist(facilityFile))
+	while (!chkFileExist(f))
 	{
 		printf("Cannot find facility file\n");
 		return;
@@ -126,21 +121,22 @@ void searchFacility()
 
 	int i = 0;
 
-	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
+	while (fread(&facData[i], sizeof(Facility), 1, f) != 0)
 	{
-		if (strcmp(facility[i].name, searchFacilityName) == 0)
+		if (strcmp(facData[i].name, searchFacilityName) == 0)
 		{
 
-			printf("Name = %s\n", facility[i].name);
-			printf("ID   = %s\n", facility[i].id);
-			printf(" Maintenance Date =%02d/%02d\n", facility[i].maintenanceDate);
-			printf(" Remarks = %s\n", facility[i].remarks);
+			printf("Name = %s\n", facData[i].name);
+			printf("ID   = %s\n", facData[i].id);
+			printf(" Maintenance Date =%02d/%02d\n", facData[i].maintenanceDate.d, facData[i].maintenanceDate.m);
+			printf(" Remarks = %s\n", facData[i].remarks);
 			system("pause");
 			return;
 		}
-		else
-			i++;
+		
+		i++;
 	}
+
 	printf("No facility can be found!\n");
 	system("pause");
 		
@@ -290,7 +286,7 @@ void modifyFacility()
 				break;
 			}
 		} while (tolower(choice[0]) == 'r');
-		printf("Modify more facility ? (y=yes) ");
+		printf("Modify more facility ? (y=yes/n=no) ");
 		getUserMenuChoice(choice, 9, "Modify more facility ? (y=yes) ");
 	} while (tolower(choice[0]) == 'y');
 
@@ -361,8 +357,10 @@ int facilityMenu()
 	case 4:
 		displayAllFacility();
 		break;		
+	case 5:
+		return 5;
 	default:
-		return;
+		return -1;
 	}
 	return choice;
 
