@@ -118,27 +118,24 @@ void searchFacility()
 	printf("Search by name:");
 	s_input(searchFacilityName,199);
 
+	int i = 0;
+
 	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
 	{
-
-		if (strcmp(facility[0].name, searchFacilityName) == 0)
+		if (strcmp(facility[i].name, searchFacilityName) == 0)
 		{
 
-			printf("Name = %s\n", facility[0].name);
-			printf("ID   = %s\n", facility[0].id);
-			printf(" Maintenance Date =%02d/%02d\n", facility[0].maintenanceDate);
-			printf(" Remarks = %s\n", facility[0].remarks);
+			printf("Name = %s\n", facility[i].name);
+			printf("ID   = %s\n", facility[i].id);
+			printf(" Maintenance Date =%02d/%02d\n", facility[i].maintenanceDate);
+			printf(" Remarks = %s\n", facility[i].remarks);
 			system("pause");
 			return;
 		}
-		else 
-		{
-			printf("No facility can be found!");
-			return;
-		}
-
+		else
+			i++;
 	}
-			
+		
 }
 
 void modifyFacility()
