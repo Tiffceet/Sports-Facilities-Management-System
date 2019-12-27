@@ -11,19 +11,18 @@ BookingData bData[100];
 
 void fusagemain()
 {
-	/*if (_staffLogin(sessionStaffID, 100))
-	{*/
+	if (_staffLogin(sessionStaffID, 100))
+	{
 		fUsageRecord();
 		while (fUsageMenu())
 		{
 			continue;
 		}
-	/*}*/
+	}
 }
 
 void fUsageRecord()
 {
-	readBookingFileToFUsageFile();
 	totalRecord = 0;
 	FILE* f = fopen(fUsageFilePath, "r");
 	if (!chkFileExist(f))
@@ -676,11 +675,11 @@ void fUsageModify()
 		switch (choice)
 		{
 		case 1:
-			chkTime(modifyFUsage.time);
-			i = strtol(modifyFUsage.time, NULL, 10) - 1;
+			chkTime(cacheData.time);
+			i = strtol(cacheData.time, NULL, 10) - 1;
 			break;
 		case 2:
-			slctFacilityID(modifyFUsage.facilityID);
+			slctFacilityID(cacheData.facilityID);
 			break;
 		default:
 			break;
@@ -998,10 +997,11 @@ int date(Date* date)
 	 return NULL;
  }
 
- /*void readBookingFileToFUsageFile()
+ void readBookingFileToFUsageFile()
  {
 	 bDataCount = 0;
   
+	 FILE*f2 = fopen(bookingFilePath, "r");
 	 while (fscanf(f2, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
 		 bData[bDataCount].bookingID,
 		 &bData[bDataCount].currentDate.d, &bData[bDataCount].currentDate.m, &bData[bDataCount].currentDate.y,
@@ -1015,7 +1015,7 @@ int date(Date* date)
 			 bDataCount++;
 		}
 	 system("pause");
- }*/
+ }
 
  /*void chkAvailableAdd(Date* date, int* time, char* facilityID)
  {
