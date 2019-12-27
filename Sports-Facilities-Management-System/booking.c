@@ -1410,6 +1410,12 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 		}
 		remarkLine[2][a] = fac->remarks[a + 48];
 	}
+	if(strlen(fac->remarks) == 0)
+	{
+		remarkLine[0][0] = '\0';
+		remarkLine[1][0] = '\0';
+		remarkLine[2][0] = '\0';
+	}
 
 	printf("%40s                Booking\n", "");
 	printf("%40s---------------------------------------\n", "");
