@@ -3,6 +3,7 @@
 
 void facInfoMain()
 {
+
 	if (!_staffLogin(sessionStaffID, 99))
 	{
 		return;
@@ -24,6 +25,7 @@ void facInfoMain()
 	// if user finally wants to log out
 	sessionStaffID[0] = '\0';
 
+	//sessionStaffID
 }
 
 
@@ -80,7 +82,7 @@ void addNewFacility()
 		getSystemDate(&fac.lastModified);
 
 		printf("\nFacility ID              : %s\n", fac.id);
-		printf("Facility Name            : %s\n", fac.name);
+		printf("Facility Name            : %s\n",toupper(fac.name));
 		printf("Facility Maintenance Date: %02d/%02d\n", fac.maintenanceDate.d, fac.maintenanceDate.m);
 		printf("Facility Remarks         : %s\n", fac.remarks);
 		printf("\nComfirm Adding facility ? (y = yes) ");
@@ -105,11 +107,10 @@ void addNewFacility()
 void searchFacility()
 {
 	char searchFacilityName[200];
-	Facility facility[10] = {"0"};
-	FILE*facilityFile;
-	facilityFile = fopen(facilityFilePath, "rb");
+	Facility facData[100];
+	FILE *f = fopen(facilityFilePath, "rb");
 
-	while (!chkFileExist(facilityFile))
+	while (!chkFileExist(f))
 	{
 		printf("Cannot find facility file\n");
 		return;
@@ -118,27 +119,27 @@ void searchFacility()
 	printf("Search by name:");
 	s_input(searchFacilityName,199);
 
-	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
-	{
+	int i = 0;
 
-		if (strcmp(facility[0].name, searchFacilityName) == 0)
+	while (fread(&facData[i], sizeof(Facility), 1, f) != 0)
+	{
+		if (strcmp(facData[i].name, searchFacilityName) == 0)
 		{
 
-			printf("Name = %s\n", facility[0].name);
-			printf("ID   = %s\n", facility[0].id);
-			printf(" Maintenance Date =%02d/%02d\n", facility[0].maintenanceDate);
-			printf(" Remarks = %s\n", facility[0].remarks);
+			printf("Name = %s\n", facData[i].name);
+			printf("ID   = %s\n", facData[i].id);
+			printf(" Maintenance Date =%02d/%02d\n", facData[i].maintenanceDate.d, facData[i].maintenanceDate.m);
+			printf(" Remarks = %s\n", facData[i].remarks);
 			system("pause");
 			return;
 		}
-		else 
-		{
-			printf("No facility can be found!");
-			return;
-		}
-
+		
+		i++;
 	}
-			
+
+	printf("No facility can be found!\n");
+	system("pause");
+		
 }
 
 void modifyFacility()
@@ -285,7 +286,7 @@ void modifyFacility()
 				break;
 			}
 		} while (tolower(choice[0]) == 'r');
-		printf("Modify more facility ? (y=yes) ");
+		printf("Modify more facility ? (y=yes/n=no) ");
 		getUserMenuChoice(choice, 9, "Modify more facility ? (y=yes) ");
 	} while (tolower(choice[0]) == 'y');
 
@@ -356,8 +357,10 @@ int facilityMenu()
 	case 4:
 		displayAllFacility();
 		break;		
+	case 5:
+		return 5;
 	default:
-		return;
+		return -1;
 	}
 	return choice;
 
