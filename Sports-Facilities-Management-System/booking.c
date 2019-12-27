@@ -590,7 +590,7 @@ void bookingModifyRecords()
 	int dataCount = readBookingDataIntoStructArray(data, 100);
 	int filteredDataCount = 0;
 	char choice[10];
-	int userPickedIDX;
+	int userPickedIDX = -1;
 
 	// logins
 	char userID[100];
@@ -613,7 +613,6 @@ void bookingModifyRecords()
 	if (tolower(choice[0]) == 'y')
 	{
 		// This function have generateFilteredSearchResult() call in it
-		// generateFilteredSearchResult should not call from bookingSearchRecords
 		bookingSearchRecords(1, filteredData, &filteredDataCount, 0, userID, &data[0], dataCount); 
 	}
 	else
@@ -631,6 +630,8 @@ void bookingModifyRecords()
 
 	if (filteredDataCount > 0)
 	{
+		Date dt;
+		getSystemDate(&dt);
 		int r; // to keep track of i_input() return val
 		do {
 			printf("<!> Enter '0' to return to menu <!>\n");
@@ -642,8 +643,18 @@ void bookingModifyRecords()
 				{
 					return;
 				}
+				if (userPickedIDX > 0 && userPickedIDX <= filteredDataCount && compareDate(dt.d, dt.m, dt.y,
+					filteredData[userPickedIDX - 1]->bookingDate.d,
+					filteredData[userPickedIDX - 1]->bookingDate.m,
+					filteredData[userPickedIDX - 1]->bookingDate.y) != -1) // if booking date is not later than current date, you are not allowed to modify
+				{
+					printf("You are not allowed to modify booking with booking date before today and today.\n");
+					system("pause");
+					r = 0;
+				}
 			}
-		} while (!r && userPickedIDX < 1 || userPickedIDX > filteredDataCount);
+		} while (!r
+			|| userPickedIDX < 1 || userPickedIDX > filteredDataCount);
 		modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
 		system("pause");
 	}
