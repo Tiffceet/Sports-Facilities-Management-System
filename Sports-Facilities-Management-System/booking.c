@@ -560,19 +560,20 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			}
 		}
 
-		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s %-12.12s %-15.15s |\n",
+		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s ",
 			count + 1,
 			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-			// data[a].facilityID,
 			data[a].facilityID,
-			getFacilityByID(data[a].facilityID)->name,
-			//data[a].usrID,
-			getUserDataByID(data[a].usrID)->name,
-			//data[a].staffID);
-			getStaffDataByID(data[a].staffID)->stfName);
+			getFacilityByID(data[a].facilityID)->name);
+		userData *usrData;
+		if (usrData = getUserDataByID(data[a].usrID))
+			printf("%-12.12s", usrData->name);
+		else
+			printf("%-12.12s", "-");
+		printf(" %-15.15s |\n", getStaffDataByID(data[a].staffID)->stfName);
 		filteredData[count] = &data[a];
 		count++;
 	}
@@ -824,18 +825,21 @@ void bookingDisplayAll()
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
 	for (int a = 0; a < dataToPrintCount; a++)
 	{
-		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s %-12.12s %-15.15s |\n",
+		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s ",
 			dataToPrint[a]->currentDate.d, dataToPrint[a]->currentDate.m, dataToPrint[a]->currentDate.y, dataToPrint[a]->currentTime.h, dataToPrint[a]->currentTime.m,
 			dataToPrint[a]->bookingID,
 			dataToPrint[a]->bookingDate.d, dataToPrint[a]->bookingDate.m, dataToPrint[a]->bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(dataToPrint[a]->timeSlotsBooked)],
 			// data[a].facilityID,
 			dataToPrint[a]->facilityID,
-			getFacilityByID(dataToPrint[a]->facilityID)->name,
-			//data[a].usrID,
-			getUserDataByID(dataToPrint[a]->usrID)->name,
-			//data[a].staffID);
-			getStaffDataByID(dataToPrint[a]->staffID)->stfName);
+			getFacilityByID(dataToPrint[a]->facilityID)->name);
+		userData *usrData;
+		if (usrData = getUserDataByID(dataToPrint[a]->usrID)) // if userID is null then print '-', this happens when staff make booking
+			printf("%-12.12s", usrData->name);
+		else
+			printf("%-12.12s", "-");
+			
+		printf(" %-15.15s |\n", getStaffDataByID(dataToPrint[a]->staffID)->stfName);
 	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "======================================================================================================================");
@@ -874,9 +878,9 @@ void bookingDisplayFilters(BookingData *data, int dataCount, char userID[])
 	if (mode == 'u') // if it is on user mode, there should be exactly one entry in user filter
 	{
 		isSet[5] = 1;
+		userFilter[0] = getUserDataByID(userID);
+		uCount = 1;
 	}
-	userFilter[0] = getUserDataByID(userID);
-	uCount = 1;
 
 	char filterChoice[10];
 	int recordsCount = 0; // to keep track of how many records is printed
@@ -1828,6 +1832,7 @@ Staff* getStaffDataByID(char *id)
 	return NULL;
 }
 
+// return pointer to user data, null if not found or no data
 userData* getUserDataByID(char *id)
 {
 	if (usrDataCount == 0)
@@ -1844,6 +1849,7 @@ userData* getUserDataByID(char *id)
 	return NULL;
 }
 
+// return pointer to faciltiy data, null if not found or no data
 Facility* getFacilityByID(char *id)
 {
 	if (facilityDataCount == 0)
@@ -1888,7 +1894,7 @@ int _usrLogin(char *usrID, int size)
 		printf("Enter 'XXX' to return to previous screen\n");
 		printf("User ID -> ");
 		s_input(usrID, size);
-		if (strcmp(usrID, "XXX") == 0)
+		if (strcmp(usrID, "XXX") == 0 || strcmp(usrID, "xxx") == 0)
 		{
 			return 0;
 		}
