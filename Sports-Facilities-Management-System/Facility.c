@@ -141,6 +141,8 @@ void searchFacility()
 		else
 			i++;
 	}
+	printf("No facility can be found!\n");
+	system("pause");
 		
 }
 
