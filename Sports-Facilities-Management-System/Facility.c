@@ -3,9 +3,14 @@
 
 void facInfoMain()
 {
+
 	if (!_staffLogin(sessionStaffID, 99))
 	{
 		return;
+	}
+	while (facilityMenu())
+	{
+		continue;
 	}
 	FILE *f = fopen(staffFilePath, "rb");
 	// find staffData of the staff log on
@@ -24,6 +29,7 @@ void facInfoMain()
 	// if user finally wants to log out
 	sessionStaffID[0] = '\0';
 
+	//sessionStaffID
 }
 
 
