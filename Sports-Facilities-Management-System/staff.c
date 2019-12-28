@@ -4,8 +4,6 @@
 /*
 TO DO LIST
 1.ADD CENCORED TO PASSWORD
-2.MAKE IT SO THIERS ONLY ONE ADMIN WHO CAN DICIDE PASS THEIR POSITION
-3.DONT DISPLAY STAFF ID HEHEHE
 */
 
 Staff staffCache[30];//Main array to keep staff info from files
@@ -224,7 +222,7 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 		printf("%25s====================================================================\n", "");
 		printf("%25s|%20sREGISTING STAFF INFOMATION%20s|\n", "", "", "");
 		printf("%25s====================================================================\n", "");
-		printf("%25s|Name :%-60s|\n%25s|ID :%-62s|\n%25s|Position :%-56s|\n","", addStaff.stfName,"",addStaff.stfID,"",addStaff.stfPosi);
+		printf("%25s|Name :%-60s|\n%25s|Position :%-56s|\n","", addStaff.stfName,"",addStaff.stfPosi);
 		printf("%25s====================================================================\n", "");
 		printf("Do you want to add this staff to the system?(y=yes) :");
 		getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
@@ -301,10 +299,9 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 	{
 		
 		printf("%25s|Name :%-60s|\n"
-			"%25s|ID :%-62s|\n"
 			"%25s|Position :%-56s|\n"
 			"%25s|Date :%d/%d/%-54d|\n"
-			"%25s|Last modified :%d/%d/%-45d|\n","",staffCache[i].stfName,"",staffCache[i].stfID,"",staffCache[i].stfPosi,"",staffCache[i].dateRegis.d,staffCache[i].dateRegis.m, staffCache[i].dateRegis.y,"",staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
+			"%25s|Last modified :%d/%d/%-45d|\n","",staffCache[i].stfName,"",staffCache[i].stfPosi,"",staffCache[i].dateRegis.d,staffCache[i].dateRegis.m, staffCache[i].dateRegis.y,"",staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 		printf("%25s====================================================================\n", "");
 	}
 }
@@ -335,10 +332,9 @@ int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 					printf("%25s|%28sSTAFF LIST%28s|\n", "", "", "");
 					printf("%25s====================================================================\n", "");
 					printf("%25s|Name :%-60s|\n"
-						"%25s|ID :%-62s|\n"
 						"%25s|Position :%-56s|\n"
 						"%25s|Date :%d/%d/%-54d|\n"
-						"%25s|Last modified :%d/%d/%-45d|\n", "", staffCache[i].stfName, "", staffCache[i].stfID, "", staffCache[i].stfPosi, "", staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y, "", staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
+						"%25s|Last modified :%d/%d/%-45d|\n", "", staffCache[i].stfName, "", staffCache[i].stfPosi, "", staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y, "", staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 					printf("%25s====================================================================\n", "");
 					break;
 				}
