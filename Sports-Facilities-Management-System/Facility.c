@@ -118,7 +118,7 @@ void searchFacility()
 
 	printf("Search by name(Enter xxx to exit):");
 	s_input(searchFacilityName,199);
-	if (tolower(searchFacilityName) == 'xxx')
+	if (strcmp(searchFacilityName, "XXX") == 0 || strcmp(searchFacilityName, "xxx") == 0)
 	{
 		return;
 	}
