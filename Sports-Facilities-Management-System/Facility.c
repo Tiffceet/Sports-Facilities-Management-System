@@ -328,7 +328,7 @@ void displayAllFacility()
 	}
 	while (fread(&facData[dataCount], sizeof(Facility),1,f) != 0)
 	{
-		printf("ID: %s\n", facData[dataCount].id);
+		printf("\nID: %s\n", facData[dataCount].id);
 		printf("Name: %s\n", facData[dataCount].name);
 		printf("Yearly Maintenance Date: %02d/%02d\n", facData[dataCount].maintenanceDate.d, facData[dataCount].maintenanceDate.m);
 		printf("Date Last Modified: %02d/%02d/%04d\n", facData[dataCount].lastModified.d, facData[dataCount].lastModified.m, facData[dataCount].lastModified.y);
