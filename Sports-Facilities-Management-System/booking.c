@@ -20,7 +20,6 @@ void bookingMain()
 	{
 		return;
 	}
-	strcpy(sessionStaffID, "Looz");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
@@ -39,8 +38,7 @@ int bookingMenu()
 	if (choice < 0 && choice > -6)
 	{
 		mode = 's'; // set staffMode
-	}
-	char ch[10];
+	}	
 	switch (choice) // calling math.abs might be a better workaround
 	{
 	case 1:
@@ -144,7 +142,7 @@ void bookingBook()
 			if (firstIteration)
 			{
 				bipChangeFacility(userPickedfacilityID);
-				bipChangeBookingDate(&userPickedDate);
+				bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 				bipChangeTimeslot(0, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 				firstIteration = 0;
 			}
@@ -168,25 +166,25 @@ void bookingBook()
 					if (!tmpR) // if no timeslot anymore
 					{
 						printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
-						bipChangeBookingDate(&userPickedDate);
+						bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
 					{
 						printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
-						bipChangeBookingDate(&userPickedDate);
+						bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 					getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
 					if (tolower(choice[0]) != 'y')
 					{
-						bipChangeBookingDate(&userPickedDate);
+						bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					break;
 				case '2':
-					bipChangeBookingDate(&userPickedDate);
+					bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 					bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					break;
 				case '3':
@@ -196,7 +194,7 @@ void bookingBook()
 			}
 
 			// printing of display
-			sprintf(statusText[0], "(%s) %s",userPickedfacilityID, getFacilityByID(userPickedfacilityID)->name);
+			sprintf(statusText[0], "(%s) %s", userPickedfacilityID, getFacilityByID(userPickedfacilityID)->name);
 			sprintf(statusText[1], "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 			strcpy(statusText[2], TIMESLOTS[userPickedtimeslot]);
 
@@ -273,7 +271,7 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 	char userID[100];
 	userID[0] = '\0';
 	// logins
-	if(requireUserLogin){
+	if (requireUserLogin) {
 		if (mode == 'u') // user mode
 		{
 			if (!_usrLogin(userID, 100))
@@ -408,7 +406,7 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 			return;
 		case 'x':
 		case 'X':
-			
+
 
 			// check if caller function wants to showRawDataOnly
 			if (showRawRecordsOnly)
@@ -581,13 +579,13 @@ void bookingModifyRecords()
 			return;
 		}
 	}
-	
+
 	printf("Would you like to filter the bookings before selecting records to modify (y=yes)? ");
 	getUserMenuChoice(choice, 9, "Would you like to filter the bookings before selecting records to modify (y=yes)? ");
 	if (tolower(choice[0]) == 'y')
 	{
 		// This function have generateFilteredSearchResult() call in it
-		bookingSearchRecords(1, filteredData, &filteredDataCount, 0, userID, &data[0], dataCount); 
+		bookingSearchRecords(1, filteredData, &filteredDataCount, 0, userID, &data[0], dataCount);
 	}
 	else
 	{
@@ -717,27 +715,26 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 			if (!tmpR) // if no timeslot anymore
 			{
 				printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
-				bipChangeBookingDate(&cache.bookingDate);
+				bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
 			{
 				printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
-				bipChangeBookingDate(&cache.bookingDate);
+				bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", cache.bookingDate.d, cache.bookingDate.m, cache.bookingDate.y);
 			getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
 			if (tolower(choice[0]) != 'y')
 			{
-				bipChangeBookingDate(&cache.bookingDate);
+				bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			break;
 		case '2':
-			bipChangeBookingDate(&cache.bookingDate);
+			bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 			bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
-			printf("\n\n%s\n\n", bookingToModify->bookingID);
 			break;
 		case '3':
 			bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
@@ -855,7 +852,7 @@ void bookingDisplayAll()
 			printf("%-12.12s", usrData->name);
 		else
 			printf("%-12.12s", "-");
-			
+
 		printf(" %-15.15s |\n", getStaffDataByID(dataToPrint[a]->staffID)->stfName);
 	}
 	printf("%s\n", "======================================================================================================================");
@@ -1431,7 +1428,7 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 		}
 		remarkLine[2][a] = fac->remarks[a + 48];
 	}
-	if(strlen(fac->remarks) == 0)
+	if (strlen(fac->remarks) == 0)
 	{
 		remarkLine[0][0] = '\0';
 		remarkLine[1][0] = '\0';
@@ -1652,7 +1649,7 @@ int getTimeslotArrayCount(int*timeslot)
 	int count = 0;
 	for (int a = 0; a < 6; a++)
 	{
-		if(timeslot[a])
+		if (timeslot[a])
 			count++;
 	}
 	return count;
@@ -1719,7 +1716,8 @@ int bipChangeFacility(char *userPickedfacilityID)
 }
 
 // Return 1 if bookingDate changed successfully
-int bipChangeBookingDate(Date *bookingDate)
+// added facilityID parameter to check for maintenance date
+int bipChangeBookingDate(Date *bookingDate, char facilityID[])
 {
 	// If available, ask user for date
 	Date currentDate;
@@ -1727,20 +1725,31 @@ int bipChangeBookingDate(Date *bookingDate)
 	int dateErr = 0;
 	int r; // r to check scanf() result
 	do {
-		if (dateErr)
+		do {
+			if (dateErr)
+			{
+				printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
+			}
+			dateErr = 1;
+			printf("Booking Date ? <dd/mm/yyyy> ");
+			rewind(stdin);
+			r = scanf("%d/%d/%d", &bookingDate->d, &bookingDate->m, &bookingDate->y);
+			rewind(stdin);
+		} while (r != 3 ||
+			!validateDate(bookingDate->d, bookingDate->m, bookingDate->y) ||
+			compareDate(bookingDate->d, bookingDate->m, bookingDate->y, currentDate.d, currentDate.m, currentDate.y) != 1
+			);
+		Facility *fac = getFacilityByID(facilityID);
+		if (compareDate(bookingDate->d, bookingDate->m, bookingDate->y, fac->maintenanceDate.d, fac->maintenanceDate.m, bookingDate->y) == 0)
 		{
-			printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
+			printf("The facility is under maintenance on that date, please book other day.\n");
+			continue;
 		}
-		dateErr = 1;
-		printf("Booking Date ? <dd/mm/yyyy> ");
-		rewind(stdin);
-		r = scanf("%d/%d/%d", &bookingDate->d, &bookingDate->m, &bookingDate->y);
-		rewind(stdin);
-	} while (r != 3 ||
-		!validateDate(bookingDate->d, bookingDate->m, bookingDate->y) ||
-		compareDate(bookingDate->d, bookingDate->m, bookingDate->y, currentDate.d, currentDate.m, currentDate.y) != 1
-		);
-	err = 0;
+		else
+		{
+			break;
+		}
+	} while (1);
 	return 1;
 }
 
@@ -1756,7 +1765,7 @@ int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, Bo
 		printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date\n");
 		return 0;
 	}
-	if(userAlreadyPickedTimeslot)
+	if (userAlreadyPickedTimeslot)
 		timeslotAvailable[*userPickedtimeslot] = 1;
 	printf("Timeslots: \n");
 	for (int a = 0; a < 6; a++)
