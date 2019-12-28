@@ -40,6 +40,7 @@ int bookingMenu()
 	{
 		mode = 's'; // set staffMode
 	}
+	char ch[10];
 	switch (choice) // calling math.abs might be a better workaround
 	{
 	case 1:
@@ -575,9 +576,12 @@ void bookingModifyRecords()
 	}
 	else if (mode == 's')
 	{
-		_staffPWReauth();
+		if (!_staffPWReauth())
+		{
+			return;
+		}
 	}
-
+	
 	printf("Would you like to filter the bookings before selecting records to modify (y=yes)? ");
 	getUserMenuChoice(choice, 9, "Would you like to filter the bookings before selecting records to modify (y=yes)? ");
 	if (tolower(choice[0]) == 'y')
@@ -598,42 +602,74 @@ void bookingModifyRecords()
 		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, userFilter, 1, NULL, NULL);
 	}
 
-	if (filteredDataCount > 0)
-	{
-		Date dt;
-		getSystemDate(&dt);
-		int r; // to keep track of i_input() return val
-		do {
-			printf("<!> Enter '0' to return to menu <!>\n");
-			printf("Select records to modify (%d-%d) ", 1, filteredDataCount);
-			r = i_input(&userPickedIDX);
-			if (r)
-			{
-				if (userPickedIDX == 0)
-				{
-					return;
-				}
-				if (userPickedIDX > 0 && userPickedIDX <= filteredDataCount && compareDate(dt.d, dt.m, dt.y,
-					filteredData[userPickedIDX - 1]->bookingDate.d,
-					filteredData[userPickedIDX - 1]->bookingDate.m,
-					filteredData[userPickedIDX - 1]->bookingDate.y) != -1) // if booking date is not later than current date, you are not allowed to modify
-				{
-					printf("You are not allowed to modify booking with booking date before today and today.\n");
-					system("pause");
-					r = 0;
-				}
+	int firstIteration = 1;
+	do {
+		if (!firstIteration)
+		{
+			// Printing of filteredResult
+			printf("%s\n", "======================================================================================================================");
+			printf("%s\n", "|                                               Booking Transactions                                                 |");
+			printf("%s\n", "======================================================================================================================");
+			printf("%s\n", "| No. | DateofTransaction BookingID BookingDate TimeslotBooked FacilityBooked           Booked by    Registered by   |");
+			printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
+			for (int a = 0; a < filteredDataCount; a++) {
+				printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s ",
+					a + 1,
+					filteredData[a]->currentDate.d, filteredData[a]->currentDate.m, filteredData[a]->currentDate.y, filteredData[a]->currentTime.h, filteredData[a]->currentTime.m,
+					filteredData[a]->bookingID,
+					filteredData[a]->bookingDate.d, filteredData[a]->bookingDate.m, filteredData[a]->bookingDate.y,
+					TIMESLOTS[getTimeslotBooked(filteredData[a]->timeSlotsBooked)],
+					filteredData[a]->facilityID,
+					getFacilityByID(filteredData[a]->facilityID)->name);
+				userData *uData;
+				if (uData = getUserDataByID(filteredData[a]->usrID))
+					printf("%-12.12s", uData->name);
+				else
+					printf("%-12.12s", "-");
+				printf(" %-15.15s |\n", getStaffDataByID(filteredData[a]->staffID)->stfName);
 			}
-		} while (!r
-			|| userPickedIDX < 1 || userPickedIDX > filteredDataCount);
-		modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
-		system("pause");
-	}
-	else
-	{
-		printf("No records was found...\n");
-		system("pause");
-	}
-
+			printf("%s\n", "======================================================================================================================");
+			printf("%s\n\n", "======================================================================================================================");
+		}
+		if (filteredDataCount > 0)
+		{
+			Date dt;
+			getSystemDate(&dt);
+			int r; // to keep track of i_input() return val
+			do {
+				printf("<!> Enter '0' to return to menu <!>\n");
+				printf("Select records to modify (%d-%d) ", 1, filteredDataCount);
+				r = i_input(&userPickedIDX);
+				if (r)
+				{
+					if (userPickedIDX == 0)
+					{
+						return;
+					}
+					if (userPickedIDX > 0 && userPickedIDX <= filteredDataCount && compareDate(dt.d, dt.m, dt.y,
+						filteredData[userPickedIDX - 1]->bookingDate.d,
+						filteredData[userPickedIDX - 1]->bookingDate.m,
+						filteredData[userPickedIDX - 1]->bookingDate.y) != -1) // if booking date is not later than current date, you are not allowed to modify
+					{
+						printf("You are not allowed to modify booking with booking date before today and today.\n");
+						system("pause");
+						r = 0;
+					}
+				}
+			} while (!r
+				|| userPickedIDX < 1 || userPickedIDX > filteredDataCount);
+			modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
+			printf("Do you wish to modify more bookings ? (y=yes) ");
+			getUserMenuChoice(choice, 9, "Do you wish to modify more bookings ? (y=yes) ");
+		}
+		else
+		{
+			printf("No records was found...\n");
+			system("pause");
+			return;
+		}
+		firstIteration = 0;
+	} while (tolower(choice[0]) == 'y');
 }
 
 // Modify specific booking
@@ -721,14 +757,14 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 	printf(" <----------------------------------------------------->\n");
 	printf(" ->                 OLD Booking Details                <-\n");
 	printf(" <----------------------------------------------------->\n");
-	printf(" | Facility     : %-36.36s |\n", getFacilityByID(bookingToModify->facilityID)->name);
+	printf(" | Facility     : (%-5.5s) %-28.28s |\n", bookingToModify->facilityID, getFacilityByID(bookingToModify->facilityID)->name);
 	printf(" | Booking Date : %02d/%02d/%04d%26s |\n", bookingToModify->bookingDate.d, bookingToModify->bookingDate.m, bookingToModify->bookingDate.y, "");
 	printf(" | Timeslot     : %-36.36s |\n", TIMESLOTS[getTimeslotBooked(bookingToModify->timeSlotsBooked)]);
 	printf(" <----------------------------------------------------->\n\n");
 	printf(" <----------------------------------------------------->\n");
 	printf(" ->                 NEW Booking Details                <-\n");
 	printf(" <----------------------------------------------------->\n");
-	printf(" | Facility     : %-36.36s |\n", getFacilityByID(cache.facilityID)->name);
+	printf(" | Facility     : (%-5.5s) %-28.28s |\n", cache.facilityID, getFacilityByID(cache.facilityID)->name);
 	printf(" | Booking Date : %02d/%02d/%04d%26s |\n", cache.bookingDate.d, cache.bookingDate.m, cache.bookingDate.y, "");
 	printf(" | Timeslot     : %-36.36s |\n", TIMESLOTS[getTimeslotBooked(cache.timeSlotsBooked)]);
 	printf(" <----------------------------------------------------->\n\n");
