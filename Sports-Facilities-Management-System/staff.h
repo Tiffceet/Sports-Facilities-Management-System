@@ -16,11 +16,12 @@ typedef struct
 	Time timeModi;
 }Staff;
 
-void addStaffList();
+int addStaffList();
+//void noStaffRegistration();
 void displayStaffList();
 void staffMain();
 void pwRecover();
-void changeStfList();
+int changeStfList();
 void login();
 void pwRecover();
 void staffSearchID();

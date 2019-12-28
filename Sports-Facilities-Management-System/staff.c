@@ -3,10 +3,9 @@
 
 /*
 TO DO LIST
-1.ADD CHECKING FOR ALL FILE PATHS
-2.ADD CENCORED TO PASSWORD
-3.MAKE IT SO THIERS ONLY ONE ADMIN WHO CAN DICIDE PASS THEIR POSITION
-3iMAKE A NEW NO STAFF MEMBER REGISTRATION MODULE
+1.ADD CENCORED TO PASSWORD
+2.MAKE IT SO THIERS ONLY ONE ADMIN WHO CAN DICIDE PASS THEIR POSITION
+3.DONT DISPLAY STAFF ID HEHEHE
 */
 
 Staff staffCache[30];//Main array to keep staff info from files
@@ -25,7 +24,7 @@ int readStfList()
 	}
 	fclose(readstf);
 	return count;
-}
+} 
 
 int isAlNum(char str[])
 {
@@ -47,10 +46,11 @@ int isAlNum(char str[])
 	return 1;
 }
 
-void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENTRY)
+int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENTRY)
 {
 	int i, valid,totstaff,totalCondition,strLength,ifUsed;//for loop
-	char idEntered[6],choice[3]; //to check if id entered is being used
+	int changeAdmin = 0;
+	char idEntered[6],choice[3],ans; //to check if id entered is being used
 	
 	// read file + get count of item in files
 	totstaff = readStfList();
@@ -62,16 +62,26 @@ void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY EN
 	if (!stf)//For checking exsitent of file.
 	{
 		printf("Can't open");
-		return;
+		return 1;
 	}
 		
+	printf("%25s====================================================================\n", "");
+	printf("%25s|%24sSTAFF REGISTRATION%24s|\n", "", "", "");
+	printf("%25s====================================================================\n", "");
+
 	do
 	{
 		strLength = 0;
 		ifUsed = 1;
 		totalCondition = 3;
-		printf("Enter staff name : ");
+		printf("Enter staff name (Enter ""CANCEL"" to return to staff module) : ");
 		scanf("%[^\n]", addStaff.stfName);
+		if (strcmp(addStaff.stfName, "CANCEL") == 0)
+		{
+			printf("Returning to staff module.\n");
+			system("pause");
+			return 1;
+		}
 		if ((strlen(addStaff.stfName)) < 30)
 		{
 			strLength = 1;
@@ -186,7 +196,19 @@ void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY EN
 			switch (choice[0])
 			{
 			case '1':
-				strcpy(addStaff.stfPosi, "ADMIN");
+				printf("Making this staff admin will strip you of your admin position.\n");
+				printf("Do you proceed?(y=yes) :");
+				scanf("%c", &ans);
+				if (ans == 'y')
+				{
+					strcpy(addStaff.stfPosi, "ADMIN");
+					changeAdmin = 1;
+				}
+				else
+				{
+					strcpy(addStaff.stfPosi, "STAFF");
+					printf("The new staff has been assigned positon ""STAFF""\n");
+				}
 				break;
 			case '2':
 				strcpy(addStaff.stfPosi, "STAFF");
@@ -210,6 +232,40 @@ void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY EN
 		if (choice[0] == 'y')
 		{
 
+			if (changeAdmin == 1)
+			{
+				Date sysDate;
+				getSystemDate(&sysDate);
+				printf("Joined date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+				addStaff.dateRegis = sysDate;
+				addStaff.dateModi = sysDate;
+				fwrite(&addStaff, sizeof(Staff), 1, stf);
+				fclose(stf);
+				totstaff = readStfList();
+
+				for (i = 0; i < totstaff; i++)
+				{
+					if (strcmp(loggedinstf.stfID, staffCache[i].stfID) == 0)
+					{
+						strcpy(staffCache[i].stfPosi, "STAFF");
+						stf = fopen(staffFilePath, "wb");
+						for (i = 0; i < totstaff; i++)
+						{
+							fwrite(&staffCache[i], sizeof(Staff), 1, stf);
+						}
+						fclose(stf);
+						printf("Position ""ADMIN"" was pass on to the new staff.\n");
+						printf("Your position was set to ""STAFF""\n");
+						printf("Programming is restarting to enforce the change of admin.\n");
+						system("pause");
+						return 0;
+
+					}
+
+				}
+			}
+
+
 			Date sysDate;
 			getSystemDate(&sysDate);
 			printf("Joined date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
@@ -226,6 +282,7 @@ void addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY EN
 			system("Pause");
 		}
 	fclose(stf);
+	return 1;
 }
 
 void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
@@ -366,11 +423,12 @@ void staffSearchID()
 }
 
 
-void changeStfList()
+int changeStfList()
 {
-	char choice[10];
+	char choice[10],ans;
 	
 	int oldStaffAdd = 0, totstaff, i, totalCondition=0, strLength=0, ifUsed=0,valid=0;
+	int changeAdmin = 0;
 	totstaff = readStfList();
 	Staff staffChange;
 	oldStaffAdd=staffSearchName();
@@ -481,12 +539,32 @@ void changeStfList()
 			case '3':
 				do //maybe add more options
 				{
+					if (strcmp(staffCache[oldStaffAdd].stfPosi, "ADMIN") == 0)
+					{
+						printf("Admins are not allow to change thier position.\n");
+						printf("They are only allow to pass thier position to others.\n");
+						system("Pause");
+						return 1;
+					}
 					printf("1.Admin\n2.staff\nEnter staff position : ");
 					getUserMenuChoice(choice, 3, "Invalid Choice, try again\n");
 					rewind(stdin);
 					switch (choice[0])
 					{
 					case '1':
+						printf("Making this staff admin will strip you of your admin position.\n");
+						printf("Do you proceed?(y=yes) :");
+						scanf("%c", &ans);
+						if (ans == 'y')
+						{
+							strcpy(staffChange.stfPosi, "ADMIN");
+							changeAdmin = 1;
+						}
+						else
+						{
+							strcpy(staffChange.stfPosi, "STAFF");
+							printf("The staff has been assigned positon ""STAFF""\n");
+						}
 						strcpy(staffChange.stfPosi, "ADMIN");
 						break;
 					case '2':
@@ -523,22 +601,57 @@ void changeStfList()
 			getUserMenuChoice(choice, 9, "Invalid Choice, try again\n");
 			if (tolower(choice[0]) == 'y')
 			{
-				strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
-				strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
-				strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
-				Date sysDate;
-				getSystemDate(&sysDate);
-				printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
-				staffCache[oldStaffAdd].dateModi = sysDate;
-				fclose(stfopen);
-				stfopen = fopen(staffFilePath, "wb");
-				for (int a = 0; a < totstaff; a++)
+				if (changeAdmin == 1)
 				{
-					fwrite(&staffCache[a], sizeof(Staff), 1, stfopen);
+					strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
+					strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
+					strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
+					Date sysDate;
+					getSystemDate(&sysDate);
+					printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+					staffCache[oldStaffAdd].dateModi = sysDate;
+
+					for (i = 0; i < totstaff; i++)
+					{
+						if (strcmp(loggedinstf.stfID, staffCache[i].stfID) == 0)
+						{
+							strcpy(staffCache[i].stfPosi, "STAFF");
+							stfopen = fopen(staffFilePath, "wb");
+							for (i = 0; i < totstaff; i++)
+							{
+								fwrite(&staffCache[i], sizeof(Staff), 1, stfopen);
+							}
+							fclose(stfopen);
+						}
+						fclose(stfopen);
+					}
 				}
-				fclose(stfopen);
-
-
+				else
+				{
+					strcpy(staffCache[oldStaffAdd].stfName, staffChange.stfName);
+					strcpy(staffCache[oldStaffAdd].stfPassW, staffChange.stfPassW);
+					strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
+					Date sysDate;
+					getSystemDate(&sysDate);
+					printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+					staffCache[oldStaffAdd].dateModi = sysDate;
+					fclose(stfopen);
+					stfopen = fopen(staffFilePath, "wb");
+					for (i = 0; i < totstaff; i++)
+					{
+						fwrite(&staffCache[i], sizeof(Staff), 1, stfopen);
+					}
+					fclose(stfopen);
+				}
+				if (changeAdmin == 1)
+				{
+					printf("Position ""ADMIN"" was pass on to the new staff.\n");
+					printf("Your position was set to ""STAFF""\n");
+					printf("Programming is restarting to enforce the change of admin.\n");
+					system("pause");
+					return 0;
+				}
+				return 1;
 				printf("Changes have been made,this is the staff's new info.\n");
 				system("pause");
 				system("cls");
@@ -563,6 +676,7 @@ void login()//log in
 
 		do
 		{
+			totstaff = readStfList();
 			printf("%25s====================================================================\n", "");
 			printf("%25s|%26s<STAFF LOGIN>%27s|\n", "", "", "");
 			printf("%25s|%5sNOTE:Only staffs are allowed to login to staff module.%7s|\n", "", "", "");
@@ -605,6 +719,7 @@ void login()//log in
 							system("cls");
 						}
 						system("cls");
+						break;
 					}
 				}
 			}
@@ -617,8 +732,10 @@ void login()//log in
 	else
 	{
 		printf("No record of staff is found.\n");
-		printf("Proceeding to staff registration.\n");
+		printf("Proceeding to ADMIN registration.\n");
 		system("pause");
+		system("cls");
+		//noStaffRegistration();
 	}
 }
 
@@ -784,7 +901,12 @@ void staffMain()
 		case 2:
 			if (position == 0)
 			{
-				addStaffList();
+				int r = addStaffList(); // addStaffList() return 0 if it wish to exit staff module due to some odd reasons
+				if (!r)
+				{
+					return;
+				}
+
 			}
 			else
 			{
@@ -799,7 +921,11 @@ void staffMain()
 		case 4:
 			if (position == 0)
 			{
-				changeStfList();
+				int r =changeStfList();
+				if (!r)
+				{
+					return;
+				}
 			}
 			else
 			{
