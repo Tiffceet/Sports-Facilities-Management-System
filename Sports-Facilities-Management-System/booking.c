@@ -20,7 +20,6 @@ void bookingMain()
 	{
 		return;
 	}
-	strcpy(sessionStaffID, "Looz");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
