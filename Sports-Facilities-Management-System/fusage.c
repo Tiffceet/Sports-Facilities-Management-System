@@ -11,7 +11,7 @@ BookingData bData[100];
 
 void fusagemain()
 {
-	if (_staffLogin(sessionStaffID, 100))
+	if (staffLogin())
 	{
 		fUsageRecord();
 		while (fUsageMenu())
@@ -27,6 +27,7 @@ void fUsageRecord()
 	FILE* f = fopen(fUsageFilePath, "r");
 	if (!chkFileExist(f))
 	{
+		readBookingFileToFUsageFile();
 		printf("There is currently no Facilities Usage Record in the system.\n");
 		system("pause");
 		return 0;
@@ -45,18 +46,21 @@ void fUsageRecord()
 
 void fUsageAddRecord()
 {
-	Date chgDate;
 	FacilityUsage addFUsage;
-	
-	int back;
-	char ctn, cfrm, ctnChg;
-	char choice, selection[10], cfrm2;
-	char chgTime[30], chgUserID[6], chgFacilityID[6], chgUsageType[20];
+	FacilityUsage storeTime[100];
+	bDataCount = readBookingDataIntoStructArray(&bData[0], 100);
+
+	char back[10];
+	char cfrm[10], cfrm2[10];
+	char choice[10], selection[10], ctn[10];
+	char chgTime[30], chgUserID[6], chgFacilityID[6];
 	int i;
-	
+
 	Date currentDate;
 	getSystemDate(&currentDate);
-	
+
+	strcpy(addFUsage.usageType, "walked-in");
+
 	FILE* f = fopen(fUsageFilePath, "a");
 	if (f == NULL)
 	{
@@ -64,199 +68,200 @@ void fUsageAddRecord()
 		system("pause");
 		return 0;
 	}
-	printf("+====================================+\n");
-	printf("|     Add Facility Usage Record      |\n");
-	printf("+====================================+\n");
-	printf("Enter '0' to EXIT (Other to Continue) >> ");
-	rewind(stdin);
-	scanf("%d", &back);
-	rewind(stdin);
-	if (back == 0)
-	{
-		return;
-	}
 	do
 	{
-		date(&addFUsage.date);
+		printf("+====================================+\n");
+		printf("|     Add Facility Usage Record      |\n");
+		printf("+====================================+\n");
+		printf("Enter '0' to EXIT (Other to Continue) >> ");
+		getUserMenuChoice(back, 9, "Enter '0' to EXIT (Other to Continue) >> ");
+		if (back[0] == '0')
+		{
+			return;
+		}
 		
-		chkTime(&addFUsage.time);
+		date(&addFUsage.date);
+
+		slctTime(&addFUsage.time);
 		i = strtol(addFUsage.time, NULL, 10) - 1;
-	
+		
 		slctFacilityID(&addFUsage.facilityID);
-		//chkAvailableAdd(&addFUsage.date, &addFUsage.time, addFUsage.facilityID);
+		
+		int tsIDX;
+		for (int a = 0; a < bDataCount; a++)
+		{
+			if ((tsIDX = getTimeslotBooked(&bData[a].timeSlotsBooked)) != -1)
+			{
+				strcpy(storeTime[a].time, timeSlots[tsIDX]);
+			}
+		}
+		for (int a = 0; a < bDataCount; a++)
+		{
+			while (addFUsage.date.d == bData[a].bookingDate.d && addFUsage.date.m == bData[a].bookingDate.m &&
+				addFUsage.date.y == bData[a].bookingDate.y && strcmp(addFUsage.facilityID, bData[a].facilityID) == 0 &&
+				strcmp(timeSlots[i], storeTime[a].time) == 0)
+			{
+				printf("\n\t\t<*! Process Failed !*>\n");
+				printf("This Facility on this DATE and TIME has been TAKEN !!!\n");
+				printf("Please try again.\n");
+				date(&addFUsage.date);
+				slctTime(&addFUsage.time);
+				i = strtol(addFUsage.time, NULL, 10) - 1;
+				slctFacilityID(&addFUsage.facilityID);
+			}
+		}
 		slctUserID(&addFUsage.userID);
 
-		printf("Enter Usage Type (walked-in / booked) : ");
-		rewind(stdin);
-		scanf("%[^\n]", addFUsage.usageType);
-		while (strcmp(addFUsage.usageType, "walked-in") != 0 && strcmp(addFUsage.usageType, "booked") != 0)
-		{
-			printf("Invalid Input !!!\n");
-			printf("Re-enter Usage Type (walked-in / booked) : ");
-			rewind(stdin);
-			scanf("%[^\n]", addFUsage.usageType);
-			rewind(stdin);
-		}
-
 		system("cls");
-		printf("========================\n");
-		printf("Facilities details added\n");
-		printf("========================\n");
+		printf("+==============================+\n");
+		printf("|    Facilities Usage added    |\n");
+		printf("+==============================+\n");
 		printf("Date        : %02d/%02d/%d\n", addFUsage.date.d, addFUsage.date.m, addFUsage.date.y);
 		printf("Time        : %s\n", timeSlots[i]);
-		printf("User ID     : %s\n", addFUsage.userID);
-		printf("Facility ID : %s\n", addFUsage.facilityID);
+		printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
+		printf("Facility ID : %s (%s)\n", addFUsage.facilityID, getFacilityID(addFUsage.facilityID)->name);
 		printf("Usage Type  : %s\n", addFUsage.usageType);
 
 		printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-		rewind(stdin);
-		scanf("%c", &cfrm);
-		while (toupper(cfrm) != 'Y' && toupper(cfrm) != 'N')
+		getUserMenuChoice(cfrm, 9,
+			"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
+		while (toupper(cfrm[0]) != 'Y' && toupper(cfrm[0]) != 'N')
 		{
-			printf("Invalid Input !!!\n");
-			printf("Re-enter Confirm to add this record? (Y=Yes/N=No) : ");
-			rewind(stdin);
-			scanf("%c", &cfrm);
-			rewind(stdin);
+			printf("Invalid Input !!!\nPlease select between (Y/N).\n");
+			printf("Confirm to add this record? (Y=Yes/N=No) : ");
+			getUserMenuChoice(cfrm, 9,
+				"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
 		}
-		if (toupper(cfrm) == 'Y')
+		if (toupper(cfrm[0]) == 'Y')
 		{
 			fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
 				addFUsage.date.d, addFUsage.date.m, addFUsage.date.y, timeSlots[i],
 				addFUsage.userID, addFUsage.facilityID, addFUsage.usageType);
 			printf("<* Added successfully to Facility Usage Record *>\n");
 		}
-		if (toupper(cfrm) == 'N')
+		if (toupper(cfrm[0]) == 'N')
 		{
 			printf("\nSelect        :\n");
 			printf("              Change Details   >> C\n");
 			printf("              Continue Process >> X\n");
-			printf("choice  (C/X) : ");
-			rewind(stdin);
-			scanf("%c", &choice);
-			while (toupper(choice) != 'C' && toupper(choice) != 'X')
+			printf("choice (C/X) : ");
+			getUserMenuChoice(choice, 9, "Invalid Input !!!\nPlease select between (C/X).\nchoice (C/X) : ");
+			while (toupper(choice[0]) != 'C' && toupper(choice[0]) != 'X')
 			{
-				printf("\nInvalid Input !!!\n");
-				printf("Select       :\n");
-				printf("             Change Details   >> C\n");
-				printf("             Continue Process >> X\n");
+				printf("Invalid Input !!!\nPlease select between (C/X).\n");
+				printf("\nSelect        :\n");
+				printf("              Change Details   >> C\n");
+				printf("              Continue Process >> X\n");
 				printf("choice (C/X) : ");
-				rewind(stdin);
-				scanf("%c", &choice);
-				rewind(stdin);
+				getUserMenuChoice(choice, 9, "Invalid Input !!!\nPlease select between (C/X).\nchoice (C/X) : ");
 			}
-			if (toupper(choice) == 'C')
+			if (toupper(choice[0]) == 'C')
 			{
 				printf("\n+=====================================+\n");
 				printf("|          Details to Change          |\n");
 				printf("+=====================================+\n");
-				printf("| 1. Date                             |\n");
-				printf("| 2. Time                             |\n");
-				printf("| 3. User ID                          |\n");
-				printf("| 4. Facility ID                      |\n");
-				printf("| 5. Usage Type                       |\n");
+				printf("| 1. Time                             |\n");
+				printf("| 2. User ID                          |\n");
+				printf("| 3. Facility ID                      |\n");
 				printf("+=====================================+\n");
-				printf("Enter Details to Change (1-5): ");
-				getUserMenuChoice(selection, 9, "Invalid Input !!!\nEnter Details to change (1-5): ");
-				while (selection[0] < '1' || selection[0] > '5')
+				printf("Enter Details to Change (1-3): ");
+				getUserMenuChoice(selection, 9,
+					"Invalid Input !!!\nPlease select between (1-3).\nEnter Details to change (1-3): ");
+				while (selection[0] < '1' || selection[0] > '3')
 				{
-					printf("Invalid Input !!!\n");
-					printf("Enter Details to Change (1-5): ");
-					getUserMenuChoice(selection, 9, "Invalid Input !!!\nEnter Details to change (1-5): ");
+					printf("Invalid Input !!!\nPlease select between (1-3).\n");
+					printf("Enter Details to Change (1-3): ");
+					getUserMenuChoice(selection, 9,
+						"Invalid Input !!!\nPlease select between (1-3).\nEnter Details to change (1-3): ");
 				}
 				switch (selection[0])
 				{
 				case'1':
-					date(&chgDate);
-					i = strtol(addFUsage.time, NULL, 10) - 1;
-					printf("\n===================\n");
-					printf("Detail After Change\n");
-					printf("===================\n");
-					printf("Date        : %02d/%02d/%d\n", chgDate.d,chgDate.m,chgDate.y);
+					slctTime(&addFUsage.time);
+					int b = strtol(addFUsage.time, NULL, 10) - 1;
+					for (int a = 0; a < bDataCount; a++)
+					{
+						while (addFUsage.date.d == bData[a].bookingDate.d && addFUsage.date.m == bData[a].bookingDate.m &&
+							addFUsage.date.y == bData[a].bookingDate.y && strcmp(addFUsage.facilityID, bData[a].facilityID) == 0 &&
+							strcmp(timeSlots[b], storeTime[a].time) == 0)
+						{
+							printf("\n\t\t<*! Process Failed !*>\n");
+							printf("This Facility on this DATE and TIME has been TAKEN !!!\n");
+							printf("Please try again.\n");
+							slctTime(&addFUsage.time);
+							b = strtol(addFUsage.time, NULL, 10) - 1;
+						}
+					}
+					printf("\n+============================+\n");
+					printf("|    Detail Before Change    |\n");
+					printf("+============================+\n");
+					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d, addFUsage.date.m, addFUsage.date.y);
 					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s\n", addFUsage.userID);
-					printf("Facility ID : %s\n", addFUsage.facilityID);
+					printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
+					printf("Facility ID : %s (%s)\n", addFUsage.facilityID, getFacilityID(addFUsage.facilityID)->name);
+					printf("Usage Type  : %s\n", addFUsage.usageType);
+
+					printf("\n+============================+\n");
+					printf("|    Detail After Change     |\n");
+					printf("+============================+\n");
+					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d,
+						addFUsage.date.m, addFUsage.date.y);
+					printf("Time        : %s\n", timeSlots[b]);
+					printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
+					printf("Facility ID : %s (%s)\n", addFUsage.facilityID, getFacilityID(addFUsage.facilityID)->name);
 					printf("Usage Type  : %s\n", addFUsage.usageType);
 
 					printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-					rewind(stdin);
-					scanf("%c", &cfrm2);
-					rewind(stdin);
-					while (toupper(cfrm2) != 'Y' && toupper(cfrm2) != 'N')
+					getUserMenuChoice(cfrm2, 9,
+						"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
+					while (toupper(cfrm2[0]) != 'Y' && toupper(cfrm2[0]) != 'N')
 					{
-						printf("Invalid Input !!!\n");
-						printf("Re-enter Confirm to add this record? (Y=Yes/N=No) : ");
-						rewind(stdin);
-						scanf("%c", &cfrm2);
-						rewind(stdin);
+						printf("Invalid Input !!!\nPlease select between (Y/N).\n");
+						printf("Confirm to add this record? (Y=Yes/N=No) : ");
+						getUserMenuChoice(cfrm2, 9,
+							"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
 					}
-					if (toupper(cfrm2) == 'Y')
+					if (toupper(cfrm2[0]) == 'Y')
 					{
 						fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-							chgDate.d, chgDate.m, chgDate.y, timeSlots[i], addFUsage.userID,
-							addFUsage.facilityID, addFUsage.usageType);
+							addFUsage.date.d, addFUsage.date.m, addFUsage.date.y,
+							timeSlots[b], addFUsage.userID, addFUsage.facilityID, addFUsage.usageType);
 						printf("<* Added successfully to Facility Usage Record *>\n");
 					}
 					break;
 				case'2':
-					chkTime(&addFUsage.time);
-					i = strtol(addFUsage.time, NULL, 10) - 1;
-					printf("\n===================\n");
-					printf("Detail After Change\n");
-					printf("===================\n");
-					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d,
-						addFUsage.date.m, addFUsage.date.y);
-					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s\n", addFUsage.userID);
-					printf("Facility ID : %s\n", addFUsage.facilityID);
-					printf("Usage Type  : %s\n", addFUsage.usageType);
-
-					printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-					rewind(stdin);
-					scanf("%c", &cfrm2);
-					rewind(stdin);
-					while (toupper(cfrm2) != 'Y' && toupper(cfrm2) != 'N')
-					{
-						printf("Invalid Input !!!\n");
-						printf("Re-enter Confirm to add this record? (Y=Yes/N=No) : ");
-						rewind(stdin);
-						scanf("%c", &cfrm2);
-						rewind(stdin);
-					}
-					if (toupper(cfrm2) == 'Y')
-					{
-						fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-							addFUsage.date.d, addFUsage.date.m, addFUsage.date.y,
-							timeSlots[i], addFUsage.userID, addFUsage.facilityID, addFUsage.usageType);
-						printf("<* Added successfully to Facility Usage Record *>\n");
-					}
-					break;
-				case'3':
 					slctUserID(&chgUserID);
 					i = strtol(addFUsage.time, NULL, 10) - 1;
-					printf("\n===================\n");
-					printf("Detail After Change\n");
-					printf("===================\n");
+					printf("\n+============================+\n");
+					printf("|    Detail Before Change    |\n");
+					printf("+============================+\n");
+					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d, addFUsage.date.m, addFUsage.date.y);
+					printf("Time        : %s\n", timeSlots[i]);
+					printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
+					printf("Facility ID : %s (%s)\n", addFUsage.facilityID ,getFacilityID(addFUsage.facilityID)->name);
+					printf("Usage Type  : %s\n", addFUsage.usageType);
+
+					printf("\n+============================+\n");
+					printf("|    Detail After Change     |\n");
+					printf("+============================+\n");
 					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d,
 						addFUsage.date.m, addFUsage.date.y);
 					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s\n", chgUserID);
-					printf("Facility ID : %s\n", addFUsage.facilityID);
+					printf("User ID     : %s (%s)\n", chgUserID, getUserID(chgUserID)->name);
+					printf("Facility ID : %s (%s)\n", addFUsage.facilityID, getFacilityID(addFUsage.facilityID)->name);
 					printf("Usage Type  : %s\n", addFUsage.usageType);
 
 					printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-					rewind(stdin);
-					scanf("%c", &cfrm2);
-					rewind(stdin);
-					while (toupper(cfrm2) != 'Y' && toupper(cfrm2) != 'N')
+					getUserMenuChoice(cfrm2, 9,
+						"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
+					while (toupper(cfrm2[0]) != 'Y' && toupper(cfrm2[0]) != 'N')
 					{
-						printf("Invalid Input !!!\n");
-						printf("Re-enter Confirm to add this record? (Y=Yes/N=No) : ");
-						rewind(stdin);
-						scanf("%c", &cfrm2);
-						rewind(stdin);
+						printf("Invalid Input !!!\nPlease select between (Y/N).\n");
+						printf("Confirm to add this record? (Y=Yes/N=No) : ");
+						getUserMenuChoice(cfrm2, 9,
+							"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
 					}
-					if (toupper(cfrm2) == 'Y')
+					if (toupper(cfrm2[0]) == 'Y')
 					{
 						fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
 							addFUsage.date.d, addFUsage.date.m, addFUsage.date.y,
@@ -264,80 +269,55 @@ void fUsageAddRecord()
 						printf("<* Added successfully to Facility Usage Record *>\n");
 					}
 					break;
-				case'4':
+				case'3':
 					slctFacilityID(&chgFacilityID);
 					i = strtol(addFUsage.time, NULL, 10) - 1;
-					printf("\n===================\n");
-					printf("Detail After Change\n");
-					printf("===================\n");
+					for (int a = 0; a < bDataCount; a++)
+					{
+						while (addFUsage.date.d == bData[a].bookingDate.d && addFUsage.date.m == bData[a].bookingDate.m &&
+							addFUsage.date.y == bData[a].bookingDate.y && strcmp(chgFacilityID, bData[a].facilityID) == 0 &&
+							strcmp(timeSlots[i], storeTime[a].time) == 0)
+						{
+							printf("\n\t\t<*! Process Failed !*>\n");
+							printf("This Facility on this DATE and TIME has been TAKEN !!!\n");
+							printf("Please try again.\n");
+							slctFacilityID(&chgFacilityID);
+						}
+					}
+					printf("\n+============================+\n");
+					printf("|    Detail Before Change    |\n");
+					printf("+============================+\n");
+					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d, addFUsage.date.m, addFUsage.date.y);
+					printf("Time        : %s\n", timeSlots[i]);
+					printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
+					printf("Facility ID : %s (%s)\n", addFUsage.facilityID, getFacilityID(addFUsage.facilityID)->name);
+					printf("Usage Type  : %s\n", addFUsage.usageType);
+
+					printf("\n+============================+\n");
+					printf("|    Detail After Change     |\n");
+					printf("+============================+\n");
 					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d,
 						addFUsage.date.m, addFUsage.date.y);
 					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s\n", addFUsage.userID);
-					printf("Facility ID : %s\n", chgFacilityID);
+					printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
+					printf("Facility ID : %s (%s)\n", chgFacilityID, getFacilityID(chgFacilityID)->name);
 					printf("Usage Type  : %s\n", addFUsage.usageType);
 
 					printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-					rewind(stdin);
-					scanf("%c", &cfrm2);
-					rewind(stdin);
-					while (toupper(cfrm2) != 'Y' && toupper(cfrm2) != 'N')
+					getUserMenuChoice(cfrm2, 9,
+						"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
+					while (toupper(cfrm2[0]) != 'Y' && toupper(cfrm2[0]) != 'N')
 					{
-						printf("Invalid Input !!!\n");
-						printf("Re-enter Confirm to add this record? (Y=Yes/N=No) : ");
-						rewind(stdin);
-						scanf("%c", &cfrm2);
-						rewind(stdin);
+						printf("Invalid Input !!!\nPlease select between (Y/N).\n");
+						printf("Confirm to add this record? (Y=Yes/N=No) : ");
+						getUserMenuChoice(cfrm2, 9,
+							"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
 					}
-					if (toupper(cfrm2) == 'Y')
+					if (toupper(cfrm2[0]) == 'Y')
 					{
 						fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
 							addFUsage.date.d, addFUsage.date.m, addFUsage.date.y,
 							timeSlots[i], addFUsage.userID, chgFacilityID, addFUsage.usageType);
-						printf("<* Added successfully to Facility Usage Record *>\n");
-					}
-					break;
-				case'5':
-					printf("Usage Type (walked-in / booked) : ");
-					rewind(stdin);
-					scanf("%[^\n]", chgUsageType);
-					rewind(stdin);
-					while (strcmp(chgUsageType, "walked-in") != 0 && strcmp(chgUsageType, "booked") != 0)
-					{
-						printf("Invalid Input !!!\n");
-						printf("Re-enter Usage Type (walked-in / booked) : ");
-						rewind(stdin);
-						scanf("%[^\n]", chgUsageType);
-						rewind(stdin);
-					}
-					i = strtol(addFUsage.time, NULL, 10) - 1;
-					printf("\n===================\n");
-					printf("Detail After Change\n");
-					printf("===================\n");
-					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d,
-						addFUsage.date.m, addFUsage.date.y);
-					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s\n", addFUsage.userID);
-					printf("Facility ID : %s\n", addFUsage.facilityID);
-					printf("Usage Type  : %s\n", chgUsageType);
-
-					printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-					rewind(stdin);
-					scanf("%c", &cfrm2);
-					rewind(stdin);
-					while (toupper(cfrm2) != 'Y' && toupper(cfrm2) != 'N')
-					{
-						printf("Invalid Input !!!\n");
-						printf("Re-enter Confirm to add this record? (Y=Yes/N=No) : ");
-						rewind(stdin);
-						scanf("%c", &cfrm2);
-						rewind(stdin);
-					}
-					if (toupper(cfrm2) == 'Y')
-					{
-						fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-							addFUsage.date.d, addFUsage.date.m, addFUsage.date.y,
-							timeSlots[i], addFUsage.userID, addFUsage.facilityID, chgUsageType);
 						printf("<* Added successfully to Facility Usage Record *>\n");
 					}
 					break;
@@ -346,31 +326,32 @@ void fUsageAddRecord()
 				}
 			}
 		}
-		printf("\nContinue to add record? (Y=YES / N=NO) : ");
-		rewind(stdin);
-		scanf("%c", &ctn);
-		rewind(stdin);
-		while (toupper(ctn) != 'Y' && toupper(ctn) != 'N')
+		printf("\nContinue to add record? (Y=Yes/N=No) : ");
+		getUserMenuChoice(ctn, 9,
+			"Invalid Input !!!\nPlease select between (Y/N).\nContinue to add record? (Y=Yes/N=No) : ");
+		while (toupper(ctn[0]) != 'Y' && toupper(ctn[0]) != 'N')
 		{
-			printf("Invalid Input !!!\n");
-			printf("Re-enter continue to add record? (Y=YES / N=NO) : ");
-			rewind(stdin);
-			scanf("%c", &ctn);
-			rewind(stdin);
+			printf("Invalid Input !!!\nPlease select between (Y/N).\n");
+			printf("Continue to add record? (Y=Yes/N=No) : ");
+			getUserMenuChoice(ctn, 9,
+				"Invalid Input !!!\nPlease select between (Y/N).\nContinue to add record? (Y=Yes/N=No) : ");
 		}
 		system("cls");
-	} while (toupper(ctn) == 'Y');
+	} while (toupper(ctn[0]) == 'Y');
 	fclose(f);
 }
 
 void fUsageSearchRecord()
 {
 	FacilityUsage searchFUsage;
+	Facility* fName;
+	userData* uName[100];
+
 	Date currentDate;
 	getSystemDate(&currentDate);
 	
 	int day, month, year;
-	char userID[30], time[30], facilityID[30], usageType[30];
+	char userID[50], time[30], facilityID[50], usageType[30];
 	char choice[10];
 	int r;
 	int count = 0;
@@ -399,7 +380,7 @@ void fUsageSearchRecord()
 	printf("Enter '0' to EXIT.\n");
 	printf("Enter detail to search (1-5) : ");
 	getUserMenuChoice(choice, 9, "Invalid Input !!!\nEnter detail to search (1-5) : ");
-	if (strcmp(choice, "0") == 0)
+	if (choice[0] == '0')
 	{
 		return;
 	}
@@ -422,8 +403,7 @@ void fUsageSearchRecord()
 			rewind(stdin);
 			r = scanf("%d/%d/%d", &day, &month, &year);
 			rewind(stdin);
-		} while (r != 3 || !validateDate(day, month, year) ||
-			compareDate(day, month, year, fUsage->date.d, fUsage->date.m, fUsage->date.y) != 0);
+		} while (r != 3 || !validateDate(day, month, year));
 		err = 0;
 
 		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
@@ -450,7 +430,7 @@ void fUsageSearchRecord()
 		}
 		break;
 	case'2':
-		chkTime(time);
+		slctTime(&time);
 		int a = strtol(time, NULL, 10) - 1;
 		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
 		printf("====\t\t====\t\t=======\t\t===========\t==========\n");
@@ -602,12 +582,13 @@ void fUsageModify()
 		printf("+=======================================+\n");
 		printf("|     Modify Facility Usage Record      |\n");
 		printf("+=======================================+\n");
-	
+
+		char back[10];
 		int total = 0;
 		int selection = 0, choice = 0;
 		char cfrm;
 		int i = 0;
-	
+
 		printf("No.\tDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
 		printf("===\t====\t\t====\t\t=======\t\t===========\t==========\n");
 		for (int a = 0; a < count; a++)
@@ -618,16 +599,17 @@ void fUsageModify()
 				fUsage[a].time, fUsage[a].userID,
 				fUsage[a].facilityID, fUsage[a].usageType);
 		}
-		printf("\nEnter '0' to EXIT.\n");
+		printf("\nEnter '0' to EXIT (Other to Continue) >> ");
+		getUserMenuChoice(back, 9, "Enter '0' to EXIT (Other to Continue) >> ");
+		if (back[0] == '0')
+		{
+			return;
+		}
 		printf("Choose No. of record to modify (1 - %d) : ", total);
 		rewind(stdin);
 		scanf("%d", &selection);
 		rewind(stdin);
-		if (selection == 0)
-		{
-			return;
-		}
-		while (selection<1 || selection>total)
+		while (selection < 1 || selection > total)
 		{
 			printf("Invalid Input !!!\n");
 			printf("Please select between (1 - %d) : ", total);
@@ -675,7 +657,7 @@ void fUsageModify()
 		switch (choice)
 		{
 		case 1:
-			chkTime(cacheData.time);
+			slctTime(cacheData.time);
 			i = strtol(cacheData.time, NULL, 10) - 1;
 			break;
 		case 2:
@@ -695,7 +677,7 @@ void fUsageModify()
 		printf("Facility ID : %s\n", modifyFUsage->facilityID);
 		printf("Usage Type  : %s\n", modifyFUsage->usageType);
 
-		if (choice == 2)
+		if (choice == 1)
 		{
 			printf("\n+============================+\n");
 			printf("|    Record After Modify     |\n");
@@ -733,7 +715,7 @@ void fUsageModify()
 		}
 		if (toupper(cfrm) == 'Y')
 		{
-			if (choice == 2)
+			if (choice == 1)
 			{
 				modifyFUsage->date.d = cacheData.date.d;
 				modifyFUsage->date.m = cacheData.date.m;
@@ -879,7 +861,7 @@ int date(Date* date)
 	return 1;*/
 }
 
- int chkTime(char*time)
+int slctTime(char* time)
 {
 	printf("Timeslots: \n");
 	for (int a = 0; a < 6; a++)
@@ -896,150 +878,134 @@ int date(Date* date)
 	}
 }
 
- void slctFacilityID(char* facilityID)
- {
-	 Facility* fID;
-	 fDataCount = 0;
-	 FILE* f2 = fopen(facilityFilePath, "rb");
-	 if (chkFileExist(f2))
-	 {
-		 while (fread(&fData[fDataCount], sizeof(Facility), 1, f2) != 0)
-		 {
-			 fDataCount++;
-		 }
-	 }
-	 fclose(f2);
-
-	 printf("+====================================================+\n"
-		 "|       Facility Type       |       Facility ID      |\n"
-		 "+====================================================+\n");
-	 for (int i = 0; i < fDataCount; i++)
-	 {
-		 printf("%-20s%25s\n", fData[i].name, fData[i].id);
-	 }
-	 printf("+====================================================+\n");
-
-	 printf("Enter Facility ID : ");
-	 rewind(stdin);
-	 scanf("%[^\n]", facilityID);
-	 rewind(stdin);
-	 fID = getFacilityID(facilityID);
-	 while (fID == NULL)
-	 {
-		 printf("This Facility ID does not EXIST !!!\nPlease try again.\n");
-		 printf("Enter Facility ID : ");
-		 rewind(stdin);
-		 scanf("%[^\n]", facilityID);
-		 rewind(stdin);
-		 fID = getFacilityID(facilityID);
-	 }
- }
-
- Facility* getFacilityID(char* id)
- {
-	 if (fDataCount == 0)
-	 {
-		 return NULL;
-	 }
-	 for (int i = 0; i < fDataCount; i++)
-	 {
-		 if (strcmp(fData[i].id, id) == 0)
-		 {
-			 return &fData[i];
-		 }
-	 }
-	 return NULL;
- }
-
- void slctUserID(char* userID)
- {
-	 userData *uID;
-	 uDataCount = 0;
-	 FILE* f2 = fopen(UserInfoFilePath, "rb");
-	 if (chkFileExist(f2))
-	 {
-		 while (fread(&uData[uDataCount], sizeof(userData), 1, f2) != 0)
-		 {
-			 uDataCount++;
-		 }
-	 }
-	 fclose(f2);
-
-	 printf("Enter User ID : ");
-	 rewind(stdin);
-	 scanf("%[^\n]", userID);
-	 rewind(stdin);
-	 uID = getUserID(userID);
-	 while (uID == NULL)
-	 {
-		 printf("This User ID does not EXIST !!!\nPlease try again.\n");
-		 printf("Enter User ID : ");
-		 rewind(stdin);
-		 scanf("%[^\n]", userID);
-		 rewind(stdin);
-		 uID = getUserID(userID);
-	 }
- }
-
- userData* getUserID(char* id)
- {
-	 if (uDataCount == 0)
-	 {
-		 return NULL;
-	 }
-	 for (int i = 0; i < uDataCount; i++)
-	 {
-		 if (strcmp(uData[i].id, id) == 0)
-		 {
-			 return &uData[i];
-		 }
-	 }
-	 return NULL;
- }
-
- void readBookingFileToFUsageFile()
- {
-	 bDataCount = 0;
-  
-	 FILE*f2 = fopen(bookingFilePath, "r");
-	 while (fscanf(f2, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
-		 bData[bDataCount].bookingID,
-		 &bData[bDataCount].currentDate.d, &bData[bDataCount].currentDate.m, &bData[bDataCount].currentDate.y,
-		 &bData[bDataCount].currentTime.h, &bData[bDataCount].currentTime.m, &bData[bDataCount].currentTime.s,
-		 &bData[bDataCount].bookingDate.d, &bData[bDataCount].bookingDate.m, &bData[bDataCount].bookingDate.y,
-		 &bData[bDataCount].timeSlotsBooked[0], &bData[bDataCount].timeSlotsBooked[1],
-		 &bData[bDataCount].timeSlotsBooked[2], &bData[bDataCount].timeSlotsBooked[3],
-		 &bData[bDataCount].timeSlotsBooked[4], &bData[bDataCount].timeSlotsBooked[5],
-		 bData[bDataCount].usrID, bData[bDataCount].staffID, bData[bDataCount].facilityID) != EOF)
+void slctFacilityID(char* facilityID)
+{
+	Facility* fID;
+	fDataCount = 0;
+	FILE* f2 = fopen(facilityFilePath, "rb");
+	if (chkFileExist(f2))
+	{
+		while (fread(&fData[fDataCount], sizeof(Facility), 1, f2) != 0)
 		{
-			 bDataCount++;
+			fDataCount++;
 		}
-	 system("pause");
- }
+	}
+	fclose(f2);
+	if (fDataCount == 0)
+	{
+		printf("\nThere is no Facility in the system.\n");
+		system("pause");
+		return;
+	}
+	printf("+====================================================+\n"
+		"|       Facility Name       |       Facility ID      |\n"
+		"+====================================================+\n");
+	for (int i = 0; i < fDataCount; i++)
+	{
+		printf("|    %-20s   |           %-10s   |\n", fData[i].name, fData[i].id);
+	}
+	printf("+====================================================+\n");
 
- /*void chkAvailableAdd(Date* date, int* time, char* facilityID)
- {
-	 totalRecord = 0;
-	 FILE* f = fopen(bookingFilePath, "r");
-	 
-	 for (int i = 0; i < totalReocrd; i++)
-	 {
-		 while (fscanf(f, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
-			 bData[i].bookingID,
-			 &bData[i].currentDate.d, &bData[i].currentDate.m, &bData[i].currentDate.y,
-			 &bData[i].currentTime.h, &bData[i].currentTime.m, &bData[i].currentTime.s,
-			 &bData[i].bookingDate.d, &bData[i].bookingDate.m, &bData[i].bookingDate.y,
-			 &bData[i].timeSlotsBooked[0], &bData[i].timeSlotsBooked[1], &bData[i].timeSlotsBooked[2],
-			 &bData[i].timeSlotsBooked[3], &bData[i].timeSlotsBooked[4], &bData[i].timeSlotsBooked[5],
-			 bData[i].usrID, bData[i].staffID, bData[i].facilityID) != EOF)
-		 {
-			 if (date->d == bData[i].bookingDate.d && date->m == bData[i].bookingDate.m &&
-				 date->y == bData[i].bookingDate.y && time == bData[i].timeSlotsBooked)
-			 {
-				 printf("This Facility ID on this DATE and TIME has been TAKEN !!!\n");
-			 }
-		 }
-	 }
-	 
-	 fclose(f);
- }*/
+	printf("Enter Facility ID : ");
+	rewind(stdin);
+	scanf("%[^\n]", facilityID);
+	rewind(stdin);
+	fID = getFacilityID(facilityID);
+	while (fID ==NULL)
+	{
+		printf("This Facility ID does not EXIST !!!\nPlease try again.\n");
+		printf("Enter Facility ID : ");
+		rewind(stdin);
+		scanf("%[^\n]", facilityID);
+		rewind(stdin);
+		fID = getFacilityID(facilityID);
+	}
+}
+
+Facility* getFacilityID(char* ID)
+{
+	if (fDataCount == 0)
+	{
+		return NULL;
+	}
+	for (int i = 0; i < fDataCount; i++)
+	{
+		if (strcmp(fData[i].id, ID) == 0)
+		{
+			return &fData[i];
+		}
+	}
+	return NULL;
+}
+
+void slctUserID(char* userID)
+{
+	userData* uID;
+	uDataCount = 0;
+	FILE* f2 = fopen(UserInfoFilePath, "rb");
+	if (chkFileExist(f2))
+	{
+		while (fread(&uData[uDataCount], sizeof(userData), 1, f2) != 0)
+		{
+			uDataCount++;
+		}
+	}
+	fclose(f2);
+
+	printf("\nEnter User ID : ");
+	rewind(stdin);
+	scanf("%[^\n]", userID);
+	rewind(stdin);
+	uID = getUserID(userID);
+	while (uID == NULL)
+	{
+		printf("This User ID does not EXIST !!!\nPlease try again.\n");
+		printf("Enter User ID : ");
+		rewind(stdin);
+		scanf("%[^\n]", userID);
+		rewind(stdin);
+		uID = getUserID(userID);
+	}
+}
+
+userData* getUserID(char* id)
+{
+	if (uDataCount == 0)
+	{
+		return NULL;
+	}
+	for (int i = 0; i < uDataCount; i++)
+	{
+		if (strcmp(uData[i].id, id) == 0)
+		{
+			return &uData[i];
+		}
+	}
+	return NULL;
+}
+
+void readBookingFileToFUsageFile()
+{
+	FacilityUsage storeData;
+	FILE* f2 = fopen(fUsageFilePath, "w");
+	bDataCount = readBookingDataIntoStructArray(&bData[0], 100);
+
+	for (int a = 0; a < bDataCount; a++)
+	{
+		storeData.date.d = bData[a].bookingDate.d;
+		storeData.date.m = bData[a].bookingDate.m;
+		storeData.date.y = bData[a].bookingDate.y;
+		strcpy(storeData.userID, bData[a].usrID);
+		strcpy(storeData.facilityID, bData[a].facilityID);
+		strcpy(storeData.usageType, "booked");
+		int tsIDX;
+		if ((tsIDX = getTimeslotBooked(&bData[a].timeSlotsBooked)) != -1)
+		{
+			strcpy(storeData.time, timeSlots[tsIDX]);
+		}
+		fprintf(f2, "%02d/%02d/%d|%s|%s|%s|%s\n",
+			storeData.date.d, storeData.date.m, storeData.date.y, storeData.time, storeData.userID,
+			storeData.facilityID, storeData.usageType);
+	}
+	fclose(f2);
+}
