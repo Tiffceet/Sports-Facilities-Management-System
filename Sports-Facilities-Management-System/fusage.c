@@ -11,8 +11,9 @@ BookingData bData[100];
 
 void fusagemain()
 {
-	if (staffLogin())
+	if (_staffLogin(sessionStaffID, 100))
 	{
+		fUsageRecord();
 		while (fUsageMenu())
 		{
 			continue;
@@ -422,7 +423,7 @@ void fUsageSearchRecord()
 			r = scanf("%d/%d/%d", &day, &month, &year);
 			rewind(stdin);
 		} while (r != 3 || !validateDate(day, month, year) ||
-			compareDate(day, month, year, currentDate.d, currentDate.m, currentDate.y) != 1);
+			compareDate(day, month, year, fUsage->date.d, fUsage->date.m, fUsage->date.y) != 0);
 		err = 0;
 
 		printf("\nDate\t\tTime\t\tUser ID\t\tFacility ID\tUsage Type\n");
@@ -656,18 +657,17 @@ void fUsageModify()
 
 		printf("\nChoose One to Modify :\n");
 		printf("+==================+\n");
-		printf("| 1. Date          |\n");
-		printf("| 2. Time          |\n");
-		printf("| 3. Facility ID   |\n");
+		printf("| 1. Time          |\n");
+		printf("| 2. Facility ID   |\n");
 		printf("+==================+\n");
-		printf("Enter your choice (1 - 3) : ");
+		printf("Enter your choice (1 - 2) : ");
 		rewind(stdin);
 		scanf("%d", &choice);
 		rewind(stdin);
-		while (choice < 1 || choice > 3)
+		while (choice < 1 || choice > 2)
 		{
 			printf("Invalid Input !!!\n");
-			printf("Please select between (1 - 3) : ");
+			printf("Please select between (1 - 2) : ");
 			rewind(stdin);
 			scanf("%d", &choice);
 			rewind(stdin);
@@ -675,13 +675,10 @@ void fUsageModify()
 		switch (choice)
 		{
 		case 1:
-			date(&cacheData.date);
-			break;
-		case 2:
 			chkTime(cacheData.time);
 			i = strtol(cacheData.time, NULL, 10) - 1;
 			break;
-		case 3:
+		case 2:
 			slctFacilityID(cacheData.facilityID);
 			break;
 		default:
@@ -859,15 +856,17 @@ int staffLogin()
 
 int date(Date* date)
 {
-	Date currentDate;
-	getSystemDate(&currentDate);
-	int r;
+	// Date currentDate;
+	// getSystemDate(&currentDate);
+	getSystemDate(date);
+	return 1;
+	/*int r;
 	int dateErr = 0; 
 	do 
 	{
 		if (dateErr)
 		{
-			printf("Invalid Date, try again.\nEnter today date is not allowed.\n");
+			printf("Invalid Date, try again.\nOnly Allow to enter today's DATE.\n");
 		}
 		dateErr = 1;
 		printf("Enter Date < DD/MM/YYYY > : ");
@@ -875,9 +874,9 @@ int date(Date* date)
 		r = scanf("%d/%d/%d", &date->d, &date->m, &date->y);
 		rewind(stdin);
 	} while (r != 3 || !validateDate(date->d, date->m,date->y) ||
-		compareDate(date->d, date->m,date->y, currentDate.d, currentDate.m, currentDate.y) != 1);
+		compareDate(date->d, date->m,date->y, currentDate.d, currentDate.m, currentDate.y) != 0);
 	err = 0;
-	return 1;
+	return 1;*/
 }
 
  int chkTime(char*time)
@@ -998,51 +997,31 @@ int date(Date* date)
 	 return NULL;
  }
 
- //void readBookingFileToFUsageFile()
- //{
-	// bDataCount = 0;
-	// totalRecord = 0;
-	// FILE* f2 = fopen(bookingFilePath, "r");
-	// if (chkFileExist(f2))
-	// {
-	//	 while (fscanf(f2, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
-	//		 bData[bDataCount].bookingID,
-	//		 &bData[bDataCount].currentDate.d, &bData[bDataCount].currentDate.m, &bData[bDataCount].currentDate.y,
-	//		 &bData[bDataCount].currentTime.h, &bData[bDataCount].currentTime.m, &bData[bDataCount].currentTime.s,
-	//		 &bData[bDataCount].bookingDate.d, &bData[bDataCount].bookingDate.m, &bData[bDataCount].bookingDate.y,
-	//		 &bData[bDataCount].timeSlotsBooked[0], &bData[bDataCount].timeSlotsBooked[1],
-	//		 &bData[bDataCount].timeSlotsBooked[2], &bData[bDataCount].timeSlotsBooked[3],
-	//		 &bData[bDataCount].timeSlotsBooked[4], &bData[bDataCount].timeSlotsBooked[5],
-	//		 bData[bDataCount].usrID, bData[bDataCount].staffID, bData[bDataCount].facilityID) != EOF)
-	//	 {
-	//		 fUsage[totalRecord].date.d = bData[bDataCount].bookingDate.d;
-	//		 fUsage[totalRecord].date.m = bData[bDataCount].bookingDate.m;
-	//		 fUsage[totalRecord].date.y = bData[bDataCount].bookingDate.y;
-	//		 strcpy(fUsage[totalRecord].userID, bData[bDataCount].usrID);
-	//		 strcpy(fUsage[totalRecord].facilityID, bData[bDataCount].facilityID);
-	//		 strcpy(fUsage[totalRecord].time, bData[bDataCount].timeSlotsBooked);
-
-	//		 printf("Date : %0d/%0d/%d\n", fUsage[totalRecord].date.d, fUsage[totalRecord].date.m, fUsage[totalRecord].date.y);
-	//		 printf("Time : %s\n", fUsage[totalRecord].time);
-	//		 printf("FID  : %s\n", fUsage[totalRecord].facilityID);
-	//		 printf("UID  : %s\n", fUsage[totalRecord].userID);
-	//	 }
-	// }
-
-	// fclose(f2);
-	// system("pause");
- //}
+ void readBookingFileToFUsageFile()
+ {
+	 bDataCount = 0;
+  
+	 FILE*f2 = fopen(bookingFilePath, "r");
+	 while (fscanf(f2, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",
+		 bData[bDataCount].bookingID,
+		 &bData[bDataCount].currentDate.d, &bData[bDataCount].currentDate.m, &bData[bDataCount].currentDate.y,
+		 &bData[bDataCount].currentTime.h, &bData[bDataCount].currentTime.m, &bData[bDataCount].currentTime.s,
+		 &bData[bDataCount].bookingDate.d, &bData[bDataCount].bookingDate.m, &bData[bDataCount].bookingDate.y,
+		 &bData[bDataCount].timeSlotsBooked[0], &bData[bDataCount].timeSlotsBooked[1],
+		 &bData[bDataCount].timeSlotsBooked[2], &bData[bDataCount].timeSlotsBooked[3],
+		 &bData[bDataCount].timeSlotsBooked[4], &bData[bDataCount].timeSlotsBooked[5],
+		 bData[bDataCount].usrID, bData[bDataCount].staffID, bData[bDataCount].facilityID) != EOF)
+		{
+			 bDataCount++;
+		}
+	 system("pause");
+ }
 
  /*void chkAvailableAdd(Date* date, int* time, char* facilityID)
  {
 	 totalRecord = 0;
 	 FILE* f = fopen(bookingFilePath, "r");
-	 if (!chkFileExist(f))
-	 {
-		 printf("Cannot open bookingFilePath !!!\n");
-		 system("pause");
-		 return 0;
-	 }
+	 
 	 for (int i = 0; i < totalReocrd; i++)
 	 {
 		 while (fscanf(f, "%[^,],%d/%d/%d,%d:%d:%d,%d/%d/%d,%d,%d,%d,%d,%d,%d,%[^,],%[^,],%[^\n]\n",

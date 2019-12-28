@@ -10,37 +10,7 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
-	/*FILE *f = fopen(UserInfoFilePath, "wb");
-	userData usr = { "Ali", "U001", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr, sizeof(userData), 1, f);
-	userData usr2 = { "Ahmad", "U002", 2019,12,10,9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr2, sizeof(userData), 1, f);
-	userData usr3 = { "Felix", "U003", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr3, sizeof(userData), 1, f);
-	userData usr4 = { "Gohan", "U004", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr4, sizeof(userData), 1, f);
-	fclose(f);
-	f = fopen(staffFilePath, "wb");
-	Staff stf = {"Looz", "010802", "010802", "Looz", "ADMIN", 1,1,2020,1,1,2020,12,12,12,12};
-	fwrite(&stf, sizeof(Staff), 1, f);
-	fclose(f);
-	f = fopen(facilityFilePath, "wb");
-	Facility fac1 = {"F001", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18};
-	fwrite(&fac1, sizeof(Facility), 1, f);
-	Facility fac2 = { "F002", "Squash Court", 2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac2, sizeof(Facility), 1, f);
-	Facility fac3 = { "F003", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac3, sizeof(Facility), 1, f);
-	Facility fac4 = { "F004", "Basketball Court",  2019,12,12 , "", "Looz",2019,12,18 };
-	fwrite(&fac4, sizeof(Facility), 1, f);
-	Facility fac5 = { "F005", "Swimming pool",  2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac5, sizeof(Facility), 1, f);
-	fclose(f);*/
-
 	readDataFromOtherModules();
-
-	/*BookingData data[100];
-	readBookingDataIntoStructArray(&data[0], 99);*/
 
 	// initialise error code for input validation use
 	err = 0;
@@ -126,7 +96,7 @@ void bookingBook()
 		}
 	}
 
-	char loginUserID[100] = "null";
+	char loginUserID[100] = "null"; // initialise so when booking is done in staff mode, it wont write corrupted data into file
 	if (mode == 'u') {
 		printf("Only registered user are allowed to make booking.\n");
 		if (!_usrLogin(loginUserID, 99))
@@ -158,7 +128,7 @@ void bookingBook()
 
 	// Sub Menu goes here
 	printBookingInfo();
-	char statusText[3][100];
+	char statusText[3][100]; // to be used to show booking details after first iteration
 
 	char choice[10];
 	char choiceToContinueNextBooking[10] = "\0";
@@ -560,19 +530,20 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			}
 		}
 
-		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s %-12.12s %-15.15s |\n",
+		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s ",
 			count + 1,
 			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-			// data[a].facilityID,
 			data[a].facilityID,
-			getFacilityByID(data[a].facilityID)->name,
-			//data[a].usrID,
-			getUserDataByID(data[a].usrID)->name,
-			//data[a].staffID);
-			getStaffDataByID(data[a].staffID)->stfName);
+			getFacilityByID(data[a].facilityID)->name);
+		userData *usrData;
+		if (usrData = getUserDataByID(data[a].usrID))
+			printf("%-12.12s", usrData->name);
+		else
+			printf("%-12.12s", "-");
+		printf(" %-15.15s |\n", getStaffDataByID(data[a].staffID)->stfName);
 		filteredData[count] = &data[a];
 		count++;
 	}
@@ -589,7 +560,7 @@ void bookingModifyRecords()
 	int dataCount = readBookingDataIntoStructArray(data, 100);
 	int filteredDataCount = 0;
 	char choice[10];
-	int userPickedIDX;
+	int userPickedIDX = -1;
 
 	// logins
 	char userID[100];
@@ -612,7 +583,6 @@ void bookingModifyRecords()
 	if (tolower(choice[0]) == 'y')
 	{
 		// This function have generateFilteredSearchResult() call in it
-		// generateFilteredSearchResult should not call from bookingSearchRecords
 		bookingSearchRecords(1, filteredData, &filteredDataCount, 0, userID, &data[0], dataCount); 
 	}
 	else
@@ -630,6 +600,8 @@ void bookingModifyRecords()
 
 	if (filteredDataCount > 0)
 	{
+		Date dt;
+		getSystemDate(&dt);
 		int r; // to keep track of i_input() return val
 		do {
 			printf("<!> Enter '0' to return to menu <!>\n");
@@ -641,8 +613,18 @@ void bookingModifyRecords()
 				{
 					return;
 				}
+				if (userPickedIDX > 0 && userPickedIDX <= filteredDataCount && compareDate(dt.d, dt.m, dt.y,
+					filteredData[userPickedIDX - 1]->bookingDate.d,
+					filteredData[userPickedIDX - 1]->bookingDate.m,
+					filteredData[userPickedIDX - 1]->bookingDate.y) != -1) // if booking date is not later than current date, you are not allowed to modify
+				{
+					printf("You are not allowed to modify booking with booking date before today and today.\n");
+					system("pause");
+					r = 0;
+				}
 			}
-		} while (!r && userPickedIDX < 1 || userPickedIDX > filteredDataCount);
+		} while (!r
+			|| userPickedIDX < 1 || userPickedIDX > filteredDataCount);
 		modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
 		system("pause");
 	}
@@ -824,18 +806,21 @@ void bookingDisplayAll()
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
 	for (int a = 0; a < dataToPrintCount; a++)
 	{
-		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s %-12.12s %-15.15s |\n",
+		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s ",
 			dataToPrint[a]->currentDate.d, dataToPrint[a]->currentDate.m, dataToPrint[a]->currentDate.y, dataToPrint[a]->currentTime.h, dataToPrint[a]->currentTime.m,
 			dataToPrint[a]->bookingID,
 			dataToPrint[a]->bookingDate.d, dataToPrint[a]->bookingDate.m, dataToPrint[a]->bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(dataToPrint[a]->timeSlotsBooked)],
 			// data[a].facilityID,
 			dataToPrint[a]->facilityID,
-			getFacilityByID(dataToPrint[a]->facilityID)->name,
-			//data[a].usrID,
-			getUserDataByID(dataToPrint[a]->usrID)->name,
-			//data[a].staffID);
-			getStaffDataByID(dataToPrint[a]->staffID)->stfName);
+			getFacilityByID(dataToPrint[a]->facilityID)->name);
+		userData *usrData;
+		if (usrData = getUserDataByID(dataToPrint[a]->usrID)) // if userID is null then print '-', this happens when staff make booking
+			printf("%-12.12s", usrData->name);
+		else
+			printf("%-12.12s", "-");
+			
+		printf(" %-15.15s |\n", getStaffDataByID(dataToPrint[a]->staffID)->stfName);
 	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "======================================================================================================================");
@@ -874,9 +859,9 @@ void bookingDisplayFilters(BookingData *data, int dataCount, char userID[])
 	if (mode == 'u') // if it is on user mode, there should be exactly one entry in user filter
 	{
 		isSet[5] = 1;
+		userFilter[0] = getUserDataByID(userID);
+		uCount = 1;
 	}
-	userFilter[0] = getUserDataByID(userID);
-	uCount = 1;
 
 	char filterChoice[10];
 	int recordsCount = 0; // to keep track of how many records is printed
@@ -1828,6 +1813,7 @@ Staff* getStaffDataByID(char *id)
 	return NULL;
 }
 
+// return pointer to user data, null if not found or no data
 userData* getUserDataByID(char *id)
 {
 	if (usrDataCount == 0)
@@ -1844,6 +1830,7 @@ userData* getUserDataByID(char *id)
 	return NULL;
 }
 
+// return pointer to faciltiy data, null if not found or no data
 Facility* getFacilityByID(char *id)
 {
 	if (facilityDataCount == 0)
@@ -1888,7 +1875,7 @@ int _usrLogin(char *usrID, int size)
 		printf("Enter 'XXX' to return to previous screen\n");
 		printf("User ID -> ");
 		s_input(usrID, size);
-		if (strcmp(usrID, "XXX") == 0)
+		if (strcmp(usrID, "XXX") == 0 || strcmp(usrID, "xxx") == 0)
 		{
 			return 0;
 		}

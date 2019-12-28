@@ -36,7 +36,7 @@ int chkTime(char* time);
 void slctFacilityID(char*facilityID);
 void slctUserID(char* userID);
 //void chkAvailableAdd(Date* date, int* time, char* facilityID);
-//void readBookingFileToFUsageFile();
+void readBookingFileToFUsageFile();
 
 Facility* getFacilityID(char* id);
 userData* getUserID(char* id);
