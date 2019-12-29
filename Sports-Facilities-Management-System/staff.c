@@ -324,7 +324,7 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 {
 	char staffNameSearch[100],ans;
-	int i = 0, totstaff,stfcount = 0, staffAdd;
+	int i = 0, totstaff,stfcount = 0, staffAdd,stffound=0;
 	totstaff = readStfList();
 
 	if (totstaff != 0)
@@ -350,28 +350,40 @@ int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 						"%25s|Date :%.02d/%.02d/%-54d|\n"
 						"%25s|Last modified :%.02d/%.02d/%-45d|\n", "", staffCache[i].stfName, "", staffCache[i].stfPosi, "", staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y, "", staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 					printf("%25s====================================================================\n", "");
+					stffound = 1;
 					break;
 				}
 				else if (stfcount >= totstaff)
 				{
 					printf("There's no such person in our system.\n");
 					system("pause");
-					return;
+					break;
 				}
 				else;
 			}
-			printf("After viewing staff's infomation enter y to continue,anything else to search for another staff :");
-			scanf("%c", &ans);
-			while (ans != 'y' && ans != 'n')
+			if (stffound == 1)
 			{
-				printf("Invalid entry\n");
-				printf("Please reenter y or n :");
-				scanf(" %c", &ans);
+				printf("After viewing staff's infomation enter y to continue,n to search for another staff :");
+				scanf("%c", &ans);
+				while (ans != 'y' && ans != 'n')
+				{
+					printf("Invalid entry\n");
+					printf("Please reenter y or n :");
+					scanf(" %c", &ans);
+				}
+			}
+			else
+			{
+				system("cls");
+				ans = 'n';
 			}
 			rewind(stdin);
 		} while (ans != 'y');
-		staffAdd = i;
-		return staffAdd;
+		if (stffound = 1)
+		{
+			staffAdd = i;
+			return staffAdd;
+		}
 	}
 	else
 	{
@@ -455,7 +467,7 @@ int changeStfList()
 {
 	char choice[10],ans;
 	
-	int oldStaffAdd = 0, totstaff, i, totalCondition=0, strLength=0, ifUsed=0,valid=0;
+	int oldStaffAdd = -1, totstaff, i, totalCondition=0, strLength=0, ifUsed=0,valid=0;
 	int changeAdmin = 0;
 	totstaff = readStfList();
 	Staff staffChange;
