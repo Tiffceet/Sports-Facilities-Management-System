@@ -10,37 +10,7 @@
 const char TIMESLOTS[6][15] = { "7am - 9am ", "9am - 11am", "1pm - 3pm ", "3pm - 5pm ", "5pm - 7pm ", "7pm - 9pm " };
 void bookingMain()
 {
-	/*FILE *f = fopen(UserInfoFilePath, "wb");
-	userData usr = { "Ali", "U001", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr, sizeof(userData), 1, f);
-	userData usr2 = { "Ahmad", "U002", 2019,12,10,9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr2, sizeof(userData), 1, f);
-	userData usr3 = { "Felix", "U003", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr3, sizeof(userData), 1, f);
-	userData usr4 = { "Gohan", "U004", 2019,12,10, 9,46,0, "L", "010389552", "123456" };
-	fwrite(&usr4, sizeof(userData), 1, f);
-	fclose(f);
-	f = fopen(staffFilePath, "wb");
-	Staff stf = {"Looz", "010802", "010802", "Looz", "ADMIN", 1,1,2020,1,1,2020,12,12,12,12};
-	fwrite(&stf, sizeof(Staff), 1, f);
-	fclose(f);
-	f = fopen(facilityFilePath, "wb");
-	Facility fac1 = {"F001", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18};
-	fwrite(&fac1, sizeof(Facility), 1, f);
-	Facility fac2 = { "F002", "Squash Court", 2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac2, sizeof(Facility), 1, f);
-	Facility fac3 = { "F003", "Badminton Court", 2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac3, sizeof(Facility), 1, f);
-	Facility fac4 = { "F004", "Basketball Court",  2019,12,12 , "", "Looz",2019,12,18 };
-	fwrite(&fac4, sizeof(Facility), 1, f);
-	Facility fac5 = { "F005", "Swimming pool",  2019,12,12 , "", "Looz", 2019,12,18 };
-	fwrite(&fac5, sizeof(Facility), 1, f);
-	fclose(f);*/
-
 	readDataFromOtherModules();
-
-	/*BookingData data[100];
-	readBookingDataIntoStructArray(&data[0], 99);*/
 
 	// initialise error code for input validation use
 	err = 0;
@@ -50,7 +20,6 @@ void bookingMain()
 	{
 		return;
 	}
-	strcpy(sessionStaffID, "Looz");
 	// while menu() doesnt return 0 = continue running
 	while (bookingMenu())
 	{
@@ -60,7 +29,7 @@ void bookingMain()
 
 int bookingMenu()
 {
-	char choiceText[][100] = { "Book", "Search bookings", "Modify bookings", "Display all bookings", "Log Out (Return to console)" };
+	char choiceText[][100] = { "Book a facility", "Search bookings", "Modify bookings", "Display all bookings", "Log Out (Return to console)" };
 	int choice = globalMainMenu("Booking Module", 5, choiceText);
 	if (choice > 0 && choice < 6)
 	{
@@ -69,7 +38,7 @@ int bookingMenu()
 	if (choice < 0 && choice > -6)
 	{
 		mode = 's'; // set staffMode
-	}
+	}	
 	switch (choice) // calling math.abs might be a better workaround
 	{
 	case 1:
@@ -126,7 +95,7 @@ void bookingBook()
 		}
 	}
 
-	char loginUserID[100] = "null";
+	char loginUserID[100] = "null"; // initialise so when booking is done in staff mode, it wont write corrupted data into file
 	if (mode == 'u') {
 		printf("Only registered user are allowed to make booking.\n");
 		if (!_usrLogin(loginUserID, 99))
@@ -158,7 +127,7 @@ void bookingBook()
 
 	// Sub Menu goes here
 	printBookingInfo();
-	char statusText[3][100];
+	char statusText[3][100]; // to be used to show booking details after first iteration
 
 	char choice[10];
 	char choiceToContinueNextBooking[10] = "\0";
@@ -173,7 +142,7 @@ void bookingBook()
 			if (firstIteration)
 			{
 				bipChangeFacility(userPickedfacilityID);
-				bipChangeBookingDate(&userPickedDate);
+				bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 				bipChangeTimeslot(0, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 				firstIteration = 0;
 			}
@@ -197,25 +166,25 @@ void bookingBook()
 					if (!tmpR) // if no timeslot anymore
 					{
 						printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
-						bipChangeBookingDate(&userPickedDate);
+						bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
 					{
 						printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
-						bipChangeBookingDate(&userPickedDate);
+						bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 					getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
 					if (tolower(choice[0]) != 'y')
 					{
-						bipChangeBookingDate(&userPickedDate);
+						bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 						bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					}
 					break;
 				case '2':
-					bipChangeBookingDate(&userPickedDate);
+					bipChangeBookingDate(&userPickedDate, userPickedfacilityID);
 					bipChangeTimeslot(1, &userPickedtimeslot, &data[0], count, &userPickedDate, userPickedfacilityID, "");
 					break;
 				case '3':
@@ -225,7 +194,7 @@ void bookingBook()
 			}
 
 			// printing of display
-			sprintf(statusText[0], "(%s) %s",userPickedfacilityID, getFacilityByID(userPickedfacilityID)->name);
+			sprintf(statusText[0], "(%s) %s", userPickedfacilityID, getFacilityByID(userPickedfacilityID)->name);
 			sprintf(statusText[1], "%02d/%02d/%04d", userPickedDate.d, userPickedDate.m, userPickedDate.y);
 			strcpy(statusText[2], TIMESLOTS[userPickedtimeslot]);
 
@@ -271,8 +240,6 @@ void bookingBook()
 				data[count - 1].bookingDate.y,
 				TIMESLOTS[getTimeslotBooked(data[count - 1].timeSlotsBooked)]
 			);
-			system("pause");
-			break;
 		}
 
 		printf("Would you like to continue a new booking ? (y=yes) ");
@@ -302,7 +269,7 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 	char userID[100];
 	userID[0] = '\0';
 	// logins
-	if(requireUserLogin){
+	if (requireUserLogin) {
 		if (mode == 'u') // user mode
 		{
 			if (!_usrLogin(userID, 100))
@@ -437,7 +404,7 @@ void bookingSearchRecords(int showRawRecordsOnly, BookingData **filteredRecords,
 			return;
 		case 'x':
 		case 'X':
-			
+
 
 			// check if caller function wants to showRawDataOnly
 			if (showRawRecordsOnly)
@@ -560,19 +527,20 @@ int generateFilteredSearchResult(BookingData **filteredData, BookingData *data, 
 			}
 		}
 
-		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s %-12.12s %-15.15s |\n",
+		printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s ",
 			count + 1,
 			data[a].currentDate.d, data[a].currentDate.m, data[a].currentDate.y, data[a].currentTime.h, data[a].currentTime.m,
 			data[a].bookingID,
 			data[a].bookingDate.d, data[a].bookingDate.m, data[a].bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(data[a].timeSlotsBooked)],
-			// data[a].facilityID,
 			data[a].facilityID,
-			getFacilityByID(data[a].facilityID)->name,
-			//data[a].usrID,
-			getUserDataByID(data[a].usrID)->name,
-			//data[a].staffID);
-			getStaffDataByID(data[a].staffID)->stfName);
+			getFacilityByID(data[a].facilityID)->name);
+		userData *usrData;
+		if (usrData = getUserDataByID(data[a].usrID))
+			printf("%-12.12s", usrData->name);
+		else
+			printf("%-12.12s", "-");
+		printf(" %-15.15s |\n", getStaffDataByID(data[a].staffID)->stfName);
 		filteredData[count] = &data[a];
 		count++;
 	}
@@ -589,7 +557,7 @@ void bookingModifyRecords()
 	int dataCount = readBookingDataIntoStructArray(data, 100);
 	int filteredDataCount = 0;
 	char choice[10];
-	int userPickedIDX;
+	int userPickedIDX = -1;
 
 	// logins
 	char userID[100];
@@ -604,7 +572,10 @@ void bookingModifyRecords()
 	}
 	else if (mode == 's')
 	{
-		_staffPWReauth();
+		if (!_staffPWReauth())
+		{
+			return;
+		}
 	}
 
 	printf("Would you like to filter the bookings before selecting records to modify (y=yes)? ");
@@ -612,8 +583,7 @@ void bookingModifyRecords()
 	if (tolower(choice[0]) == 'y')
 	{
 		// This function have generateFilteredSearchResult() call in it
-		// generateFilteredSearchResult should not call from bookingSearchRecords
-		bookingSearchRecords(1, filteredData, &filteredDataCount, 0, userID, &data[0], dataCount); 
+		bookingSearchRecords(1, filteredData, &filteredDataCount, 0, userID, &data[0], dataCount);
 	}
 	else
 	{
@@ -628,30 +598,74 @@ void bookingModifyRecords()
 		filteredDataCount = generateFilteredSearchResult(filteredData, &data[0], dataCount, &isSet[0], NULL, NULL, NULL, NULL, NULL, NULL, NULL, userFilter, 1, NULL, NULL);
 	}
 
-	if (filteredDataCount > 0)
-	{
-		int r; // to keep track of i_input() return val
-		do {
-			printf("<!> Enter '0' to return to menu <!>\n");
-			printf("Select records to modify (%d-%d) ", 1, filteredDataCount);
-			r = i_input(&userPickedIDX);
-			if (r)
-			{
-				if (userPickedIDX == 0)
-				{
-					return;
-				}
+	int firstIteration = 1;
+	do {
+		if (!firstIteration)
+		{
+			// Printing of filteredResult
+			printf("%s\n", "======================================================================================================================");
+			printf("%s\n", "|                                               Booking Transactions                                                 |");
+			printf("%s\n", "======================================================================================================================");
+			printf("%s\n", "| No. | DateofTransaction BookingID BookingDate TimeslotBooked FacilityBooked           Booked by    Registered by   |");
+			printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
+			for (int a = 0; a < filteredDataCount; a++) {
+				printf("| %-3d | %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-18.18s ",
+					a + 1,
+					filteredData[a]->currentDate.d, filteredData[a]->currentDate.m, filteredData[a]->currentDate.y, filteredData[a]->currentTime.h, filteredData[a]->currentTime.m,
+					filteredData[a]->bookingID,
+					filteredData[a]->bookingDate.d, filteredData[a]->bookingDate.m, filteredData[a]->bookingDate.y,
+					TIMESLOTS[getTimeslotBooked(filteredData[a]->timeSlotsBooked)],
+					filteredData[a]->facilityID,
+					getFacilityByID(filteredData[a]->facilityID)->name);
+				userData *uData;
+				if (uData = getUserDataByID(filteredData[a]->usrID))
+					printf("%-12.12s", uData->name);
+				else
+					printf("%-12.12s", "-");
+				printf(" %-15.15s |\n", getStaffDataByID(filteredData[a]->staffID)->stfName);
 			}
-		} while (!r && userPickedIDX < 1 || userPickedIDX > filteredDataCount);
-		modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
-		system("pause");
-	}
-	else
-	{
-		printf("No records was found...\n");
-		system("pause");
-	}
-
+			printf("%s\n", "======================================================================================================================");
+			printf("%s\n\n", "======================================================================================================================");
+		}
+		if (filteredDataCount > 0)
+		{
+			Date dt;
+			getSystemDate(&dt);
+			int r; // to keep track of i_input() return val
+			do {
+				printf("<!> Enter '0' to return to menu <!>\n");
+				printf("Select records to modify (%d-%d) ", 1, filteredDataCount);
+				r = i_input(&userPickedIDX);
+				if (r)
+				{
+					if (userPickedIDX == 0)
+					{
+						return;
+					}
+					if (userPickedIDX > 0 && userPickedIDX <= filteredDataCount && compareDate(dt.d, dt.m, dt.y,
+						filteredData[userPickedIDX - 1]->bookingDate.d,
+						filteredData[userPickedIDX - 1]->bookingDate.m,
+						filteredData[userPickedIDX - 1]->bookingDate.y) != -1) // if booking date is not later than current date, you are not allowed to modify
+					{
+						printf("You are not allowed to modify booking with booking date before today and today.\n");
+						system("pause");
+						r = 0;
+					}
+				}
+			} while (!r
+				|| userPickedIDX < 1 || userPickedIDX > filteredDataCount);
+			modifySpecificBooking(filteredData[userPickedIDX - 1], &data[0], dataCount);
+			printf("Do you wish to modify more bookings ? (y=yes) ");
+			getUserMenuChoice(choice, 9, "Do you wish to modify more bookings ? (y=yes) ");
+		}
+		else
+		{
+			printf("No records was found...\n");
+			system("pause");
+			return;
+		}
+		firstIteration = 0;
+	} while (tolower(choice[0]) == 'y');
 }
 
 // Modify specific booking
@@ -699,27 +713,26 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 			if (!tmpR) // if no timeslot anymore
 			{
 				printf("There are no available timeslots on booking date.\n Please re-select date + timeslot.\n");
-				bipChangeBookingDate(&cache.bookingDate);
+				bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			else if (!tmpTS[userPickedtimeslot]) // if the timeslot picked is full
 			{
 				printf("The timeslot you picked is unavailable.\n Please re-select date + timeslot.\n");
-				bipChangeBookingDate(&cache.bookingDate);
+				bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			printf("Is the booking date %02d/%02d/%04d correct ? (y=yes) ", cache.bookingDate.d, cache.bookingDate.m, cache.bookingDate.y);
 			getUserMenuChoice(choice, 9, "Is the booking date %02d/%02d/%04d correct ? (y=yes) ");
 			if (tolower(choice[0]) != 'y')
 			{
-				bipChangeBookingDate(&cache.bookingDate);
+				bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 				bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
 			}
 			break;
 		case '2':
-			bipChangeBookingDate(&cache.bookingDate);
+			bipChangeBookingDate(&cache.bookingDate, cache.facilityID);
 			bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
-			printf("\n\n%s\n\n", bookingToModify->bookingID);
 			break;
 		case '3':
 			bipChangeTimeslot(1, &userPickedtimeslot, &data[0], dataCount, &cache.bookingDate, cache.facilityID, cache.bookingID);
@@ -739,14 +752,14 @@ int modifySpecificBooking(BookingData *bookingToModify, BookingData *data, int d
 	printf(" <----------------------------------------------------->\n");
 	printf(" ->                 OLD Booking Details                <-\n");
 	printf(" <----------------------------------------------------->\n");
-	printf(" | Facility     : %-36.36s |\n", getFacilityByID(bookingToModify->facilityID)->name);
+	printf(" | Facility     : (%-5.5s) %-28.28s |\n", bookingToModify->facilityID, getFacilityByID(bookingToModify->facilityID)->name);
 	printf(" | Booking Date : %02d/%02d/%04d%26s |\n", bookingToModify->bookingDate.d, bookingToModify->bookingDate.m, bookingToModify->bookingDate.y, "");
 	printf(" | Timeslot     : %-36.36s |\n", TIMESLOTS[getTimeslotBooked(bookingToModify->timeSlotsBooked)]);
 	printf(" <----------------------------------------------------->\n\n");
 	printf(" <----------------------------------------------------->\n");
 	printf(" ->                 NEW Booking Details                <-\n");
 	printf(" <----------------------------------------------------->\n");
-	printf(" | Facility     : %-36.36s |\n", getFacilityByID(cache.facilityID)->name);
+	printf(" | Facility     : (%-5.5s) %-28.28s |\n", cache.facilityID, getFacilityByID(cache.facilityID)->name);
 	printf(" | Booking Date : %02d/%02d/%04d%26s |\n", cache.bookingDate.d, cache.bookingDate.m, cache.bookingDate.y, "");
 	printf(" | Timeslot     : %-36.36s |\n", TIMESLOTS[getTimeslotBooked(cache.timeSlotsBooked)]);
 	printf(" <----------------------------------------------------->\n\n");
@@ -824,18 +837,21 @@ void bookingDisplayAll()
 	printf("%s\n", "|--------------------------------------------------------------------------------------------------------------------|");
 	for (int a = 0; a < dataToPrintCount; a++)
 	{
-		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s %-12.12s %-15.15s |\n",
+		printf("| %02d/%02d/%-04d %02d:%02d  %-8.7s  %02d/%02d/%-05d %-14.14s %-5.5s-%-24.24s ",
 			dataToPrint[a]->currentDate.d, dataToPrint[a]->currentDate.m, dataToPrint[a]->currentDate.y, dataToPrint[a]->currentTime.h, dataToPrint[a]->currentTime.m,
 			dataToPrint[a]->bookingID,
 			dataToPrint[a]->bookingDate.d, dataToPrint[a]->bookingDate.m, dataToPrint[a]->bookingDate.y,
 			TIMESLOTS[getTimeslotBooked(dataToPrint[a]->timeSlotsBooked)],
 			// data[a].facilityID,
 			dataToPrint[a]->facilityID,
-			getFacilityByID(dataToPrint[a]->facilityID)->name,
-			//data[a].usrID,
-			getUserDataByID(dataToPrint[a]->usrID)->name,
-			//data[a].staffID);
-			getStaffDataByID(dataToPrint[a]->staffID)->stfName);
+			getFacilityByID(dataToPrint[a]->facilityID)->name);
+		userData *usrData;
+		if (usrData = getUserDataByID(dataToPrint[a]->usrID)) // if userID is null then print '-', this happens when staff make booking
+			printf("%-12.12s", usrData->name);
+		else
+			printf("%-12.12s", "-");
+
+		printf(" %-15.15s |\n", getStaffDataByID(dataToPrint[a]->staffID)->stfName);
 	}
 	printf("%s\n", "======================================================================================================================");
 	printf("%s\n", "======================================================================================================================");
@@ -874,9 +890,9 @@ void bookingDisplayFilters(BookingData *data, int dataCount, char userID[])
 	if (mode == 'u') // if it is on user mode, there should be exactly one entry in user filter
 	{
 		isSet[5] = 1;
+		userFilter[0] = getUserDataByID(userID);
+		uCount = 1;
 	}
-	userFilter[0] = getUserDataByID(userID);
-	uCount = 1;
 
 	char filterChoice[10];
 	int recordsCount = 0; // to keep track of how many records is printed
@@ -1410,6 +1426,12 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 		}
 		remarkLine[2][a] = fac->remarks[a + 48];
 	}
+	if (strlen(fac->remarks) == 0)
+	{
+		remarkLine[0][0] = '\0';
+		remarkLine[1][0] = '\0';
+		remarkLine[2][0] = '\0';
+	}
 
 	printf("%40s                Booking\n", "");
 	printf("%40s---------------------------------------\n", "");
@@ -1420,7 +1442,13 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("%40s---------------------------------------\n", "");
 	printf("                   User                                Faciltity                                Staff                 \n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
-	printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
+	if(mode == 's'){
+		printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
+	}
+	else if (mode == 'u')
+	{
+		printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, "*HIDDEN*");
+	}
 	printf("  | Name            : %-16.16s | | Name             : %-15.15s | | Name            : %-16.16s |\n", usr->name, fac->name, stf->stfName);
 	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Maintenance Date : %02d/%02d           | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m, fac->maintenanceDate.d, fac->maintenanceDate.m, stf->stfPosi);
 	printf("  | Gender          : %-16.16s | | Remarks          : %-15.15s | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, remarkLine[0], stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
@@ -1625,7 +1653,7 @@ int getTimeslotArrayCount(int*timeslot)
 	int count = 0;
 	for (int a = 0; a < 6; a++)
 	{
-		if(timeslot[a])
+		if (timeslot[a])
 			count++;
 	}
 	return count;
@@ -1653,7 +1681,7 @@ int bipChangeFacility(char *userPickedfacilityID)
 		return 0;
 	}
 	do {
-		printf("Select one of the following facilities: \n");
+		printf(" Select one of the following facilities: \n");
 		/*
 		Insert code to get all facilities
 		Need to count how many facilities are there?
@@ -1676,9 +1704,9 @@ int bipChangeFacility(char *userPickedfacilityID)
 				continue;
 			}
 			facList[idxNumbering - 1] = &facData[a];
-			printf("\t%d. %s\n", idxNumbering++, facData[a].name);
+			printf(" \t%d. %s\n", idxNumbering++, facData[a].name);
 		}
-		printf("\nSelect Facility you wish to book(%d-%d): ", 1, idxNumbering - 1);
+		printf("\n Select Facility you wish to book(%d-%d): ", 1, idxNumbering - 1);
 		if (i_input(&userChoice)) // if user entered integer
 		{
 			if (userChoice > 0 && userChoice <= idxNumbering - 1) // if user input is within range
@@ -1692,7 +1720,8 @@ int bipChangeFacility(char *userPickedfacilityID)
 }
 
 // Return 1 if bookingDate changed successfully
-int bipChangeBookingDate(Date *bookingDate)
+// added facilityID parameter to check for maintenance date
+int bipChangeBookingDate(Date *bookingDate, char facilityID[])
 {
 	// If available, ask user for date
 	Date currentDate;
@@ -1700,20 +1729,32 @@ int bipChangeBookingDate(Date *bookingDate)
 	int dateErr = 0;
 	int r; // r to check scanf() result
 	do {
-		if (dateErr)
+		do {
+			if (dateErr)
+			{
+				printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
+			}
+			dateErr = 1;
+			printf(" Booking Date ? <dd/mm/yyyy> ");
+			rewind(stdin);
+			r = scanf("%d/%d/%d", &bookingDate->d, &bookingDate->m, &bookingDate->y);
+			rewind(stdin);
+		} while (r != 3 ||
+			!validateDate(bookingDate->d, bookingDate->m, bookingDate->y) ||
+			compareDate(bookingDate->d, bookingDate->m, bookingDate->y, currentDate.d, currentDate.m, currentDate.y) != 1
+			);
+		Facility *fac = getFacilityByID(facilityID);
+		if (compareDate(bookingDate->d, bookingDate->m, bookingDate->y, fac->maintenanceDate.d, fac->maintenanceDate.m, bookingDate->y) == 0)
 		{
-			printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
+			printf(" The facility is under maintenance on that date, please book other day.\n");
+			dateErr = 0; // change it back to zero to prevent the msg from printing 
+			continue;
 		}
-		dateErr = 1;
-		printf("Booking Date ? <dd/mm/yyyy> ");
-		rewind(stdin);
-		r = scanf("%d/%d/%d", &bookingDate->d, &bookingDate->m, &bookingDate->y);
-		rewind(stdin);
-	} while (r != 3 ||
-		!validateDate(bookingDate->d, bookingDate->m, bookingDate->y) ||
-		compareDate(bookingDate->d, bookingDate->m, bookingDate->y, currentDate.d, currentDate.m, currentDate.y) != 1
-		);
-	err = 0;
+		else
+		{
+			break;
+		}
+	} while (1);
 	return 1;
 }
 
@@ -1729,12 +1770,12 @@ int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, Bo
 		printf("Sorry, but there are no free timeslots on that day for that facility, please try other facility / date\n");
 		return 0;
 	}
-	if(userAlreadyPickedTimeslot)
+	if (userAlreadyPickedTimeslot)
 		timeslotAvailable[*userPickedtimeslot] = 1;
-	printf("Timeslots: \n");
+	printf(" Timeslots: \n");
 	for (int a = 0; a < 6; a++)
 	{
-		printf("\t%d. %s ", a + 1, TIMESLOTS[a]);
+		printf(" \t%d. %s ", a + 1, TIMESLOTS[a]);
 		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	}
 
@@ -1750,8 +1791,8 @@ int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, Bo
 				printf("Please select timeslot from 1 - 6\n");
 			}
 			err = 1;
-			printf("Please, pick a timeslot(1-6): ");
-			getUserMenuChoice(userPickedtimeslotSTR, 9, "Please, pick a timeslot(1-6): ");
+			printf(" Please, pick a timeslot(1-6): ");
+			getUserMenuChoice(userPickedtimeslotSTR, 9, " Please, pick a timeslot(1-6): ");
 
 		} while (userPickedtimeslotSTR[0] < '1' || userPickedtimeslotSTR[0] > '6'); // this checks whether user enter valid input (if you are wondering why not i_input()
 		err = 1;
@@ -1822,6 +1863,7 @@ Staff* getStaffDataByID(char *id)
 	return NULL;
 }
 
+// return pointer to user data, null if not found or no data
 userData* getUserDataByID(char *id)
 {
 	if (usrDataCount == 0)
@@ -1838,6 +1880,7 @@ userData* getUserDataByID(char *id)
 	return NULL;
 }
 
+// return pointer to faciltiy data, null if not found or no data
 Facility* getFacilityByID(char *id)
 {
 	if (facilityDataCount == 0)
@@ -1882,7 +1925,7 @@ int _usrLogin(char *usrID, int size)
 		printf("Enter 'XXX' to return to previous screen\n");
 		printf("User ID -> ");
 		s_input(usrID, size);
-		if (strcmp(usrID, "XXX") == 0)
+		if (strcmp(usrID, "XXX") == 0 || strcmp(usrID, "xxx") == 0)
 		{
 			return 0;
 		}

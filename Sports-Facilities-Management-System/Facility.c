@@ -3,6 +3,7 @@
 
 void facInfoMain()
 {
+
 	if (!_staffLogin(sessionStaffID, 99))
 	{
 		return;
@@ -24,6 +25,7 @@ void facInfoMain()
 	// if user finally wants to log out
 	sessionStaffID[0] = '\0';
 
+	//sessionStaffID
 }
 
 
@@ -80,7 +82,7 @@ void addNewFacility()
 		getSystemDate(&fac.lastModified);
 
 		printf("\nFacility ID              : %s\n", fac.id);
-		printf("Facility Name            : %s\n", fac.name);
+		printf("Facility Name            : %s\n",fac.name);
 		printf("Facility Maintenance Date: %02d/%02d\n", fac.maintenanceDate.d, fac.maintenanceDate.m);
 		printf("Facility Remarks         : %s\n", fac.remarks);
 		printf("\nComfirm Adding facility ? (y = yes) ");
@@ -105,40 +107,45 @@ void addNewFacility()
 void searchFacility()
 {
 	char searchFacilityName[200];
-	Facility facility[10] = {"0"};
-	FILE*facilityFile;
-	facilityFile = fopen(facilityFilePath, "rb");
+	Facility facData[100];
+	FILE *f = fopen(facilityFilePath, "rb");
 
-	while (!chkFileExist(facilityFile))
+	while (!chkFileExist(f))
 	{
 		printf("Cannot find facility file\n");
 		return;
 	}
 
-	printf("Search by name:");
+	printf("Search by name(Enter xxx to exit):");
 	s_input(searchFacilityName,199);
-
-	while (fread(&facility, sizeof(facility), 1, facilityFile) != 0)
+	if (strcmp(searchFacilityName, "XXX") == 0 || strcmp(searchFacilityName, "xxx") == 0)
 	{
-
-		if (strcmp(facility[0].name, searchFacilityName) == 0)
-		{
-
-			printf("Name = %s\n", facility[0].name);
-			printf("ID   = %s\n", facility[0].id);
-			printf(" Maintenance Date =%02d/%02d\n", facility[0].maintenanceDate);
-			printf(" Remarks = %s\n", facility[0].remarks);
-			system("pause");
-			return;
-		}
-		else 
-		{
-			printf("No facility can be found!");
-			return;
-		}
-
+		return;
 	}
-			
+	else
+	{
+		int i = 0;
+
+		while (fread(&facData[i], sizeof(Facility), 1, f) != 0)
+		{
+			if (strcmp(facData[i].name, searchFacilityName) == 0)
+			{
+
+				printf("Name = %s\n", facData[i].name);
+				printf("ID   = %s\n", facData[i].id);
+				printf(" Maintenance Date =%02d/%02d\n", facData[i].maintenanceDate.d, facData[i].maintenanceDate.m);
+				printf(" Remarks = %s\n", facData[i].remarks);
+				system("pause");
+				return;
+			}
+
+			i++;
+		}
+
+		printf("No facility can be found!\n");
+		system("pause");
+	}
+		
 }
 
 void modifyFacility()
@@ -169,125 +176,133 @@ void modifyFacility()
 		facNameSearchResultIDX = 0;
 		printf("Enter facility Name to modify: ");
 		s_input(facilityNameSearch, 199);
-		for (int a = 0; a < dataCount; a++)
+		do
 		{
-			if (strcmp(facilityNameSearch, facData[a].name) == 0)
+
+		
+		
+			for (int a = 0; a < dataCount; a++)
 			{
-				facNameSearchResult[facNameSearchResultIDX] = &facData[a];
-				facNameSearchResultIDX++;
+				if (strcmp(facilityNameSearch, facData[a].name) == 0)
+				{
+					facNameSearchResult[facNameSearchResultIDX] = &facData[a];
+					facNameSearchResultIDX++;
+				}
 			}
-		}
-		if (facNameSearchResultIDX == 0)
-		{
-			printf("There are no facility of name \"%s\"\n", facilityNameSearch);
-			system("pause");
-			choice[0] = 'y'; // to break the loop
-			continue;
-		}
-		if (facNameSearchResultIDX != 1) // if there are multiple facility of same name
-		{
-			for (int a = 0; a < facNameSearchResultIDX; a++)
+			if (facNameSearchResultIDX == 0)
 			{
-				printf("\t%d. %s - %s\n", a + 1, facNameSearchResult[a]->id, facNameSearchResult[a]->name);
-			}
-			int userPickedFromSearchR;
-			do {
-				printf("\nWhich facility you wish to modify ? (%d - %d) ", 1, facNameSearchResultIDX);
-				i_input(&userPickedFromSearchR);
-			} while (userPickedFromSearchR < 1 || userPickedFromSearchR > facNameSearchResultIDX);
-			facToModify = facNameSearchResult[userPickedFromSearchR - 1]; // -1 to match idx on facNameSearchResult
-		}
-		else
-		{
-			facToModify = facNameSearchResult[0];
-		}
-
-		strcpy(newData.id, facToModify->id);
-		strcpy(newData.name, facToModify->name);
-		strcpy(newData.remarks, facToModify->remarks);
-		strcpy(newData.staffHandledID, facToModify->staffHandledID);
-		newData.maintenanceDate.d = facToModify->maintenanceDate.d;
-		newData.maintenanceDate.m = facToModify->maintenanceDate.m;
-		newData.maintenanceDate.y = facToModify->maintenanceDate.y;
-		newData.lastModified.d = facToModify->lastModified.d;
-		newData.lastModified.m = facToModify->lastModified.m;
-		newData.lastModified.y = facToModify->lastModified.y;
-		do {
-			printf("\tID               : %s\n", newData.id);
-			printf("\tName             : %s\n", newData.name);
-			printf("\tMaintenance Date : %02d/%02d\n", newData.maintenanceDate.d, newData.maintenanceDate.m);
-			printf("\tRemarks          : %s\n", newData.remarks);
-			printf("\n\t1. Change facility name\n"
-				"\t2. Add/Modify Facilty Remarks\n"
-				"\t3. Change Yearly Maintenance Date\n");
-			printf("Choice ? ");
-			getUserMenuChoice(choice, 9, "Choice ? ");
-			switch (choice[0])
-			{
-			case '1':
-				printf("Previous name: %s\n", facToModify->name);
-				printf("New name     : ");
-				s_input(newData.name, 199);
-				break;
-			case '2':
-				printf("Previous Remarks: %s\n", facToModify->remarks);
-				printf("New Remarks     : ");
-				s_input(newData.remarks, 499);
-				break;
-			case '3':
-				printf("Previous Maintenance Date    : %02d/%02d\n", facToModify->maintenanceDate.d, facToModify->maintenanceDate.m);
-
-				// Get Date input
-				int r = -999; // to store scanf output
-				newData.maintenanceDate.y = 2020; // for the validation to work
-				do {
-					if (r != -999) {
-						if (r != 2)
-						{
-							printf("Wrong Date format.\n");
-						}
-						else if (!validateDate(newData.maintenanceDate.d, newData.maintenanceDate.m, newData.maintenanceDate.y))
-						{
-							printf("Invalid date\n");
-						}
-					}
-					printf("New Maintenance Date (dd/mm) : ");
-					rewind(stdin);
-					r = scanf("%d/%d", &newData.maintenanceDate.d, &newData.maintenanceDate.m);
-					rewind(stdin);
-				} while (r != 2 || !validateDate(newData.maintenanceDate.d, newData.maintenanceDate.m, newData.maintenanceDate.y));
-
-				break;
-			}
-			printf("Old Facility Info:\n");
-			printf("\tID               : %s\n", facToModify->id);
-			printf("\tName             : %s\n", facToModify->name);
-			printf("\tMaintenance Date : %02d/%02d\n", facToModify->maintenanceDate.d, facToModify->maintenanceDate.m);
-			printf("\tRemarks          : %s\n", facToModify->remarks);
-
-			printf("\nNew Facility Info:\n");
-			printf("\tID               : %s\n", facToModify->id);
-			printf("\tName             : %s\n", newData.name);
-			printf("\tMaintenance Date : %02d/%02d\n", newData.maintenanceDate.d, newData.maintenanceDate.m);
-			printf("\tRemarks          : %s\n", newData.remarks);
-
-			printf("\nApply Changes ? (y = apply, r = back) ");
-			getUserMenuChoice(choice, 9, "Apply Changes ? (y = apply, r = back) ");
-			if (tolower(choice[0]) == 'y') {
-				strcpy(facToModify->name, newData.name);
-				strcpy(facToModify->remarks, newData.remarks);
-				strcpy(facToModify->staffHandledID, sessionStaffID);
-				facToModify->maintenanceDate.d = newData.maintenanceDate.d;
-				facToModify->maintenanceDate.m = newData.maintenanceDate.m;
-				facToModify->maintenanceDate.y = newData.maintenanceDate.y;
-				getSystemDate(&facToModify->maintenanceDate);
+				printf("There are no facility of name \"%s\"\n", facilityNameSearch);
 				system("pause");
-				break;
+				choice[0] = 'y'; // to break the loop
+				continue;
 			}
+			if (facNameSearchResultIDX != 1) // if there are multiple facility of same name
+			{
+				for (int a = 0; a < facNameSearchResultIDX; a++)
+				{
+					printf("\t%d. %s - %s\n", a + 1, facNameSearchResult[a]->id, facNameSearchResult[a]->name);
+				}
+				int userPickedFromSearchR;
+				do {
+					printf("\nWhich facility you wish to modify ? (%d - %d) ", 1, facNameSearchResultIDX);
+					i_input(&userPickedFromSearchR);
+				} while (userPickedFromSearchR < 1 || userPickedFromSearchR > facNameSearchResultIDX);
+				facToModify = facNameSearchResult[userPickedFromSearchR - 1]; // -1 to match idx on facNameSearchResult
+			}
+			else
+			{
+				facToModify = facNameSearchResult[0];
+			}
+
+			strcpy(newData.id, facToModify->id);
+			strcpy(newData.name, facToModify->name);
+			strcpy(newData.remarks, facToModify->remarks);
+			strcpy(newData.staffHandledID, facToModify->staffHandledID);
+			newData.maintenanceDate.d = facToModify->maintenanceDate.d;
+			newData.maintenanceDate.m = facToModify->maintenanceDate.m;
+			newData.maintenanceDate.y = facToModify->maintenanceDate.y;
+			newData.lastModified.d = facToModify->lastModified.d;
+			newData.lastModified.m = facToModify->lastModified.m;
+			newData.lastModified.y = facToModify->lastModified.y;
+			
+				printf("\tID               : %s\n", newData.id);
+				printf("\tName             : %s\n", newData.name);
+				printf("\tMaintenance Date : %02d/%02d\n", newData.maintenanceDate.d, newData.maintenanceDate.m);
+				printf("\tRemarks          : %s\n", newData.remarks);
+				printf("\n\t1. Change facility name\n"
+					"\t2. Add/Modify Facilty Remarks\n"
+					"\t3. Change Yearly Maintenance Date\n");
+				printf("Choice ? ");
+				getUserMenuChoice(choice, 9, "Choice ? ");
+				switch (choice[0])
+				{
+				case '1':
+					printf("Previous name: %s\n", facToModify->name);
+					printf("New name     : ");
+					s_input(newData.name, 199);
+					break;
+				case '2':
+					printf("Previous Remarks: %s\n", facToModify->remarks);
+					printf("New Remarks     : ");
+					s_input(newData.remarks, 499);
+					break;
+				case '3':
+					printf("Previous Maintenance Date    : %02d/%02d\n", facToModify->maintenanceDate.d, facToModify->maintenanceDate.m);
+
+					// Get Date input
+					int r = -999; // to store scanf output
+					newData.maintenanceDate.y = 2020; // for the validation to work
+					do {
+						if (r != -999) {
+							if (r != 2)
+							{
+								printf("Wrong Date format.\n");
+							}
+							else if (!validateDate(newData.maintenanceDate.d, newData.maintenanceDate.m, newData.maintenanceDate.y))
+							{
+								printf("Invalid date\n");
+							}
+						}
+						printf("New Maintenance Date (dd/mm) : ");
+						rewind(stdin);
+						r = scanf("%d/%d", &newData.maintenanceDate.d, &newData.maintenanceDate.m);
+						rewind(stdin);
+					} while (r != 2 || !validateDate(newData.maintenanceDate.d, newData.maintenanceDate.m, newData.maintenanceDate.y));
+
+					break;
+				}
+				printf("Old Facility Info:\n");
+				printf("\tID               : %s\n", facToModify->id);
+				printf("\tName             : %s\n", facToModify->name);
+				printf("\tMaintenance Date : %02d/%02d\n", facToModify->maintenanceDate.d, facToModify->maintenanceDate.m);
+				printf("\tRemarks          : %s\n", facToModify->remarks);
+
+				printf("\nNew Facility Info:\n");
+				printf("\tID               : %s\n", facToModify->id);
+				printf("\tName             : %s\n", newData.name);
+				printf("\tMaintenance Date : %02d/%02d\n", newData.maintenanceDate.d, newData.maintenanceDate.m);
+				printf("\tRemarks          : %s\n", newData.remarks);
+
+				printf("\nApply Changes ? (y = apply, r = back) ");
+				getUserMenuChoice(choice, 9, "Apply Changes ? (y = apply, r = back) ");
+				if (tolower(choice[0]) == 'y') {
+					strcpy(facToModify->name, newData.name);
+					strcpy(facToModify->remarks, newData.remarks);
+					strcpy(facToModify->staffHandledID, sessionStaffID);
+					facToModify->maintenanceDate.d = newData.maintenanceDate.d;
+					facToModify->maintenanceDate.m = newData.maintenanceDate.m;
+					facToModify->maintenanceDate.y = newData.maintenanceDate.y;
+					getSystemDate(&facToModify->maintenanceDate);
+					system("pause");
+					break;
+				}
+
 		} while (tolower(choice[0]) == 'r');
-		printf("Modify more facility ? (y=yes) ");
+		
+		printf("Modify more facility ? (y=yes/n=no) ");
 		getUserMenuChoice(choice, 9, "Modify more facility ? (y=yes) ");
-	} while (tolower(choice[0]) == 'y');
+
+	}while (tolower(choice[0]) == 'y');
 
 	// End of Main Logic
 
@@ -313,7 +328,7 @@ void displayAllFacility()
 	}
 	while (fread(&facData[dataCount], sizeof(Facility),1,f) != 0)
 	{
-		printf("ID: %s\n", facData[dataCount].id);
+		printf("\nID: %s\n", facData[dataCount].id);
 		printf("Name: %s\n", facData[dataCount].name);
 		printf("Yearly Maintenance Date: %02d/%02d\n", facData[dataCount].maintenanceDate.d, facData[dataCount].maintenanceDate.m);
 		printf("Date Last Modified: %02d/%02d/%04d\n", facData[dataCount].lastModified.d, facData[dataCount].lastModified.m, facData[dataCount].lastModified.y);
@@ -356,8 +371,10 @@ int facilityMenu()
 	case 4:
 		displayAllFacility();
 		break;		
+	case 5:
+		return 5;
 	default:
-		return;
+		return -1;
 	}
 	return choice;
 
