@@ -1741,6 +1741,7 @@ int bipChangeBookingDate(Date *bookingDate, char facilityID[])
 		if (compareDate(bookingDate->d, bookingDate->m, bookingDate->y, fac->maintenanceDate.d, fac->maintenanceDate.m, bookingDate->y) == 0)
 		{
 			printf(" The facility is under maintenance on that date, please book other day.\n");
+			dateErr = 0; // change it back to zero to prevent the msg from printing 
 			continue;
 		}
 		else
