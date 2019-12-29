@@ -499,6 +499,7 @@ int changeStfList()
 						rewind(stdin);
 					}
 				} while (totalCondition != valid + ifUsed + strLength);
+				break;
 			case '2':
 				printf("Enter new password(MINUMUM 8):");
 				scanf("%[^\n]", staffChange.stfPassW);
@@ -575,7 +576,7 @@ int changeStfList()
 				break;
 			case '4':
 				printf("Exiting");
-				return;
+				return 1;
 				break;
 			default:
 				printf("Invalid choice !\n");
@@ -647,7 +648,6 @@ int changeStfList()
 					system("pause");
 					return 0;
 				}
-				return 1;
 				printf("Changes have been made,this is the staff's new info.\n");
 				system("pause");
 				system("cls");
