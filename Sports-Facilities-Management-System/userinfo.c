@@ -905,7 +905,7 @@ int userInfo()
 	printf("\t\t\t\t\t\t5. Exit\n");
 	printf("\n\t\t\t\t\t\tMenu Choice: ");*/
 
-	char choiceText[][100] = { "Registration For New User", "Changing User Info", "Search Details Of User(ONLY FOR STAFF)", "Display All The User In Database(ONLY FOR STAFF)", "Exit" };
+	char choiceText[][100] = { "Registration For New User", "Modify User Info", "Search Details Of User(ONLY FOR STAFF)", "Display All The User In Database(ONLY FOR STAFF)", "Exit" };
 	do {
 		int choice = globalMainMenu("^_^ USERINFO MODULE ^_^", 5, choiceText);
 
