@@ -1,10 +1,6 @@
 #include "stdcxx.h"
 #include "staff.h"
 
-/*
-TO DO LIST
-1.ADD CENCORED TO PASSWORD
-*/
 
 Staff staffCache[30];//Main array to keep staff info from files
 Staff loggedinstf;//To check for globla logged in status
@@ -115,35 +111,35 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 
 		
 		printf("Enter staff Passwords(MINIMUM 8): ");
-		scanf("%[^\n]", addStaff.stfPassW);
+		collectCensoredInput(addStaff.stfPassW, 99);
 		rewind(stdin);
 		while (strlen(addStaff.stfPassW) < 8)
 		{
 			printf("password too short please reenter : \n");
 			printf("Enter staff Passwords(MINIMUM 8): ");
-			scanf("%[^\n]", addStaff.stfPassW);
+			collectCensoredInput(addStaff.stfPassW, 99);
 			rewind(stdin);
 		}
 		
 		printf("Reenter password to confirm :");
-		scanf("%[^\n]", addStaff.stfConPassW);
+		collectCensoredInput(addStaff.stfConPassW, 99);
 		rewind(stdin);
 		while (strcmp(addStaff.stfPassW, addStaff.stfConPassW) != 0)
 		{
 			printf("Passwords does not match please reenter !\n");
 			rewind(stdin);
 			printf("Enter staff Passwords(MINIMUM 8) :");
-			scanf("%[^\n]", addStaff.stfPassW);
+			collectCensoredInput(addStaff.stfPassW, 99);
 			rewind(stdin);
 			while (strlen(addStaff.stfPassW) < 8)
 			{
 				printf("password too short please reenter : \n");
 				printf("Enter staff Passwords(MINIMUM 8): ");
-				scanf("%[^\n]", addStaff.stfPassW);
+				collectCensoredInput(addStaff.stfPassW, 99);
 				rewind(stdin);
 			}
 			printf("Reenter passowrd to confirm :");
-			scanf("%[^\n]", addStaff.stfConPassW);
+			collectCensoredInput(addStaff.stfConPassW, 99);
 			rewind(stdin);
 		}
 
@@ -502,34 +498,34 @@ int changeStfList()
 				break;
 			case '2':
 				printf("Enter new password(MINUMUM 8):");
-				scanf("%[^\n]", staffChange.stfPassW);
+				collectCensoredInput(staffChange.stfPassW, 99);
 				rewind(stdin);
 				while (strlen(staffChange.stfPassW) < 8)
 				{
 					printf("password too short please reenter : \n");
 					printf("Enter staff Passwords(MINIMUM 8): ");
-					scanf("%[^\n]", staffChange.stfPassW);
+					collectCensoredInput(staffChange.stfPassW, 99);
 					rewind(stdin);
 				}
 				printf("Reenter password to confirm :");
-				scanf("%[^\n]", staffChange.stfConPassW);
+				collectCensoredInput(staffChange.stfConPassW, 99);
 				rewind(stdin);
 				while (strcmp(staffChange.stfPassW, staffChange.stfConPassW) != 0)
 				{
 					printf("Passwords does not match please reenter !\n");
 					rewind(stdin);
 					printf("Enter staff Passwords(MINIMUM 8) :");
-					scanf("%[^\n]", staffChange.stfPassW);
+					collectCensoredInput(staffChange.stfPassW, 99);
 					rewind(stdin);
 					while (strlen(staffChange.stfPassW) < 8)
 					{
 						printf("password too short please reenter : \n");
 						printf("Enter staff Passwords(MINIMUM 8): ");
-						scanf("%[^\n]", staffChange.stfPassW);
+						collectCensoredInput(staffChange.stfPassW, 99);
 						rewind(stdin);
 					}
 					printf("Reenter passowrd to confirm :");
-					scanf("%[^\n]", staffChange.stfConPassW);
+					collectCensoredInput(staffChange.stfConPassW, 99);
 					rewind(stdin);
 				}
 				break;
@@ -682,7 +678,7 @@ void login()//log in
 			scanf("%[^\n]", nameEntered);
 			rewind(stdin);
 			printf("Passwords :");
-			scanf("%[^\n]", passwordEntered);
+			collectCensoredInput(passwordEntered, 99);
 			rewind(stdin);
 			for (i = 0; i < totstaff; i++)
 			{
@@ -808,33 +804,33 @@ void pwRecover()
 	} while (stafffound != 1);
 
 	printf("Enter new password(MINUMUM 8):");
-	scanf("%[^\n]",&newpw);
+	collectCensoredInput(newpw, 99);
 	rewind(stdin);
 	while (strlen(newpw) < 8)
 	{
 		printf("Password too short please reenter : \n");
-		scanf("%[^\n]",&newpw);
+		collectCensoredInput(newpw, 99);
 		rewind(stdin);
 	}
 	printf("Reenter password to confirm :");
-	scanf("%[^\n]",&newconpw);
+	collectCensoredInput(newconpw, 99);
 	rewind(stdin);
 	while (strcmp(newconpw,newpw) != 0)
 	{
 		printf("Passwords does not match please reenter !\n");
 		rewind(stdin);
 		printf("Enter staff Passwords(MINIMUM 8) :");
-		scanf("%[^\n]",&newpw);
+		collectCensoredInput(newpw, 99);
 		rewind(stdin);
 		while (strlen(newpw) < 8)
 		{
 			printf("password too short please reenter : \n");
 			printf("Enter staff Passwords(MINIMUM 8): ");
-			scanf("%[^\n]",&newpw);
+			collectCensoredInput(newpw, 99);;
 			rewind(stdin);
 		}
 		printf("Reenter password to confirm :");
-		scanf("%[^\n]",&newconpw);
+		collectCensoredInput(newconpw, 99);
 		rewind(stdin);
 	}
 	printf("Here's your new password :%s\n",newpw);
