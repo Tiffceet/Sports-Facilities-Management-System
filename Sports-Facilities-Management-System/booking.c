@@ -240,8 +240,6 @@ void bookingBook()
 				data[count - 1].bookingDate.y,
 				TIMESLOTS[getTimeslotBooked(data[count - 1].timeSlotsBooked)]
 			);
-			system("pause");
-			break;
 		}
 
 		printf("Would you like to continue a new booking ? (y=yes) ");
@@ -1677,7 +1675,7 @@ int bipChangeFacility(char *userPickedfacilityID)
 		return 0;
 	}
 	do {
-		printf("Select one of the following facilities: \n");
+		printf(" Select one of the following facilities: \n");
 		/*
 		Insert code to get all facilities
 		Need to count how many facilities are there?
@@ -1700,9 +1698,9 @@ int bipChangeFacility(char *userPickedfacilityID)
 				continue;
 			}
 			facList[idxNumbering - 1] = &facData[a];
-			printf("\t%d. %s\n", idxNumbering++, facData[a].name);
+			printf(" \t%d. %s\n", idxNumbering++, facData[a].name);
 		}
-		printf("\nSelect Facility you wish to book(%d-%d): ", 1, idxNumbering - 1);
+		printf("\n Select Facility you wish to book(%d-%d): ", 1, idxNumbering - 1);
 		if (i_input(&userChoice)) // if user entered integer
 		{
 			if (userChoice > 0 && userChoice <= idxNumbering - 1) // if user input is within range
@@ -1731,7 +1729,7 @@ int bipChangeBookingDate(Date *bookingDate, char facilityID[])
 				printf("Invalid Date, try again.\nDo note that booking on today is not allowed.\n");
 			}
 			dateErr = 1;
-			printf("Booking Date ? <dd/mm/yyyy> ");
+			printf(" Booking Date ? <dd/mm/yyyy> ");
 			rewind(stdin);
 			r = scanf("%d/%d/%d", &bookingDate->d, &bookingDate->m, &bookingDate->y);
 			rewind(stdin);
@@ -1742,7 +1740,7 @@ int bipChangeBookingDate(Date *bookingDate, char facilityID[])
 		Facility *fac = getFacilityByID(facilityID);
 		if (compareDate(bookingDate->d, bookingDate->m, bookingDate->y, fac->maintenanceDate.d, fac->maintenanceDate.m, bookingDate->y) == 0)
 		{
-			printf("The facility is under maintenance on that date, please book other day.\n");
+			printf(" The facility is under maintenance on that date, please book other day.\n");
 			continue;
 		}
 		else
@@ -1767,10 +1765,10 @@ int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, Bo
 	}
 	if (userAlreadyPickedTimeslot)
 		timeslotAvailable[*userPickedtimeslot] = 1;
-	printf("Timeslots: \n");
+	printf(" Timeslots: \n");
 	for (int a = 0; a < 6; a++)
 	{
-		printf("\t%d. %s ", a + 1, TIMESLOTS[a]);
+		printf(" \t%d. %s ", a + 1, TIMESLOTS[a]);
 		if (timeslotAvailable[a]) printf(" <Available>\n"); else printf(" <Not Available>\n");
 	}
 
@@ -1786,8 +1784,8 @@ int bipChangeTimeslot(int userAlreadyPickedTimeslot, int *userPickedtimeslot, Bo
 				printf("Please select timeslot from 1 - 6\n");
 			}
 			err = 1;
-			printf("Please, pick a timeslot(1-6): ");
-			getUserMenuChoice(userPickedtimeslotSTR, 9, "Please, pick a timeslot(1-6): ");
+			printf(" Please, pick a timeslot(1-6): ");
+			getUserMenuChoice(userPickedtimeslotSTR, 9, " Please, pick a timeslot(1-6): ");
 
 		} while (userPickedtimeslotSTR[0] < '1' || userPickedtimeslotSTR[0] > '6'); // this checks whether user enter valid input (if you are wondering why not i_input()
 		err = 1;
