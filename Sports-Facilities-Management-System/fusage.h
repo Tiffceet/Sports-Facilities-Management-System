@@ -9,7 +9,7 @@ typedef struct
 {
 	Date date;
 	char time[20];
-	char userID[30], facilityID[10];
+	char userID[100], facilityID[10];
 	char usageType[20];
 } FacilityUsage;
 
@@ -20,7 +20,7 @@ int uDataCount;
 int fDataCount;
 int bDataCount;
 
-int staffLogin();
+int usrLogin(char* usrID, int size);
 
 void fusagemain();
 void fUsageRecord();

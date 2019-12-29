@@ -11,7 +11,7 @@ BookingData bData[100];
 
 void fusagemain()
 {
-	if (staffLogin())
+	if (_staffLogin(sessionStaffID, 99))
 	{
 		fUsageRecord();
 		while (fUsageMenu())
@@ -53,7 +53,7 @@ void fUsageAddRecord()
 	char back[10];
 	char cfrm[10], cfrm2[10];
 	char choice[10], selection[10], ctn[10];
-	char chgTime[30], chgUserID[6], chgFacilityID[6];
+	char chgTime[30], chgFacilityID[6];
 	int i;
 
 	Date currentDate;
@@ -68,6 +68,12 @@ void fUsageAddRecord()
 		system("pause");
 		return 0;
 	}
+	if (!usrLogin(addFUsage.userID, 99))
+	{
+		return;
+	}
+	system("pause");
+	system("cls");
 	do
 	{
 		printf("+====================================+\n");
@@ -110,7 +116,6 @@ void fUsageAddRecord()
 				slctFacilityID(&addFUsage.facilityID);
 			}
 		}
-		slctUserID(&addFUsage.userID);
 
 		system("cls");
 		printf("+==============================+\n");
@@ -161,18 +166,17 @@ void fUsageAddRecord()
 				printf("|          Details to Change          |\n");
 				printf("+=====================================+\n");
 				printf("| 1. Time                             |\n");
-				printf("| 2. User ID                          |\n");
-				printf("| 3. Facility ID                      |\n");
+				printf("| 2. Facility ID                      |\n");
 				printf("+=====================================+\n");
-				printf("Enter Details to Change (1-3): ");
+				printf("Enter Details to Change (1-2): ");
 				getUserMenuChoice(selection, 9,
-					"Invalid Input !!!\nPlease select between (1-3).\nEnter Details to change (1-3): ");
-				while (selection[0] < '1' || selection[0] > '3')
+					"Invalid Input !!!\nPlease select between (1-2).\nEnter Details to change (1-2): ");
+				while (selection[0] < '1' || selection[0] > '2')
 				{
-					printf("Invalid Input !!!\nPlease select between (1-3).\n");
-					printf("Enter Details to Change (1-3): ");
+					printf("Invalid Input !!!\nPlease select between (1-2).\n");
+					printf("Enter Details to Change (1-2): ");
 					getUserMenuChoice(selection, 9,
-						"Invalid Input !!!\nPlease select between (1-3).\nEnter Details to change (1-3): ");
+						"Invalid Input !!!\nPlease select between (1-2).\nEnter Details to change (1-2): ");
 				}
 				switch (selection[0])
 				{
@@ -230,46 +234,6 @@ void fUsageAddRecord()
 					}
 					break;
 				case'2':
-					slctUserID(&chgUserID);
-					i = strtol(addFUsage.time, NULL, 10) - 1;
-					printf("\n+============================+\n");
-					printf("|    Detail Before Change    |\n");
-					printf("+============================+\n");
-					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d, addFUsage.date.m, addFUsage.date.y);
-					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s (%s)\n", addFUsage.userID, getUserID(addFUsage.userID)->name);
-					printf("Facility ID : %s (%s)\n", addFUsage.facilityID ,getFacilityID(addFUsage.facilityID)->name);
-					printf("Usage Type  : %s\n", addFUsage.usageType);
-
-					printf("\n+============================+\n");
-					printf("|    Detail After Change     |\n");
-					printf("+============================+\n");
-					printf("Date        : %02d/%02d/%d\n", addFUsage.date.d,
-						addFUsage.date.m, addFUsage.date.y);
-					printf("Time        : %s\n", timeSlots[i]);
-					printf("User ID     : %s (%s)\n", chgUserID, getUserID(chgUserID)->name);
-					printf("Facility ID : %s (%s)\n", addFUsage.facilityID, getFacilityID(addFUsage.facilityID)->name);
-					printf("Usage Type  : %s\n", addFUsage.usageType);
-
-					printf("\nConfirm to add this record? (Y=Yes/N=No) : ");
-					getUserMenuChoice(cfrm2, 9,
-						"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
-					while (toupper(cfrm2[0]) != 'Y' && toupper(cfrm2[0]) != 'N')
-					{
-						printf("Invalid Input !!!\nPlease select between (Y/N).\n");
-						printf("Confirm to add this record? (Y=Yes/N=No) : ");
-						getUserMenuChoice(cfrm2, 9,
-							"Invalid Input !!!\nPlease select between (Y/N).\nConfirm to add this record? (Y=Yes/N=No) : ");
-					}
-					if (toupper(cfrm2[0]) == 'Y')
-					{
-						fprintf(f, "%02d/%02d/%d|%s|%s|%s|%s\n",
-							addFUsage.date.d, addFUsage.date.m, addFUsage.date.y,
-							timeSlots[i], chgUserID, addFUsage.facilityID, addFUsage.usageType);
-						printf("<* Added successfully to Facility Usage Record *>\n");
-					}
-					break;
-				case'3':
 					slctFacilityID(&chgFacilityID);
 					i = strtol(addFUsage.time, NULL, 10) - 1;
 					for (int a = 0; a < bDataCount; a++)
@@ -827,38 +791,64 @@ int fUsageMenu()
 	return 1;
 }
 
-int staffLogin()
+int usrLogin(char* usrID, int size)
 {
-	if (!_staffLogin(sessionStaffID, 99))
+	uDataCount = 0;
+	FILE* f2 = fopen(UserInfoFilePath, "rb");
+	if (chkFileExist(f2))
 	{
+		while (fread(&uData[uDataCount], sizeof(userData), 1, f2) != 0)
+		{
+			uDataCount++;
+		}
+	}
+	fclose(f2);
+	char pw[100];
+	userData* usr;
+	if (uDataCount == 0)
+	{
+		printf("There are currently no users in the system.\n");
+		system("pause");
 		return 0;
 	}
-	return 1;
+
+	do
+	{
+		printf("===============\n");
+		printf("| User Login |\n");
+		printf("===============\n");
+		printf("Enter 'XXX' to return to previous screen\n");
+		printf("User ID -> ");
+		s_input(usrID, size);
+		if (strcmp(usrID, "XXX") == 0 || strcmp(usrID, "xxx") == 0)
+		{
+			return 0;
+		}
+		usr = getUserID(usrID);
+		if (usr == NULL)
+		{
+			printf("Such usrID do not exist.\n");
+			system("pause");
+			continue;
+		}
+		printf("Password -> ");
+		collectCensoredInput(pw, 99);
+		if (strcmp(pw, usr->password) == 0)
+		{
+			printf("User Login Successful.\n");
+			return 1;
+		}
+		else 
+		{
+			printf("Invalid password.\n");
+		}
+	} while (1);
 }
 
 int date(Date* date)
 {
-	// Date currentDate;
-	// getSystemDate(&currentDate);
 	getSystemDate(date);
 	return 1;
-	/*int r;
-	int dateErr = 0; 
-	do 
-	{
-		if (dateErr)
-		{
-			printf("Invalid Date, try again.\nOnly Allow to enter today's DATE.\n");
-		}
-		dateErr = 1;
-		printf("Enter Date < DD/MM/YYYY > : ");
-		rewind(stdin);
-		r = scanf("%d/%d/%d", &date->d, &date->m, &date->y);
-		rewind(stdin);
-	} while (r != 3 || !validateDate(date->d, date->m,date->y) ||
-		compareDate(date->d, date->m,date->y, currentDate.d, currentDate.m, currentDate.y) != 0);
-	err = 0;
-	return 1;*/
 }
 
 int slctTime(char* time)
