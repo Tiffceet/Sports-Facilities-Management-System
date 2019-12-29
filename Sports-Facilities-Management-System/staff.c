@@ -22,6 +22,7 @@ int readStfList()
 
 int isAlNum(char str[])
 {
+	
 	if (!strchr(str, '\0'))
 	{
 		return 0; // string not initialise
@@ -204,6 +205,12 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 				printf("Making this staff admin will strip you of your admin position.\n");
 				printf("Do you proceed?(y=yes) :");
 				scanf("%c", &ans);
+				while (ans != 'y' && ans != 'n')
+				{
+					printf("Invalid entry\n");
+					printf("Please reenter y or n :");
+					scanf(" %c", &ans);
+				}
 				if (ans == 'y')
 				{
 					strcpy(addStaff.stfPosi, "ADMIN");
@@ -355,6 +362,12 @@ int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 			}
 			printf("After viewing staff's infomation enter y to continue,anything else to search for another staff :");
 			scanf("%c", &ans);
+			while (ans != 'y' && ans != 'n')
+			{
+				printf("Invalid entry\n");
+				printf("Please reenter y or n :");
+				scanf(" %c", &ans);
+			}
 			rewind(stdin);
 		} while (ans != 'y');
 		staffAdd = i;
@@ -405,6 +418,12 @@ void staffSearchID()
 			{
 				printf("Enter 'y' to reenter :");
 				scanf("%c", &ans);
+				do
+				{
+					printf("Invalid entry\n");
+					printf("Please reenter y or n :");
+					scanf("%c", &ans);
+				} while (ans != 'y' || ans != 'n');
 				while (ans != 'y')
 				{
 					printf("\n");
@@ -417,6 +436,12 @@ void staffSearchID()
 				printf("\n");
 				printf("Do you want to search for someone else?(y = yes anything else = continue)");
 				scanf("%c", &ans);
+				while (ans != 'y' && ans != 'n')
+				{
+					printf("Invalid entry\n");
+					printf("Please reenter y or n :");
+					scanf(" %c", &ans);
+				}
 			}
 			rewind(stdin);
 		} while (ans == 'y');
@@ -559,6 +584,12 @@ int changeStfList()
 						printf("Making this staff admin will strip you of your admin position.\n");
 						printf("Do you proceed?(y=yes) :");
 						scanf("%c", &ans);
+						while (ans != 'y' && ans != 'n')
+						{
+							printf("Invalid entry\n");
+							printf("Please reenter y or n :");
+							scanf(" %c", &ans);
+						}
 						if (ans == 'y')
 						{
 							strcpy(staffChange.stfPosi, "ADMIN");
@@ -711,7 +742,13 @@ void login()//log in
 						if (failedlogins >= 3)
 						{
 							printf("Do you want to reset your password?(enter y to proceed to reset):");
-							scanf("%c",&ans);
+							scanf(" %c",&ans);
+							while (ans != 'y' && ans != 'n')
+							{
+								printf("Invalid entry\n");
+								printf("Please reenter y or n :");
+								scanf(" %c", &ans);
+							} 
 							if (ans=='y')
 							{
 								system("cls");
@@ -800,6 +837,12 @@ void pwRecover()
 				printf("There's no such person please reenter staff ID.\n");
 				printf("Enter y to return to log in or n to reenter ID :");
 				scanf("%c", &ans);
+				while (ans != 'y' && ans != 'n')
+				{
+					printf("Invalid entry\n");
+					printf("Please reenter y or n :");
+					scanf(" %c", &ans);
+				}
 				rewind(stdin);
 				if (ans == 'y')
 				{
@@ -846,6 +889,12 @@ void pwRecover()
 	printf("Here's your new password :%s\n",newpw);
 	printf("Do you want to make the change?(y to make change n to cancel changes) :");
 	scanf("%c", &ans);
+	while (ans != 'y' && ans != 'n')
+	{
+		printf("Invalid entry\n");
+		printf("Please reenter y or n :");
+		scanf(" %c", &ans);
+	}
 	rewind(stdin);
 	if (ans == 'y')
 	{
