@@ -29,7 +29,7 @@ void bookingMain()
 
 int bookingMenu()
 {
-	char choiceText[][100] = { "Book", "Search bookings", "Modify bookings", "Display all bookings", "Log Out (Return to console)" };
+	char choiceText[][100] = { "Book a facility", "Search bookings", "Modify bookings", "Display all bookings", "Log Out (Return to console)" };
 	int choice = globalMainMenu("Booking Module", 5, choiceText);
 	if (choice > 0 && choice < 6)
 	{
@@ -1442,7 +1442,13 @@ void printBookingDetails(char *bookingID, BookingData *data, int dataSize)
 	printf("%40s---------------------------------------\n", "");
 	printf("                   User                                Faciltity                                Staff                 \n");
 	printf("  -------------------------------------- -------------------------------------- --------------------------------------\n");
-	printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
+	if(mode == 's'){
+		printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, stf->stfID);
+	}
+	else if (mode == 'u')
+	{
+		printf("  | ID              : %-16.16s | | ID               : %-15.15s | | ID              : %-16.16s |\n", usr->id, fac->id, "*HIDDEN*");
+	}
 	printf("  | Name            : %-16.16s | | Name             : %-15.15s | | Name            : %-16.16s |\n", usr->name, fac->name, stf->stfName);
 	printf("  | Date registered : %02d/%02d/%04d %02d:%02d | | Maintenance Date : %02d/%02d           | | Position        : %-16.16s |\n", usr->dateEnter.d, usr->dateEnter.m, usr->dateEnter.y, usr->timeEnter.h, usr->timeEnter.m, fac->maintenanceDate.d, fac->maintenanceDate.m, stf->stfPosi);
 	printf("  | Gender          : %-16.16s | | Remarks          : %-15.15s | | Date Registered : %02d/%02d/%04d       |\n", usr->gender, remarkLine[0], stf->dateRegis.d, stf->dateRegis.m, stf->dateRegis.y);
