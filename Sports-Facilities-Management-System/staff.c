@@ -91,19 +91,24 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 		}
 		if (totalCondition != ifUsed + strLength + valid)
 		{
-			printf("Name fails to meet the following condition \n");
+			printf("\n");
+			printf("Name fails to meet the following condition :\n");
+			printf("====================================================\n");
 			if (valid != 1)
 			{
-				printf("Only numbers and alphabet are allowed in entry.\n");
+				printf("-Only numbers and alphabet are allowed in entry\n");
 			}
 			if (ifUsed != 1)
 			{
-				printf("Name exist in our system.\n");
+				printf("-Name exist in our system\n");
 			}
 			if (strLength != 1)
 			{
-				printf("Length of entry is too long.(limit = 29)\n");
+				printf("-Length of entry is too long.(limit = 29)\n");
 			}
+			printf("====================================================\n");
+			printf("\n");
+
 			rewind(stdin);
 		}
 	} while (totalCondition != valid + ifUsed + strLength);
@@ -133,7 +138,7 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 			rewind(stdin);
 			while (strlen(addStaff.stfPassW) < 8)
 			{
-				printf("password too short please reenter : \n");
+				printf("password too short please reenter!\n");
 				printf("Enter staff Passwords(MINIMUM 8): ");
 				collectCensoredInput(addStaff.stfPassW, 99);
 				rewind(stdin);
@@ -150,6 +155,7 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 			printf("Enter staff ID(4 characters): ");
 			scanf("%[^\n]", addStaff.stfID);
 			rewind(stdin);
+
 			if (strlen(addStaff.stfID) == 4)
 			{
 				strLength = 1;
@@ -160,24 +166,29 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 				while (strcmp(addStaff.stfID, staffCache[i].stfID) == 0)
 				{
 					ifUsed = 0;
+					break;
 				}
 			}
 			if (totalCondition != ifUsed + strLength + valid)
 			{
+				printf("\n");
 				printf("ID fails to meet the following condition \n");
+				printf("====================================================\n");
 				if (valid != 1)
 				{
-					printf("Only numbers and alphabet are allowed in entry.\n");
+					printf("-Only numbers and alphabet are allowed in entry\n");
 				}
 				if (ifUsed != 1)
 				{
-					printf("ID exist in our system.\n");
+					printf("-ID exist in our system\n");
 				}
 				if (strLength != 1)
 				{
-					printf("Length of entry is not 4\n");
+					printf("-Length of entry is not 4\n");
 				}
 				rewind(stdin);
+				printf("====================================================\n");
+				printf("\n");
 			}
 		} while (totalCondition != strLength + ifUsed + valid);
 
@@ -230,7 +241,7 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 			{
 				Date sysDate;
 				getSystemDate(&sysDate);
-				printf("Joined date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+				printf("Joined date:%.02d/%.02d/%d\n", sysDate.d, sysDate.m, sysDate.y);
 				addStaff.dateRegis = sysDate;
 				addStaff.dateModi = sysDate;
 				fwrite(&addStaff, sizeof(Staff), 1, stf);
@@ -262,7 +273,7 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 
 			Date sysDate;
 			getSystemDate(&sysDate);
-			printf("Joined date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+			printf("Joined date:%.02d/%.02d/%d\n", sysDate.d, sysDate.m, sysDate.y);
 			addStaff.dateRegis = sysDate;
 			addStaff.dateModi = sysDate;
 			fwrite(&addStaff, sizeof(Staff), 1, stf);
@@ -296,8 +307,8 @@ void displayStaffList()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 		
 		printf("%25s|Name :%-60s|\n"
 			"%25s|Position :%-56s|\n"
-			"%25s|Date :%d/%d/%-54d|\n"
-			"%25s|Last modified :%d/%d/%-45d|\n","",staffCache[i].stfName,"",staffCache[i].stfPosi,"",staffCache[i].dateRegis.d,staffCache[i].dateRegis.m, staffCache[i].dateRegis.y,"",staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
+			"%25s|Date :%02.d/%02.d/%-54d|\n"
+			"%25s|Last modified :%02.d/%02.d/%-45d|\n","",staffCache[i].stfName,"",staffCache[i].stfPosi,"",staffCache[i].dateRegis.d,staffCache[i].dateRegis.m, staffCache[i].dateRegis.y,"",staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 		printf("%25s====================================================================\n", "");
 	}
 }
@@ -329,8 +340,8 @@ int staffSearchName()//(NEED TO MAKE THE PRINT F MUCH BETTER LOOKING)
 					printf("%25s====================================================================\n", "");
 					printf("%25s|Name :%-60s|\n"
 						"%25s|Position :%-56s|\n"
-						"%25s|Date :%d/%d/%-54d|\n"
-						"%25s|Last modified :%d/%d/%-45d|\n", "", staffCache[i].stfName, "", staffCache[i].stfPosi, "", staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y, "", staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
+						"%25s|Date :%.02d/%.02d/%-54d|\n"
+						"%25s|Last modified :%.02d/%.02d/%-45d|\n", "", staffCache[i].stfName, "", staffCache[i].stfPosi, "", staffCache[i].dateRegis.d, staffCache[i].dateRegis.m, staffCache[i].dateRegis.y, "", staffCache[i].dateModi.d, staffCache[i].dateModi.m, staffCache[i].dateModi.y);
 					printf("%25s====================================================================\n", "");
 					break;
 				}
@@ -601,7 +612,7 @@ int changeStfList()
 					strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
 					Date sysDate;
 					getSystemDate(&sysDate);
-					printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+					printf("Date:%.02d/%.02d/%d\n", sysDate.d, sysDate.m, sysDate.y);
 					staffCache[oldStaffAdd].dateModi = sysDate;
 
 					for (i = 0; i < totstaff; i++)
@@ -626,7 +637,7 @@ int changeStfList()
 					strcpy(staffCache[oldStaffAdd].stfPosi, staffChange.stfPosi);
 					Date sysDate;
 					getSystemDate(&sysDate);
-					printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+					printf("Date:%.02d/%.02d/%d\n", sysDate.d, sysDate.m, sysDate.y);
 					staffCache[oldStaffAdd].dateModi = sysDate;
 					fclose(stfopen);
 					stfopen = fopen(staffFilePath, "wb");
@@ -727,7 +738,6 @@ void login()//log in
 		printf("Proceeding to ADMIN registration.\n");
 		system("pause");
 		system("cls");
-		//noStaffRegistration();
 	}
 }
 
@@ -841,7 +851,7 @@ void pwRecover()
 	{
 		Date sysDate;
 		getSystemDate(&sysDate);
-		printf("Date:%d/%d/%d\n", sysDate.d, sysDate.m, sysDate.y);
+		printf("Date:%.02d/%.02d/%d\n", sysDate.d, sysDate.m, sysDate.y);
 		staffCache[staffadd].dateModi = sysDate;
 		strcpy(staffCache[staffadd].stfPassW, newpw);
 		stfopen = fopen(staffFilePath, "wb");
@@ -875,6 +885,7 @@ void staffMain()
 	fclose(stflist);
 	int err = 0;
 	char choice[10];
+
 	login();
 	do
 	{
