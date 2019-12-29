@@ -2,8 +2,8 @@
 #include "stdcxx.h"
 #ifndef USERINFO_H
 #define USERINFO_H
-void searchInfo();
-void displayInfo();
+int searchInfo();
+int displayInfo();
 void userinfoMain();
 int userInfo();
 void registerInfo();
