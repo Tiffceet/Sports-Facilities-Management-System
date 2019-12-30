@@ -20,7 +20,7 @@ int readStfList()
 	return count;
 } 
 
-int isAlNum(char str[])
+int isAlNum(char str[], int size)
 {
 	
 	if (!strchr(str, '\0'))
@@ -29,6 +29,10 @@ int isAlNum(char str[])
 	}
 	for (int a = 0; a < strlen(str); a++)
 	{
+		if (a > size)
+		{
+			return 0;
+		}
 		if (!isalnum(str[a])) // is not alphanumeric
 		{
 			if (!isspace((unsigned char)str[a])) // is not space
@@ -69,8 +73,12 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 		strLength = 0;
 		ifUsed = 1;
 		totalCondition = 3;
-		printf("Enter staff name (Enter ""CANCEL"" to return to staff module) : ");
-		scanf("%[^\n]", addStaff.stfName);
+		do{
+			printf("Enter staff name (Enter ""CANCEL"" to return to staff module) : ");
+			addStaff.stfName[0] = '\0';
+			scanf("%[^\n]", addStaff.stfName);
+			rewind(stdin);
+		} while (strlen(addStaff.stfName) == 0);
 		if (strcmp(addStaff.stfName, "CANCEL") == 0)
 		{
 			printf("Returning to staff module.\n");
@@ -82,7 +90,7 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 			strLength = 1;
 		}
 		rewind(stdin);
-		valid = isAlNum(addStaff.stfName);
+		valid = isAlNum(addStaff.stfName, 29);
 		for (i = 0; i < totstaff; i++)
 		{
 			if (strcmp(addStaff.stfName, staffCache[i].stfName) == 0)
@@ -153,15 +161,19 @@ int addStaffList()//For adding new staff(NEED TO MAKE CONFRIMATION FOR EVERY ENT
 			strLength = 0;
 			ifUsed = 1;
 			totalCondition = 3;
-			printf("Enter staff ID(4 characters): ");
-			scanf("%[^\n]", addStaff.stfID);
-			rewind(stdin);
+			do {
+				printf("Enter staff ID(4 characters): ");
+				addStaff.stfID[0] = '\0';
+				scanf("%[^\n]", addStaff.stfID);
+				rewind(stdin);
+			} while (strlen(addStaff.stfName) == 0);
+			
 
 			if (strlen(addStaff.stfID) == 4)
 			{
 				strLength = 1;
 			}
-			valid = isAlNum(addStaff.stfID);
+			valid = isAlNum(addStaff.stfID, 5);
 			for (i = 0; i < totstaff; i++)
 			{
 				while (strcmp(addStaff.stfID, staffCache[i].stfID) == 0)
@@ -510,14 +522,18 @@ int changeStfList()
 					strLength = 0;
 					ifUsed = 1;
 					totalCondition = 3;
-					printf("Enter new name : ");
-					scanf("%[^\n]", staffChange.stfName);
+					do {
+						printf("Enter new name : ");
+						staffChange.stfName[0] = '\0';
+						scanf("%[^\n]", staffChange.stfName);
+						rewind(stdin);
+					} while (strlen(staffChange.stfName) == 0);
 					if ((strlen(staffChange.stfName)) < 30)
 					{
 						strLength = 1;
 					}
 					rewind(stdin);
-					valid = isAlNum(staffChange.stfName);
+					valid = isAlNum(staffChange.stfName, 29);
 					for (i = 0; i < totstaff; i++)
 					{
 						if (strcmp(staffChange.stfName, staffCache[i].stfName) == 0)
