@@ -20,22 +20,6 @@ int main(void)
 
 int mainMenu()
 {
-	//printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
-	//printf("%41s|     Sports Facilities Console     |\n", "");
-	//printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
-	//printf("%41s|     1. Staff                      |\n", "");
-	//printf("%41s|     2. Facilities                 |\n", "");
-	//printf("%41s|     3. Users                      |\n", "");
-	//printf("%41s|     4. Booking facilities         |\n", "");
-	//printf("%41s|     5. Facilities Usage           |\n", "");
-	//printf("%41s|     6. Exit                       |\n", "");
-	//printf("%41s-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-\n", "");
-	//printf("%49sEnter menu choice: ", "");
-
-	//// prevents user from spamming keys on menu
-	//char choice[100];
-	//getUserMenuChoice(choice, 99, "                                                 Enter menu choice: ");
-
 	char choiceText[][100] = { "Staff", "Facilities", "Users", "Booking Facilities", "Facilities Usage", "Exit" };
 	int choice = globalMainMenu("<!> CONSOLE <!>", 6, choiceText);
 	// menu selection
@@ -58,10 +42,9 @@ int mainMenu()
 		fusagemain();
 		break;
 	case 6:
-		exit(0); // maybe we should do some file validation (checks if all files are closed properly)
+		exit(0);
 		break;
 	default:
-		// printf("%52sInvalid Choice.\n", "");
 		return 1;
 	}
 	return 1;

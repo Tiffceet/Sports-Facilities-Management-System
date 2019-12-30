@@ -96,7 +96,7 @@ void registerInfo()
 	userData userData1;
 	FILE * userinfo;
 	char id[16];
-	char chckContact[20];
+	// char chckContact[20];
 
 
 
@@ -322,8 +322,8 @@ void registerInfo()
 void modifyInfo2()
 {
 	char confirmation[20];
-	char check;
-	char choice[6];
+	// char check;
+	// char choice[6];
 	char exit[20];
 	char s[20];
 	char newPass[20];
@@ -801,7 +801,7 @@ int searchInfo()
 	int i = 0;
 	char id[15];
 	char password[20];
-	userData user1;
+	//	userData user1;
 	FILE *userinfo1;
 	userinfo1 = fopen(UserInfoFilePath, "rb");
 
@@ -918,9 +918,10 @@ int userInfo()
 		case 3:
 		if (!_staffLogin(sessionStaffID, 99))
 		{
-			return;
+			break;
 		}
 		while (searchInfo())
+
 		{
 			continue;
 		}
@@ -929,7 +930,7 @@ int userInfo()
 		case 4:
 		if (!_staffLogin(sessionStaffID, 99))
 		{
-			return;
+			break;
 		}
 	     while (displayInfo())
 	    {
