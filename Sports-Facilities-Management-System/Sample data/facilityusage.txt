@@ -1,0 +1,5 @@
+10/10/2019|1pm - 3pm |U001|F001|booked
+16/10/2019|9am - 11am|U002|F002|booked
+01/11/2020|3pm - 5pm |U003|F002|booked
+30/12/2019|7pm - 9pm |U004|F003|booked
+10/01/2020|7am - 9am |U004|F003|booked
