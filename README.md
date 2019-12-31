@@ -17,4 +17,9 @@ To create a console application that helps in sports facilities management
 This project can be built in Visual Studio 2017 with Windows SDK 10.0.17763.0. 
 
 Command to build using msbuild:
+
 `msbuild.exe Sports-Facilities-Management-System.sln`
+
+Command to build using gcc:
+
+`gcc Facility.c userinfo.c staff.c booking.c stdcxx.c fusage.c main.c -o main.exe`
